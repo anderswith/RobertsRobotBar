@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotBarApp", "RobotBarApp\RobotBarApp.csproj", "{2DB73FA9-2951-410D-A3EC-A9B811E17275}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotBarTests", "RobotBarTests\RobotBarTests.csproj", "{35502906-B202-4DD0-9206-82812863FC86}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2DB73FA9-2951-410D-A3EC-A9B811E17275}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DB73FA9-2951-410D-A3EC-A9B811E17275}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DB73FA9-2951-410D-A3EC-A9B811E17275}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DB73FA9-2951-410D-A3EC-A9B811E17275}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35502906-B202-4DD0-9206-82812863FC86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35502906-B202-4DD0-9206-82812863FC86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35502906-B202-4DD0-9206-82812863FC86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35502906-B202-4DD0-9206-82812863FC86}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
