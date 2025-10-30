@@ -139,7 +139,7 @@ C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\bin\Debug\net9.0-windo
 C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\bin\Debug\net9.0-windows\runtimes\win-arm64\native\e_sqlite3.dll
 C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\bin\Debug\net9.0-windows\runtimes\win-x64\native\e_sqlite3.dll
 C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\bin\Debug\net9.0-windows\runtimes\win-x86\native\e_sqlite3.dll
-C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\obj\Debug\net9.0-windows\MainWindow.baml
-C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\obj\Debug\net9.0-windows\MixingWindow.baml
-C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\obj\Debug\net9.0-windows\MainWindow.g.cs
-C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\obj\Debug\net9.0-windows\MixingWindow.g.cs
+C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\obj\Debug\net9.0-windows\View\MainWindow.baml
+C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\obj\Debug\net9.0-windows\View\MixingWindow.baml
+C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\obj\Debug\net9.0-windows\View\MainWindow.g.cs
+C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\obj\Debug\net9.0-windows\View\MixingWindow.g.cs
