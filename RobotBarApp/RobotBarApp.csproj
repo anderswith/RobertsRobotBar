@@ -10,10 +10,17 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="UnderAutomation.UniversalRobots" Version="8.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="DAL\Database\" />
+      <Folder Include="View\" />
     </ItemGroup>
 
 </Project>
