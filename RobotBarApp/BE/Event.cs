@@ -11,5 +11,5 @@ public class Event
     public Guid EventBarSetupId { get; set; }
     
     public Menu Menu { get; set; }
-    public ICollection<EventBarSetup> EventBarSetups { get; set; }
+    public ICollection<BarSetup> BarSetups { get; set; }
 }

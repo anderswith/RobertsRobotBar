@@ -59,7 +59,7 @@ namespace RobotBarApp {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/RobotBarApp;V1.0.0.0;component/view/mixingwindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/RobotBarApp;component/view/mixingwindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\View\MixingWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RobotBarApp.BE;
 
-public class EventBarSetup
+public class BarSetup
 {
     [Key]
     public Guid EventBarSetupId { get; set; }

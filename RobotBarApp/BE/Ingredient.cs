@@ -16,5 +16,5 @@ public class Ingredient
     public string Script { get; set; }
     
     public ICollection<DrinkContent> DrinkContents { get; set; }
-    public ICollection<EventBarSetup> EventBarSetups { get; set; }
+    public ICollection<BarSetup> BarSetups { get; set; }
 }
