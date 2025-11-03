@@ -7,7 +7,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="81e3debc-009a-4a86-b805-1c9ec3228e31" name="Changes" comment="" />
+    <list default="true" id="81e3debc-009a-4a86-b805-1c9ec3228e31" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/DrinkContent.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/Event.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/EventBarSetup.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/Log.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/MenuContent.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/SOP.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/SOPStep.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.RobertsRobotBar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.RobertsRobotBar/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/BE/Drink.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/BE/Drink.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/DAL/RobotBarContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/DAL/RobotBarContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/App.g.i.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/App.g.i.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp_MarkupCompile.cache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/View/MainWindow.g.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/View/MainWindow.g.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/View/MixingWindow.g.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/View/MixingWindow.g.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarTests/obj/Debug/net8.0/RobotBarTests.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarTests/obj/Debug/net8.0/RobotBarTests.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarTests/obj/Debug/net8.0/RobotBarTests.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarTests/obj/Debug/net8.0/RobotBarTests.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarTests/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarTests/obj/rider.project.model.nuget.info" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,12 +46,12 @@
     &quot;assignee&quot;: &quot;anderswith&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/anderswith/RobertsRobotBar.git",
-    "accountId": "5c8bfc2c-e41c-4d2a-a4f1-877b5187e979"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/anderswith/RobertsRobotBar.git&quot;,
+    &quot;accountId&quot;: &quot;5c8bfc2c-e41c-4d2a-a4f1-877b5187e979&quot;
   }
-}]]></component>
+}</component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -44,19 +65,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Project.RobotBarApp.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Project.RobotBarApp.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "andersw",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="RobotBarApp" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -104,7 +125,8 @@
       <option name="presentableId" value="Default" />
       <updated>1761303955265</updated>
       <workItem from="1761303956358" duration="4976000" />
-      <workItem from="1761828607591" duration="4690000" />
+      <workItem from="1761828607591" duration="10211000" />
+      <workItem from="1762173844536" duration="1364000" />
     </task>
     <servers />
   </component>

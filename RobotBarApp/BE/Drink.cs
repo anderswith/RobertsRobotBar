@@ -6,5 +6,12 @@ public class Drink
 {
     [Key]
     public Guid DrinkId { get; set; }
+    public string Name { get; set; }
+    public string Image { get; set; }
+    public int UseCount { get; set; }
+    public string Script { get; set; }
+    public bool IsMocktail { get; set; }
     
+    public ICollection<DrinkContent> DrinkContents { get; set; }
+    public ICollection<MenuContent> MenuContents { get; set; }
 }
