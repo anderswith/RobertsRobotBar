@@ -14,4 +14,5 @@ public class Drink
     
     public ICollection<DrinkContent> DrinkContents { get; set; }
     public ICollection<MenuContent> MenuContents { get; set; }
+    public ICollection<DrinkScript> DrinkScripts { get; set; }
 }

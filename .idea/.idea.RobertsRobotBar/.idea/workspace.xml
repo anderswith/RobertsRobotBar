@@ -8,26 +8,36 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="81e3debc-009a-4a86-b805-1c9ec3228e31" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/DrinkContent.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/Event.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/EventBarSetup.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/Log.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/MenuContent.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/SOP.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/SOPStep.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/DrinkScript.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/IngredientScript.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.RobertsRobotBar/.idea/dataSources/aeb04043-3026-4136-96a4-eb0439cc9602.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.RobertsRobotBar/.idea/dataSources/aeb04043-3026-4136-96a4-eb0439cc9602.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.RobertsRobotBar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.RobertsRobotBar/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/BE/Drink.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/BE/Drink.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RobotBarApp/DAL/RobotBarContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/DAL/RobotBarContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/App.g.i.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/App.g.i.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/BE/Ingredient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/BE/Ingredient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/DAL/Database/RobotBar.db" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/DAL/Database/RobotBar.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/Migrations/RobotBarContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/Migrations/RobotBarContextModelSnapshot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.exe" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp_MarkupCompile.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/View/MainWindow.g.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/View/MainWindow.g.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/View/MixingWindow.g.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/View/MixingWindow.g.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.csproj.CoreCompileInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/apphost.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/ref/RobotBarApp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/ref/RobotBarApp.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/refint/RobotBarApp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/refint/RobotBarApp.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/RobotBarApp.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/RobotBarApp.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/RobotBarApp.csproj.nuget.g.props" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/RobotBarApp.csproj.nuget.g.props" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/project.nuget.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/rider.project.restore.info" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarTests/obj/Debug/net8.0/RobotBarTests.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarTests/obj/Debug/net8.0/RobotBarTests.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarTests/obj/Debug/net8.0/RobotBarTests.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarTests/obj/Debug/net8.0/RobotBarTests.AssemblyInfoInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarTests/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarTests/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarTests/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarTests/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,19 +75,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Project.RobotBarApp.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "andersw",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Project.RobotBarApp.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;andersw&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="RobotBarApp" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -127,6 +137,9 @@
       <workItem from="1761303956358" duration="4976000" />
       <workItem from="1761828607591" duration="10211000" />
       <workItem from="1762173844536" duration="1364000" />
+      <workItem from="1762175240080" duration="16251000" />
+      <workItem from="1762267650103" duration="498000" />
+      <workItem from="1762268164135" duration="640000" />
     </task>
     <servers />
   </component>
