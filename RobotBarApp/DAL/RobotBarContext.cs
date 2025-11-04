@@ -1,4 +1,5 @@
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 using Microsoft.EntityFrameworkCore;
 using RobotBarApp.BE;
 
@@ -17,6 +18,8 @@ public class RobotBarContext : DbContext
     public DbSet<Sop> Sops { get; set; }
     public DbSet<SopStep> SopSteps { get; set; }
     public DbSet<Log> Logs { get; set; }
+    public DbSet<IngredientScript> IngredientScripts { get; set; }
+    public DbSet<DrinkScript> DrinkScripts { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
