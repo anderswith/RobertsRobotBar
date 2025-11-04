@@ -38,11 +38,12 @@ public class RobotBarContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        //cascade to delete steps when sop is deleted
         modelBuilder.Entity<Sop>()
             .HasMany(s => s.SopSteps)
             .WithOne(s => s.Sop)
             .HasForeignKey(s => s.SopId)
-            .OnDelete(DeleteBehavior.Cascade); //cascade to delete steps when sop is deleted
+            .OnDelete(DeleteBehavior.Cascade); 
     }
     
 }

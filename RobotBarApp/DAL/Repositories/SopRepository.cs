@@ -33,7 +33,6 @@ public class SopRepository : ISopRepository
     {
         _context.Sops.Remove(sop);
         _context.SaveChanges();
-        //delete should also delete steps
     }
 
     public void UpdateSop(Sop sop)

@@ -1,5 +1,5 @@
 ﻿RobotBarApp
-
+1.0.0.0
 
 winexe
 C#
@@ -12,7 +12,7 @@ TRACE;DEBUG;NET;NET9_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR
 C:\Users\Anders\RiderProjects\RobertsRobotBar\RobotBarApp\App.xaml
 2-161001947
 
-49-2129192407
+512049549313
 2191732149721
 View\MainWindow.xaml;View\MixingWindow.xaml;
 
