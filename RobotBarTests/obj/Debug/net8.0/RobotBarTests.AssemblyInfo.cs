@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RobotBarTests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6dc81608d73826e3e409636fb78e8dcfcee60668")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+939eaf30f87bf0597d2680d844e335ae6c994568")]
 [assembly: System.Reflection.AssemblyProductAttribute("RobotBarTests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RobotBarTests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
