@@ -3175,26 +3175,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Anders\\.nuget\\packages\\": {}
+    "C:\\Users\\ko2an\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Anders\\RiderProjects\\RobertsRobotBar\\RobotBarApp\\RobotBarApp.csproj",
+      "projectUniqueName": "C:\\Users\\ko2an\\Documents\\GitHub\\RobertsRobotBar\\RobotBarApp\\RobotBarApp.csproj",
       "projectName": "RobotBarApp",
-      "projectPath": "C:\\Users\\Anders\\RiderProjects\\RobertsRobotBar\\RobotBarApp\\RobotBarApp.csproj",
-      "packagesPath": "C:\\Users\\Anders\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Anders\\RiderProjects\\RobertsRobotBar\\RobotBarApp\\obj\\",
+      "projectPath": "C:\\Users\\ko2an\\Documents\\GitHub\\RobertsRobotBar\\RobotBarApp\\RobotBarApp.csproj",
+      "packagesPath": "C:\\Users\\ko2an\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ko2an\\Documents\\GitHub\\RobertsRobotBar\\RobotBarApp\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Anders\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\ko2an\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0-windows"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -3212,7 +3210,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net9.0-windows7.0": {
@@ -3256,7 +3255,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Users\\ko2an\\.dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
