@@ -4,23 +4,30 @@ namespace RobotBarApp
 {
     public partial class MainWindow : Window
     {
+        private bool _menuOpen;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            // Sample data for the cards:
+            FestivalItems.ItemsSource = new[]
+            {
+                new { Title = "Tønder Festival", ImagePath = "Images/TonderFestival.jpg" },
+                new { Title = "Naturvidenskabsfestival", ImagePath = "Images/Naturvidenskab.jpg" }
+            };
         }
 
-        private void MixDrink_Click(object sender, RoutedEventArgs e)
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            var robo = new RoboComms("192.168.0.101");
-            Console.WriteLine("entered mix drink");
+            // Navigate to main screen (this one) – your logic here
+        }
 
-            // Replace with your actual program name from the robot’s /programs folder
-            robo.LoadAndRunProgram("test.urp");
-            Console.WriteLine("Played script yay!");
-            
-            // Open the second window
-            var mixWindow = new MixingWindow();
-            mixWindow.ShowDialog();
+        private void MenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            _menuOpen = !_menuOpen;
+            MenuColumn.Width = _menuOpen ? new GridLength(260) : new GridLength(0);
         }
     }
+
 }
