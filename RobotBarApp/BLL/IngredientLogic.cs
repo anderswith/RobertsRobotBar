@@ -11,7 +11,7 @@ public class IngredientLogic : IIngredientLogic
     {
         _ingredientRepository = ingredientRepository;
     }
-    public void AddIngredient(string name, string type, string image, double size, string dose)
+    public void AddIngredient(string name, string type, string image, double size, string dose, List<string> scriptNames)
     {
         if(string.IsNullOrEmpty(name))
         {
@@ -26,7 +26,7 @@ public class IngredientLogic : IIngredientLogic
         {
             throw new ArgumentException("Ingredient image cannot be null or empty.");
         }
-        if(size < 0)
+        if(size <= 0)
         {
             throw new ArgumentException("Ingredient size cannot be negative.");
         }
@@ -35,7 +35,17 @@ public class IngredientLogic : IIngredientLogic
         {
             throw new ArgumentException("Ingredient dose has to be single or double.");
         }
-    
+
+        if (scriptNames == null || scriptNames.Count == 0)
+        {
+            throw new ArgumentException("Ingredient must have at least one script.");
+        }
+
+        if (scriptNames.Any(s => string.IsNullOrWhiteSpace(s)))
+        {
+            throw new ArgumentException("Script name cannot be null or whitespace.");
+        }
+        
         Ingredient ingredient = new Ingredient
         {
             IngredientId = Guid.NewGuid(),
@@ -44,8 +54,22 @@ public class IngredientLogic : IIngredientLogic
             Image = image,
             UseCount = 0,
             Size = size,
-            Dose = dose
+            Dose = dose,
+            IngredientScripts = new List<IngredientScript>()
         };
+        
+        int number = 1;
+        foreach (var scriptName in scriptNames)
+        {
+            ingredient.IngredientScripts.Add(new IngredientScript
+            {
+                ScriptId = Guid.NewGuid(),
+                UrScript = scriptName,
+                Number = number++,
+                PositionNumber = 0, 
+                IngredientId = ingredient.IngredientId
+            });
+        }
         _ingredientRepository.AddIngredient(ingredient);
     }
     public IEnumerable<Ingredient> GetAllIngredients()
@@ -78,7 +102,7 @@ public class IngredientLogic : IIngredientLogic
         _ingredientRepository.DeleteIngredient(ingredient);
         
     }
-    public void UpdateIngredient(Guid ingredientId, string name, string type, string image, double size, string dose)
+    public void UpdateIngredient(Guid ingredientId, string name, string type, string image, double size, string dose, List<string> scriptNames)
     {
         if(string.IsNullOrEmpty(name))
         {
@@ -92,7 +116,7 @@ public class IngredientLogic : IIngredientLogic
         {
             throw new ArgumentException("Ingredient image cannot be null or empty.");
         }
-        if(size < 0)
+        if(size <= 0)
         {
             throw new ArgumentException("Ingredient size cannot be negative.");
         }
@@ -101,31 +125,54 @@ public class IngredientLogic : IIngredientLogic
         {
             throw new ArgumentException("Ingredient dose has to be single or double.");
         }
+        if (scriptNames == null || scriptNames.Count == 0)
+        {
+            throw new ArgumentException("Ingredient must have at least one script.");
+        }
+
+        if (scriptNames.Any(s => string.IsNullOrWhiteSpace(s)))
+        {
+            throw new ArgumentException("Script name cannot be null or whitespace.");
+        }
 
         var existingIngredient = _ingredientRepository.GetIngredientById(ingredientId);
         if (existingIngredient == null)
         {
-            existingIngredient = new Ingredient
-            {
-                IngredientId = Guid.NewGuid(),
-                Name = name,
-                Type = type,
-                Image = image,
-                Size = size,
-                Dose = dose
-            };
-            _ingredientRepository.AddIngredient(existingIngredient);
+            throw new ArgumentException("Ingredient not found.");
         }
-        else
+        
+        existingIngredient.Name = name;
+        existingIngredient.Type = type;
+        existingIngredient.Image = image;
+        existingIngredient.Size = size;
+        existingIngredient.Dose = dose;
+        
+        var currentScripts = existingIngredient.IngredientScripts?.ToList() ?? new List<IngredientScript>();
+
+        // Remove old scripts not in the new list
+        var toRemove = currentScripts.Where(s => !scriptNames.Contains(s.UrScript)).ToList();
+        foreach (var script in toRemove)
         {
-            existingIngredient.Name = name;
-            existingIngredient.Type = type;
-            existingIngredient.Image = image;
-            existingIngredient.Size = size;
-            existingIngredient.Dose = dose;
-            
-            _ingredientRepository.UpdateIngredient(existingIngredient);
+            existingIngredient.IngredientScripts.Remove(script);
         }
+        
+        // Add new scripts that didn’t exist before
+        var toAdd = scriptNames.Where(s => !currentScripts.Select(c => c.UrScript).Contains(s)).ToList();
+
+        int nextNumber = currentScripts.Count > 0 ? currentScripts.Max(s => s.Number) + 1 : 1;
+        foreach (var scriptName in toAdd)
+        {
+            existingIngredient.IngredientScripts.Add(new IngredientScript
+            {
+                ScriptId = Guid.NewGuid(),
+                UrScript = scriptName,
+                Number = nextNumber++,
+                PositionNumber = 0,
+                IngredientId = existingIngredient.IngredientId
+            });
+        }
+        
+        _ingredientRepository.UpdateIngredient(existingIngredient);
         
     }
 }
