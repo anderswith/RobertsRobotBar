@@ -3175,24 +3175,32 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ko2an\\.nuget\\packages\\": {}
+    "C:\\Users\\andbu\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ko2an\\Documents\\GitHub\\RobertsRobotBar\\RobotBarApp\\RobotBarApp.csproj",
+      "projectUniqueName": "C:\\Users\\andbu\\OneDrive\\Skole\\Hovedopgave\\RobertsRobotBar\\RobotBarApp\\RobotBarApp.csproj",
       "projectName": "RobotBarApp",
-      "projectPath": "C:\\Users\\ko2an\\Documents\\GitHub\\RobertsRobotBar\\RobotBarApp\\RobotBarApp.csproj",
-      "packagesPath": "C:\\Users\\ko2an\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ko2an\\Documents\\GitHub\\RobertsRobotBar\\RobotBarApp\\obj\\",
+      "projectPath": "C:\\Users\\andbu\\OneDrive\\Skole\\Hovedopgave\\RobertsRobotBar\\RobotBarApp\\RobotBarApp.csproj",
+      "packagesPath": "C:\\Users\\andbu\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\andbu\\OneDrive\\Skole\\Hovedopgave\\RobertsRobotBar\\RobotBarApp\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\ko2an\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\andbu\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net9.0-windows"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -3255,7 +3263,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Users\\ko2an\\.dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

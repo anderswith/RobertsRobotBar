@@ -1,0 +1,66 @@
+# Build artifacts
+[Bb]in/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# JetBrains Rider / ReSharper
+.idea/
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+*.sln.iml
+
+# VS Code
+.vscode/
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+*.nuspec
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Logs
+*.log
+logs/
+
+# Test & Coverage
+TestResults/
+*.coverage
+*.coveragexml
+*.cov
+.coverage
+coverage*.json
+coverage*.xml
+lcov.info
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# EF Core local database (dev only)
+RobotBarApp/DAL/Database/*.db
+RobotBarApp/DAL/Database/*.db-shm
+RobotBarApp/DAL/Database/*.db-wal
+
+# Publish outputs
+app.publish/
+*.publishsettings
+
+# Misc caches/backups
+*.tmp
+*.bak
+*.cache
+
