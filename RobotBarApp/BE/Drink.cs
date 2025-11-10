@@ -9,7 +9,6 @@ public class Drink
     public string Name { get; set; }
     public string Image { get; set; }
     public int UseCount { get; set; }
-    public string Script { get; set; }
     public bool IsMocktail { get; set; }
     
     public ICollection<DrinkContent> DrinkContents { get; set; }

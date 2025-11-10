@@ -15,6 +15,18 @@ public class SopLogic : ISopLogic
     
     public void AddSop(String name, String image, List<SopStep> sopSteps)
     {
+        if (String.IsNullOrEmpty(name) )
+        {
+            throw new ArgumentException("Name cannot be null or empty");
+        }
+        if (String.IsNullOrEmpty(image) )
+        {
+            throw new ArgumentException("Image cannot be null or empty");
+        }
+        if (sopSteps == null || sopSteps.Count <= 0)
+        {
+            throw new ArgumentException("SopSteps cannot be null or empty");
+        }
         var sop = new Sop
         {
             SopId = Guid.NewGuid(),
