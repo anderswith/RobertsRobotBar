@@ -29,7 +29,7 @@ namespace UnitTests
         public void AddIngredient_ShouldThrow_WhenNameIsNullOrEmpty(string? invalidName)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient(invalidName, "Type", "Image.png", 10, 1));
+                _ingredientLogic.AddIngredient(invalidName, "Type", "Image.png", 10, "single"));
             Assert.That(ex.Message, Is.EqualTo("Ingredient name cannot be null or empty."));
         }
 
@@ -38,7 +38,7 @@ namespace UnitTests
         public void AddIngredient_ShouldThrow_WhenTypeIsNullOrEmpty(string? invalidType)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient("Name", invalidType, "Image.png", 10, 1));
+                _ingredientLogic.AddIngredient("Name", invalidType, "Image.png", 10, "single"));
             Assert.That(ex.Message, Is.EqualTo("Ingredient type cannot be null or empty."));
         }
 
@@ -47,7 +47,7 @@ namespace UnitTests
         public void AddIngredient_ShouldThrow_WhenImageIsNullOrEmpty(string? invalidImage)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient("Name", "Type", invalidImage, 10, 1));
+                _ingredientLogic.AddIngredient("Name", "Type", invalidImage, 10, "single"));
             Assert.That(ex.Message, Is.EqualTo("Ingredient image cannot be null or empty."));
         }
 
@@ -55,24 +55,25 @@ namespace UnitTests
         public void AddIngredient_ShouldThrow_WhenSizeIsNegative()
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient("Name", "Type", "Image.png", -5, 1));
+                _ingredientLogic.AddIngredient("Name", "Type", "Image.png", -5, "single"));
             Assert.That(ex.Message, Is.EqualTo("Ingredient size cannot be negative."));
         }
 
-        [TestCase(0)]
-        [TestCase(-2)]
-        public void AddIngredient_ShouldThrow_WhenDoseIsZeroOrNegative(double invalidDose)
+        [TestCase("")]
+        [TestCase(null)]
+        [TestCase("WrongString")]
+        public void AddIngredient_ShouldThrow_WhenDoseIsZeroOrNegative(string? invalidDose)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
                 _ingredientLogic.AddIngredient("Name", "Type", "Image.png", 5, invalidDose));
-            Assert.That(ex.Message, Is.EqualTo("Ingredient dose cannot be negative or 0."));
+            Assert.That(ex.Message, Is.EqualTo("Ingredient dose has to be single or double."));
         }
 
         [Test]
         public void AddIngredient_ShouldCallRepository_WhenDataIsValid()
         {
             // Act
-            _ingredientLogic.AddIngredient("Vodka", "Alcohol", "vodka.png", 750, 50);
+            _ingredientLogic.AddIngredient("Vodka", "Alcohol", "vodka.png", 750, "single");
 
             // Assert
             _ingredientRepositoryMock.Verify(r => r.AddIngredient(It.Is<Ingredient>(i =>
@@ -80,7 +81,7 @@ namespace UnitTests
                 i.Type == "Alcohol" &&
                 i.Image == "vodka.png" &&
                 i.Size == 750 &&
-                i.Dose == 50
+                i.Dose == "single"
             )), Times.Once);
         }
 
@@ -152,7 +153,7 @@ namespace UnitTests
         public void UpdateIngredient_ShouldThrow_WhenNameIsNullOrEmpty(string? invalidName)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(Guid.NewGuid(), invalidName, "Type", "img.png", 10, 1));
+                _ingredientLogic.UpdateIngredient(Guid.NewGuid(), invalidName, "Type", "img.png", 10, "single"));
             Assert.That(ex.Message, Is.EqualTo("Ingredient name cannot be null or empty."));
         }
 
@@ -161,7 +162,7 @@ namespace UnitTests
         public void UpdateIngredient_ShouldThrow_WhenTypeIsNullOrEmpty(string? invalidType)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(Guid.NewGuid(), "Name", invalidType, "img.png", 10, 1));
+                _ingredientLogic.UpdateIngredient(Guid.NewGuid(), "Name", invalidType, "img.png", 10, "single"));
             Assert.That(ex.Message, Is.EqualTo("Ingredient type cannot be null or empty."));
         }
 
@@ -170,7 +171,7 @@ namespace UnitTests
         public void UpdateIngredient_ShouldThrow_WhenImageIsNullOrEmpty(string? invalidImage)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(Guid.NewGuid(), "Name", "Type", invalidImage, 10, 1));
+                _ingredientLogic.UpdateIngredient(Guid.NewGuid(), "Name", "Type", invalidImage, 10, "single"));
             Assert.That(ex.Message, Is.EqualTo("Ingredient image cannot be null or empty."));
         }
 
@@ -178,17 +179,18 @@ namespace UnitTests
         public void UpdateIngredient_ShouldThrow_WhenSizeIsNegative()
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(Guid.NewGuid(), "Name", "Type", "img.png", -5, 1));
+                _ingredientLogic.UpdateIngredient(Guid.NewGuid(), "Name", "Type", "img.png", -5, "single"));
             Assert.That(ex.Message, Is.EqualTo("Ingredient size cannot be negative."));
         }
 
-        [TestCase(0)]
-        [TestCase(-1)]
-        public void UpdateIngredient_ShouldThrow_WhenDoseIsZeroOrNegative(double invalidDose)
+        [TestCase("")]
+        [TestCase(null)]
+        [TestCase("WrongString")]
+        public void UpdateIngredient_ShouldThrow_WhenDoseIsZeroOrNegative(string? invalidDose)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
                 _ingredientLogic.UpdateIngredient(Guid.NewGuid(), "Name", "Type", "img.png", 10, invalidDose));
-            Assert.That(ex.Message, Is.EqualTo("Ingredient dose cannot be negative or 0."));
+            Assert.That(ex.Message, Is.EqualTo("Ingredient dose has to be single or double."));
         }
 
         [Test]
@@ -197,7 +199,7 @@ namespace UnitTests
             _ingredientRepositoryMock.Setup(r => r.GetIngredientById(It.IsAny<Guid>()))
                 .Returns((Ingredient)null);
 
-            _ingredientLogic.UpdateIngredient(Guid.NewGuid(), "Name", "Type", "img.png", 10, 1);
+            _ingredientLogic.UpdateIngredient(Guid.NewGuid(), "Name", "Type", "img.png", 10, "single");
 
             _ingredientRepositoryMock.Verify(r => r.AddIngredient(It.Is<Ingredient>(i =>
                 i.Name == "Name" && i.Type == "Type" && i.Image == "img.png"
@@ -211,14 +213,14 @@ namespace UnitTests
             var existingIngredient = new Ingredient { IngredientId = id, Name = "Old" };
             _ingredientRepositoryMock.Setup(r => r.GetIngredientById(id)).Returns(existingIngredient);
 
-            _ingredientLogic.UpdateIngredient(id, "New", "Type", "img.png", 10, 1);
+            _ingredientLogic.UpdateIngredient(id, "New", "Type", "img.png", 10, "single");
 
             _ingredientRepositoryMock.Verify(r => r.UpdateIngredient(It.Is<Ingredient>(i =>
                 i.Name == "New" &&
                 i.Type == "Type" &&
                 i.Image == "img.png" &&
                 i.Size == 10 &&
-                i.Dose == 1
+                i.Dose == "single"
             )), Times.Once);
         }
     }

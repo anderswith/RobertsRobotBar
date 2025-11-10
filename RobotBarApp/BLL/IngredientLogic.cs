@@ -11,7 +11,7 @@ public class IngredientLogic : IIngredientLogic
     {
         _ingredientRepository = ingredientRepository;
     }
-    public void AddIngredient(string name, string type, string image, double size, double dose)
+    public void AddIngredient(string name, string type, string image, double size, string dose)
     {
         if(string.IsNullOrEmpty(name))
         {
@@ -30,9 +30,10 @@ public class IngredientLogic : IIngredientLogic
         {
             throw new ArgumentException("Ingredient size cannot be negative.");
         }
-        if(dose <= 0)
+        dose = dose?.ToLowerInvariant();
+        if(string.IsNullOrEmpty(dose) || dose !="single" && dose !="double")
         {
-            throw new ArgumentException("Ingredient dose cannot be negative or 0.");
+            throw new ArgumentException("Ingredient dose has to be single or double.");
         }
     
         Ingredient ingredient = new Ingredient
@@ -77,7 +78,7 @@ public class IngredientLogic : IIngredientLogic
         _ingredientRepository.DeleteIngredient(ingredient);
         
     }
-    public void UpdateIngredient(Guid ingredientId, string name, string type, string image, double size, double dose)
+    public void UpdateIngredient(Guid ingredientId, string name, string type, string image, double size, string dose)
     {
         if(string.IsNullOrEmpty(name))
         {
@@ -95,9 +96,10 @@ public class IngredientLogic : IIngredientLogic
         {
             throw new ArgumentException("Ingredient size cannot be negative.");
         }
-        if(dose <= 0)
+        dose = dose?.ToLowerInvariant();
+        if(string.IsNullOrEmpty(dose) || dose !="single" && dose !="double")
         {
-            throw new ArgumentException("Ingredient dose cannot be negative or 0.");
+            throw new ArgumentException("Ingredient dose has to be single or double.");
         }
 
         var existingIngredient = _ingredientRepository.GetIngredientById(ingredientId);

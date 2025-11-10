@@ -38,12 +38,33 @@ public class RobotBarContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //cascade to delete steps when sop is deleted
+        // Each Sop has many SopSteps
         modelBuilder.Entity<Sop>()
             .HasMany(s => s.SopSteps)
             .WithOne(s => s.Sop)
             .HasForeignKey(s => s.SopId)
-            .OnDelete(DeleteBehavior.Cascade); 
+            .OnDelete(DeleteBehavior.Cascade); //delete all SopSteps if Sop is deleted
+        
+        // Each Drink has many DrinkContents
+        modelBuilder.Entity<Drink>()
+            .HasMany(d => d.DrinkContents)
+            .WithOne()
+            .HasForeignKey(dc => dc.DrinkId)
+            .OnDelete(DeleteBehavior.Cascade); // delete all DrinkContents if Drink is deleted
+        
+        // Each Drink has many DrinkScripts
+        modelBuilder.Entity<Drink>()
+            .HasMany(d => d.DrinkScripts)
+            .WithOne(s => s.Drink)
+            .HasForeignKey(s => s.DrinkId)
+            .OnDelete(DeleteBehavior.Cascade); // delete all DrinkScripts if Drink is deleted
+
+        // Each Ingredient can appear in many DrinkContents
+        modelBuilder.Entity<Ingredient>()
+            .HasMany<DrinkContent>()
+            .WithOne()
+            .HasForeignKey(dc => dc.IngredientId)
+            .OnDelete(DeleteBehavior.Restrict); // don’t delete ingredients when DrinkContent is deleted
     }
     
 }

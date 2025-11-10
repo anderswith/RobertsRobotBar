@@ -1,66 +1,78 @@
-# Build artifacts
-[Bb]in/
-[Oo]bj/
-[Bb]uild/
-[Bb]uilds/
+# ---------------------------
+# .NET / C# + JetBrains Rider
+# ---------------------------
 
-# Visual Studio
-.vs/
-*.suo
+# Build output
+bin/
+obj/
+out/
+[Bb]uild/
+[Ll]og/
+
+# User-specific files
 *.user
+*.suo
 *.userosscache
 *.sln.docstates
 
-# JetBrains Rider / ReSharper
+# Rider / IntelliJ IDEA
 .idea/
-_ReSharper*/
-*.[Rr]e[Ss]harper
-*.DotSettings.user
-*.sln.iml
+*.iml
 
-# VS Code
-.vscode/
+# Visual Studio cache
+.vs/
+_ReSharper*/
+*_ReSharper*/
+*.DotSettings.user
+
+# Auto-generated files
+*.generated.cs
+*.g.cs
+*.g.i.cs
 
 # NuGet
-packages/
 *.nupkg
 *.snupkg
+packages/
 *.nuspec
 project.lock.json
 project.fragment.lock.json
-artifacts/
 
-# Logs
+# Entity Framework migrations snapshots
+*Migrations/*.Designer.cs
+
+# MSBuild
+*.cache
 *.log
-logs/
+*.tlog
+*.lastcodeanalysissucceeded
+*.FileListAbsolute.txt
+*.dbmdl
 
-# Test & Coverage
+# Test results
 TestResults/
 *.coverage
 *.coveragexml
-*.cov
-.coverage
-coverage*.json
-coverage*.xml
-lcov.info
 
-# OS generated files
-Thumbs.db
-Desktop.ini
-$RECYCLE.BIN/
+# Build-related files
+*.dll
+*.exe
+*.pdb
+*.mdb
+
+# Publish
+publish/
+dist/
+
+# Configuration files
+appsettings.Development.json
+launchSettings.json
+
+# OS files
 .DS_Store
+Thumbs.db
 
-# EF Core local database (dev only)
-RobotBarApp/DAL/Database/*.db
-RobotBarApp/DAL/Database/*.db-shm
-RobotBarApp/DAL/Database/*.db-wal
-
-# Publish outputs
-app.publish/
-*.publishsettings
-
-# Misc caches/backups
-*.tmp
-*.bak
-*.cache
-
+# Tooling
+*.dotCover
+*.nCrunch*
+*.sass-cache
