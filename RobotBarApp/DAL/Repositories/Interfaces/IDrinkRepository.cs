@@ -10,4 +10,5 @@ public interface IDrinkRepository
     Drink? GetDrinkById(Guid drinkId);
     void DeleteDrink(Drink drink);
     void UpdateDrink(Drink drink);
+    IEnumerable<Drink> GetDrinksByIds(IEnumerable<Guid> drinkIds);
 }

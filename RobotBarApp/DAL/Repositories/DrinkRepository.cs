@@ -27,6 +27,13 @@ public class DrinkRepository
             .Include(d => d.DrinkContents)
             .FirstOrDefault(d => d.DrinkId == drinkId);
     }
+    
+    public IEnumerable<Drink> GetDrinksByIds(IEnumerable<Guid> drinkIds)
+    {
+        return _context.Drinks
+            .Where(d => drinkIds.Contains(d.DrinkId))
+            .ToList();
+    }
     public void DeleteDrink(Drink drink)
     {
         _context.Drinks.Remove(drink);
