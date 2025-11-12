@@ -59,7 +59,6 @@ public class DrinkLogic
             DrinkId = Guid.NewGuid(),
             Name = name,
             Image = image,
-            UseCount = 0,
             IsMocktail = IsMocktail,
             DrinkContents = new List<DrinkContent>(),
             DrinkScripts = new List<DrinkScript>()

@@ -52,7 +52,6 @@ public class IngredientLogic : IIngredientLogic
             Name = name,
             Type = type,
             Image = image,
-            UseCount = 0,
             Size = size,
             Dose = dose,
             IngredientScripts = new List<IngredientScript>()

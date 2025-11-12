@@ -20,6 +20,8 @@ public class RobotBarContext : DbContext
     public DbSet<Log> Logs { get; set; }
     public DbSet<IngredientScript> IngredientScripts { get; set; }
     public DbSet<DrinkScript> DrinkScripts { get; set; }
+    public DbSet<DrinkUseCount> DrinkUseCounts { get; set; }
+    public DbSet<IngredientUseCount> IngredientUseCounts { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
