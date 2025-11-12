@@ -8,27 +8,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="81e3debc-009a-4a86-b805-1c9ec3228e31" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/BLL/Interfaces/ILogLogic.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/BLL/LogLogic.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/DAL/Repositories/Interfaces/ILogRepository.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/DAL/Repositories/LogRepository.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarTests/LogTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarTests/MenuTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.RobertsRobotBar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.RobertsRobotBar/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/BLL/MenuLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/BLL/MenuLogic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/DAL/Repositories/DrinkRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/DAL/Repositories/DrinkRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/DAL/Repositories/Interfaces/IDrinkRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/DAL/Repositories/Interfaces/IDrinkRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.exe" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp_MarkupCompile.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/View/MainWindow.g.i.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/View/MainWindow.g.i.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/apphost.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/ref/RobotBarApp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/ref/RobotBarApp.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/refint/RobotBarApp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/refint/RobotBarApp.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RobotBarTests/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarTests/obj/rider.project.model.nuget.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,26 +68,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Project.RobotBarApp.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Logs&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Project.RobotBarApp.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "Menu",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager" selected=".NET Project.RobotBarApp">
+}]]></component>
+  <component name="RunManager">
     <configuration name="RobotBarApp" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
