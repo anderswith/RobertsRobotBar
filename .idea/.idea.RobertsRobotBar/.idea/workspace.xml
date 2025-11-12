@@ -8,12 +8,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="81e3debc-009a-4a86-b805-1c9ec3228e31" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/BLL/Interfaces/ILogLogic.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/BLL/LogLogic.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/DAL/Repositories/Interfaces/ILogRepository.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarApp/DAL/Repositories/LogRepository.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RobotBarTests/LogTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/DrinkUseCount.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/BE/IngredientUseCount.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/DAL/Repositories/DrinkUseCountRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/DAL/Repositories/IngredientUseCountRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/DAL/Repositories/Interfaces/IDrinkUseCountRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RobotBarApp/DAL/Repositories/Interfaces/IIngredientUseCountRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.RobertsRobotBar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.RobertsRobotBar/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/BE/Drink.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/BE/Drink.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/BE/Ingredient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/BE/Ingredient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/BLL/DrinkLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/BLL/DrinkLogic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/BLL/IngredientLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/BLL/IngredientLogic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotBarApp/DAL/RobotBarContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/DAL/RobotBarContext.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.exe" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/bin/Debug/net9.0-windows/RobotBarApp.pdb" afterDir="false" />
@@ -23,12 +29,9 @@
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/RobotBarApp_MarkupCompile.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/View/MainWindow.g.i.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/View/MainWindow.g.i.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/apphost.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/ref/RobotBarApp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/ref/RobotBarApp.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/refint/RobotBarApp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarApp/obj/Debug/net9.0-windows/refint/RobotBarApp.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RobotBarTests/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/RobotBarTests/obj/rider.project.model.nuget.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +83,7 @@
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Logs&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;UseCount&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -150,7 +153,9 @@
       <workItem from="1762730066115" duration="3608000" />
       <workItem from="1762787737598" duration="16939000" />
       <workItem from="1762870066167" duration="782000" />
-      <workItem from="1762871782657" duration="4399000" />
+      <workItem from="1762871782657" duration="5433000" />
+      <workItem from="1762960788073" duration="133000" />
+      <workItem from="1762960929937" duration="1642000" />
     </task>
     <servers />
   </component>
