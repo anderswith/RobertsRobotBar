@@ -8,6 +8,7 @@ public class BarSetup
     public Guid EventBarSetupId { get; set; }
     public int PositionNumber { get; set; }
     public Guid IngredientId { get; set; }
+    public Guid EventId { get; set; }
 
     public Ingredient Ingredient { get; set; }
     public Event Event { get; set; }
