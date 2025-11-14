@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RobotBarApp.DAL;
 
@@ -10,9 +11,11 @@ using RobotBarApp.DAL;
 namespace RobotBarApp.Migrations
 {
     [DbContext(typeof(RobotBarContext))]
-    partial class RobotBarContextModelSnapshot : ModelSnapshot
+    [Migration("20251103203655_AddNewEntities")]
+    partial class AddNewEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
@@ -91,29 +94,6 @@ namespace RobotBarApp.Migrations
                     b.ToTable("DrinkContents");
                 });
 
-            modelBuilder.Entity("RobotBarApp.BE.DrinkScript", b =>
-                {
-                    b.Property<Guid>("ScriptId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("DrinkId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Number")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("UrScript")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ScriptId");
-
-                    b.HasIndex("DrinkId");
-
-                    b.ToTable("DrinkScript");
-                });
-
             modelBuilder.Entity("RobotBarApp.BE.Event", b =>
                 {
                     b.Property<Guid>("EventId")
@@ -158,6 +138,13 @@ namespace RobotBarApp.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("PositionNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Script")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<double>("Size")
                         .HasColumnType("REAL");
 
@@ -171,32 +158,6 @@ namespace RobotBarApp.Migrations
                     b.HasKey("IngredientId");
 
                     b.ToTable("Ingredients");
-                });
-
-            modelBuilder.Entity("RobotBarApp.BE.IngredientScript", b =>
-                {
-                    b.Property<Guid>("ScriptId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("IngredientId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Number")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("PositionNumber")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("UrScript")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ScriptId");
-
-                    b.HasIndex("IngredientId");
-
-                    b.ToTable("IngredientScript");
                 });
 
             modelBuilder.Entity("RobotBarApp.BE.Log", b =>
@@ -341,17 +302,6 @@ namespace RobotBarApp.Migrations
                     b.Navigation("Ingredient");
                 });
 
-            modelBuilder.Entity("RobotBarApp.BE.DrinkScript", b =>
-                {
-                    b.HasOne("RobotBarApp.BE.Drink", "Drink")
-                        .WithMany("DrinkScripts")
-                        .HasForeignKey("DrinkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Drink");
-                });
-
             modelBuilder.Entity("RobotBarApp.BE.Event", b =>
                 {
                     b.HasOne("RobotBarApp.BE.Menu", "Menu")
@@ -361,17 +311,6 @@ namespace RobotBarApp.Migrations
                         .IsRequired();
 
                     b.Navigation("Menu");
-                });
-
-            modelBuilder.Entity("RobotBarApp.BE.IngredientScript", b =>
-                {
-                    b.HasOne("RobotBarApp.BE.Ingredient", "Ingredient")
-                        .WithMany("IngredientScripts")
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ingredient");
                 });
 
             modelBuilder.Entity("RobotBarApp.BE.MenuContent", b =>
@@ -408,8 +347,6 @@ namespace RobotBarApp.Migrations
                 {
                     b.Navigation("DrinkContents");
 
-                    b.Navigation("DrinkScripts");
-
                     b.Navigation("MenuContents");
                 });
 
@@ -423,8 +360,6 @@ namespace RobotBarApp.Migrations
                     b.Navigation("BarSetups");
 
                     b.Navigation("DrinkContents");
-
-                    b.Navigation("IngredientScripts");
                 });
 
             modelBuilder.Entity("RobotBarApp.BE.Menu", b =>

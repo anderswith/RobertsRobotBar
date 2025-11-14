@@ -1,0 +1,78 @@
+# ---------------------------
+# .NET / C# + JetBrains Rider
+# ---------------------------
+
+# Build output
+bin/
+obj/
+out/
+[Bb]uild/
+[Ll]og/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / IntelliJ IDEA
+.idea/
+*.iml
+
+# Visual Studio cache
+.vs/
+_ReSharper*/
+*_ReSharper*/
+*.DotSettings.user
+
+# Auto-generated files
+*.generated.cs
+*.g.cs
+*.g.i.cs
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+*.nuspec
+project.lock.json
+project.fragment.lock.json
+
+# Entity Framework migrations snapshots
+*Migrations/*.Designer.cs
+
+# MSBuild
+*.cache
+*.log
+*.tlog
+*.lastcodeanalysissucceeded
+*.FileListAbsolute.txt
+*.dbmdl
+
+# Test results
+TestResults/
+*.coverage
+*.coveragexml
+
+# Build-related files
+*.dll
+*.exe
+*.pdb
+*.mdb
+
+# Publish
+publish/
+dist/
+
+# Configuration files
+appsettings.Development.json
+launchSettings.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Tooling
+*.dotCover
+*.nCrunch*
+*.sass-cache
