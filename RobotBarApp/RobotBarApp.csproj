@@ -20,6 +20,12 @@
 
     <ItemGroup>
       <Folder Include="DAL\Database\" />
+      <Folder Include="Resources\Icons\" />
+    </ItemGroup>
+
+    <!-- Include the menu icon as a WPF Resource so pack URIs can locate it -->
+    <ItemGroup>
+      <Resource Include="Resources\Icons\menu.png" />
     </ItemGroup>
 
     <ItemGroup>

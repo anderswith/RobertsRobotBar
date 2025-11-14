@@ -57,23 +57,22 @@
 
                 <!-- Hamburger menu button -->
                 <Button Grid.Column="2"
-                        Width="44"
-                        Height="32"
+                        Width="70"
+                        Height="70"
+                        Padding="0"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
                         VerticalAlignment="Center"
                         Background="Transparent"
                         BorderThickness="0"
                         Cursor="Hand"
                         Click="MenuButton_Click">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Rectangle Grid.Row="0" Height="3" Margin="0,2" Fill="White" RadiusX="1.5" RadiusY="1.5"/>
-                        <Rectangle Grid.Row="1" Height="3" Margin="0,2" Fill="White" RadiusX="1.5" RadiusY="1.5"/>
-                        <Rectangle Grid.Row="2" Height="3" Margin="0,2" Fill="White" RadiusX="1.5" RadiusY="1.5"/>
-                    </Grid>
+                    <!-- Use the new menu icon from Resources/Icons/menu.png -->
+                    <Image
+                           Height="59"
+                           VerticalAlignment="Center"
+                           Source="/RobotBarApp;component/Resources/Icons/menu.png"
+                           Stretch="Uniform"/>
                 </Button>
             </Grid>
         </Border>
