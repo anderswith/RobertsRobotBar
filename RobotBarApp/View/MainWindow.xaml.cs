@@ -22,7 +22,7 @@ namespace RobotBarApp.View
             ShowView(new EventListView());
         }
 
-        private void ShowView(UserControl view)
+        public void ShowView(UserControl view)
         {
             MainContentHost.Content = view;
         }

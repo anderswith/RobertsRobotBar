@@ -23,7 +23,7 @@
         <!-- TOP BAR -->
         <Border Grid.Row="0"
                 Background="#4F7C97"
-                Height="70">
+                Height="110"> <!-- increased from 70 -->
             <Grid Margin="20,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>  <!-- Logo + title -->
@@ -40,18 +40,9 @@
                         Cursor="Hand"
                         Click="HomeButton_Click">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <!-- Simple house icon -->
-                        <Viewbox Width="28" Height="28" Margin="0,0,10,0">
-                            <Canvas Width="24" Height="24">
-                                <Polygon Points="12,0 24,10 24,24 16,24 16,14 8,14 8,24 0,24 0,10"
-                                         Fill="White"/>
-                            </Canvas>
-                        </Viewbox>
-                        <TextBlock Text="Robert's robotbar"
-                                   VerticalAlignment="Center"
-                                   FontSize="28"
-                                   FontWeight="Bold"
-                                   Foreground="White"/>
+                        <Image Source="/RobotBarApp;component/Resources/Icons/Roberts_robotbar_logo.png"
+                               Margin="0,5,10,10"
+                               Stretch="Uniform"/>
                     </StackPanel>
                 </Button>
 
