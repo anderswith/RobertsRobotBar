@@ -22,7 +22,7 @@ namespace UnitTests
             _logLogic = new LogLogic(_logRepositoryMock.Object);
         }
 
-        // ----------------------- ADD LOG -----------------------
+        // ---------- AddLog ----------
 
         [TestCase(null)]
         [TestCase("")]
@@ -60,7 +60,7 @@ namespace UnitTests
             )), Times.Once);
         }
 
-        // ----------------------- GET ALL LOGS -----------------------
+        // ---------- GetAllLogs----------
 
         [Test]
         public void GetAllLogs_ShouldReturnAllLogsFromRepository()
@@ -82,7 +82,7 @@ namespace UnitTests
             });
         }
 
-        // ----------------------- GET BY TYPE -----------------------
+        // ---------- GetLogsByType----------
 
         [TestCase(null)]
         [TestCase("")]
@@ -106,7 +106,7 @@ namespace UnitTests
             _logRepositoryMock.Verify(r => r.GetLogsByType("Info"), Times.Once);
         }
 
-        // ----------------------- GET LOGS IN TIMEFRAME -----------------------
+        // ---------- GetLogsByTimeframe----------
 
         [Test]
         public void GetLogsInTimeFrame_ShouldThrow_WhenStartAfterEnd()
@@ -146,7 +146,7 @@ namespace UnitTests
             Assert.That(ex.Message, Is.EqualTo("Start and end times must be specified"));
         }
 
-        // ----------------------- GET BY TYPE IN TIMEFRAME -----------------------
+        // ----------------------- GetLogByTypeInTimeframe-----------------------
 
         [TestCase(null)]
         [TestCase("")]

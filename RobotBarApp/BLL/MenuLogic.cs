@@ -1,17 +1,20 @@
 using RobotBarApp.BE;
+using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.DAL.Repositories.Interfaces;
 
 namespace RobotBarApp.BLL;
 
-public class MenuLogic
+public class MenuLogic : IMenuLogic
 {
     private readonly IMenuRepository _menuRepository;
     private readonly IDrinkRepository _drinkRepository;
+    private readonly IEventRepository _eventRepository;
     
-    public MenuLogic(IMenuRepository menuRepository, IDrinkRepository drinkRepository)
+    public MenuLogic(IMenuRepository menuRepository, IDrinkRepository drinkRepository, IEventRepository eventRepository)
     {
         _menuRepository = menuRepository;
         _drinkRepository = drinkRepository;
+        _eventRepository = eventRepository;
     }
     
    public void AddMenuWithDrinks(string name, List<Guid> drinkIds)
@@ -106,6 +109,28 @@ public class MenuLogic
         }
         
         _menuRepository.UpdateMenu(existingMenu);
+    }
+    
+    public Menu GetMenuForEvent(Guid eventId)
+    {
+        if (eventId == Guid.Empty)
+        {
+            throw new ArgumentException("Event ID cannot be empty.");
+        }
+
+        var ev = _eventRepository.GetEventById(eventId);
+        if (ev == null)
+        {
+            throw new KeyNotFoundException("Event not found.");
+        }
+
+        var menu = _menuRepository.GetMenuWithDrinksAndIngredients(ev.MenuId);
+        if (menu == null)
+        {
+            throw new KeyNotFoundException("Menu not found.");
+        } 
+        
+        return menu;
     }
 
  

@@ -10,7 +10,7 @@ using RobotBarApp.DAL.Repositories.Interfaces;
 namespace UnitTests
 {
     [TestFixture]
-    public class IngredientTests
+    public class IngredientLogicTests
     {
         private Mock<IIngredientRepository> _ingredientRepositoryMock;
         private IngredientLogic _ingredientLogic;
@@ -22,7 +22,7 @@ namespace UnitTests
             _ingredientLogic = new IngredientLogic(_ingredientRepositoryMock.Object);
         }
 
-        // ---------- ADD VALIDATION ----------
+        // ---------- AddIngredient----------
 
         [TestCase(null)]
         [TestCase("")]
@@ -93,8 +93,6 @@ namespace UnitTests
             Assert.That(ex.Message, Is.EqualTo("Script name cannot be null or whitespace."));
         }
 
-        // ---------- ADD SUCCESS ----------
-
         [Test]
         public void AddIngredient_ShouldCallRepository_WithValidDataAndScripts()
         {
@@ -113,7 +111,7 @@ namespace UnitTests
             )), Times.Once);
         }
 
-        // ---------- DELETE ----------
+        // ---------- DeleteIngredient ----------
 
         [Test]
         public void DeleteIngredient_ShouldThrow_WhenNotFound()
@@ -161,7 +159,7 @@ namespace UnitTests
             _ingredientRepositoryMock.Verify(r => r.DeleteIngredient(ingredient), Times.Once);
         }
 
-        // ---------- UPDATE VALIDATION ----------
+        // ---------- UpdateIngredient ----------
 
         [TestCase(null)]
         [TestCase("")]
@@ -307,8 +305,7 @@ namespace UnitTests
 
             Assert.That(ex.Message, Is.EqualTo("Script name cannot be null or whitespace."));
         }
-
-        // ---------- UPDATE FUNCTIONALITY ----------
+        
 
         [Test]
         public void UpdateIngredient_ShouldAddNewAndRemoveOldScripts()

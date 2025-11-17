@@ -9,7 +9,7 @@ using RobotBarApp.DAL.Repositories.Interfaces;
 namespace UnitTests
 {
     [TestFixture]
-    public class SopTests
+    public class SopLogicTests
     {
         private Mock<ISopRepository> _sopRepositoryMock;
         private SopLogic _sopLogic;
@@ -21,7 +21,7 @@ namespace UnitTests
             _sopLogic = new SopLogic(_sopRepositoryMock.Object);
         }
 
-        // ---------- ADD SOP ----------
+        // ---------- AddSop----------
 
         [TestCase(null)]
         [TestCase("")]
@@ -79,7 +79,7 @@ namespace UnitTests
             )), Times.Once);
         }
 
-        // ---------- DELETE SOP ----------
+        // ---------- DeleteSop----------
 
         [Test]
         public void DeleteSop_ShouldThrow_WhenSopNotFound()
@@ -104,7 +104,7 @@ namespace UnitTests
             _sopRepositoryMock.Verify(r => r.DeleteSop(sop), Times.Once);
         }
 
-        // ---------- UPDATE SOP ----------
+        // ---------- UpdateSop----------
 
         [TestCase(null)]
         [TestCase("")]
@@ -185,8 +185,8 @@ namespace UnitTests
                 s.SopSteps == newSteps
             )), Times.Once);
         }
-
-        // ---------- GET METHODS ----------
+        
+        // ---------- GetAllSops----------
 
         [Test]
         public void GetAllSops_ShouldReturnDataFromRepository()

@@ -22,9 +22,7 @@ namespace UnitTests
             _logic = new DrinkLogic(_repo.Object);
         }
 
-        // -----------------------------------------------------------
-        // GetAllDrinks
-        // -----------------------------------------------------------
+        // ---------- GetAllDrinks----------
 
         [Test]
         public void GetAllDrinks_ReturnsRepositoryResult()
@@ -41,9 +39,7 @@ namespace UnitTests
             Assert.That(result, Is.EqualTo(list));
         }
 
-        // -----------------------------------------------------------
-        // GetDrinkById
-        // -----------------------------------------------------------
+        // ---------- GetDrinkById----------
 
         [Test]
         public void GetDrinkById_EmptyGuid_Throws()
@@ -64,9 +60,7 @@ namespace UnitTests
             Assert.That(result, Is.EqualTo(d));
         }
 
-        // -----------------------------------------------------------
-        // AddDrink – validation
-        // -----------------------------------------------------------
+        // ---------- AddDrink----------
 
         [TestCase(null)]
         [TestCase("")]
@@ -131,11 +125,7 @@ namespace UnitTests
 
             Assert.That(ex!.Message, Is.EqualTo("Script name cannot be null or whitespace."));
         }
-
-
-        // -----------------------------------------------------------
-        // AddDrink – success + structure
-        // -----------------------------------------------------------
+        
 
         [Test]
         public void AddDrink_Valid_CreatesDrinkWithContentsAndScripts_AndCallsRepo()
@@ -167,9 +157,7 @@ namespace UnitTests
             });
         }
 
-        // -----------------------------------------------------------
-        // DeleteDrink
-        // -----------------------------------------------------------
+        // ---------- DeleteDrink----------
 
         [Test]
         public void DeleteDrink_NotFound_Throws()
@@ -191,9 +179,7 @@ namespace UnitTests
             _repo.Verify(r => r.DeleteDrink(d), Times.Once);
         }
 
-        // -----------------------------------------------------------
-        // UpdateDrink – validation
-        // -----------------------------------------------------------
+        // ---------- UpdateDrink----------
 
         [TestCase(null)]
         [TestCase("")]
@@ -246,10 +232,7 @@ namespace UnitTests
                 _logic.UpdateDrink(Guid.NewGuid(), "Name", "img.png", true, new List<Guid> { Guid.NewGuid() }, new List<string>()));
             Assert.That(ex!.Message, Is.EqualTo("Drink must have at least one script."));
         }
-
-        // -----------------------------------------------------------
-        // UpdateDrink – not found
-        // -----------------------------------------------------------
+        
 
         [Test]
         public void UpdateDrink_NotFound_Throws()
@@ -261,10 +244,7 @@ namespace UnitTests
                     new List<Guid> { Guid.NewGuid() }, new List<string> { "ScriptA" }));
             Assert.That(ex!.Message, Is.EqualTo("Drink not found."));
         }
-
-        // -----------------------------------------------------------
-        // UpdateDrink – collection replacement (ingredients + scripts)
-        // -----------------------------------------------------------
+        
 
         [Test]
         public void UpdateDrink_ReplacesIngredientsAndScripts_AsExpected_AndCallsRepoUpdate()
@@ -352,10 +332,7 @@ namespace UnitTests
                 Assert.That(s4.Number, Is.EqualTo(3));
             });
         }
-
-        // -----------------------------------------------------------
-        // UpdateDrink – throw if script list include whitespace items
-        // -----------------------------------------------------------
+        
         [Test]
         public void UpdateDrink_ShouldThrow_WhenScriptNameIsWhitespaceOrNull()
         {

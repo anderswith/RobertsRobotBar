@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using RobotBarApp.BE;
 using RobotBarApp.DAL.Repositories.Interfaces;
 
@@ -37,6 +38,17 @@ public class MenuRepository : IMenuRepository
     {
         _context.Menus.Update(menu);
         _context.SaveChanges();
+    }
+    
+    public Menu? GetMenuWithDrinksAndIngredients(Guid menuId)
+    {
+        return _context.Menus
+            .Where(m => m.MenuId == menuId)
+            .Include(m => m.MenuContents)
+            .ThenInclude(mc => mc.Drink)
+            .ThenInclude(d => d.DrinkContents)
+            .ThenInclude(dc => dc.Ingredient)
+            .FirstOrDefault();
     }
     
 }
