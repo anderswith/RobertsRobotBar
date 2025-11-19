@@ -2,7 +2,7 @@ using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Linq;
+using RobotBarApp.ViewModels;
 
 namespace RobotBarApp.View
 {
@@ -70,21 +70,27 @@ namespace RobotBarApp.View
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            if (Window.GetWindow(this) is MainWindow mw)
-                mw.ShowView(new EventListView());
+            if (Window.GetWindow(this) is MainWindow mw && mw.DataContext is MainWindowViewModel vm)
+            {
+                vm.CurrentViewModel = new EventListViewModel();
+            }
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            if (Window.GetWindow(this) is MainWindow mw)
-                mw.ShowView(new EventListView());
+            if (Window.GetWindow(this) is MainWindow mw && mw.DataContext is MainWindowViewModel vm)
+            {
+                vm.CurrentViewModel = new EventListViewModel();
+            }
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Gemte event (demo).");
-            if (Window.GetWindow(this) is MainWindow mw)
-                mw.ShowView(new EventListView());
+            if (Window.GetWindow(this) is MainWindow mw && mw.DataContext is MainWindowViewModel vm)
+            {
+                vm.CurrentViewModel = new EventListViewModel();
+            }
         }
     }
 

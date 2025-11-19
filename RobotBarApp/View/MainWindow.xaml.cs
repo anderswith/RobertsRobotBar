@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Media.Animation;
 using System.Windows.Media;
-using System.Windows.Controls;
+using RobotBarApp.ViewModels;
 
 namespace RobotBarApp.View
 {
@@ -11,63 +11,70 @@ namespace RobotBarApp.View
         private const double MenuWidth = 260; // keep in sync with XAML
         private TranslateTransform? _menuTransform; // nullable until captured
 
+        private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext;
+
         public MainWindow()
         {
             InitializeComponent();
 
+            // Set runtime DataContext for now (later can use DI)
+            if (DataContext is not MainWindowViewModel vm)
+            {
+                vm = new MainWindowViewModel();
+                DataContext = vm;
+            }
+
+            // Ensure initial view is EventListViewModel
+            ViewModel.CurrentViewModel = new EventListViewModel();
+
             // Cache transform for performance / easier access
             _menuTransform = SideMenu.RenderTransform as TranslateTransform;
-
-            // Show initial view
-            ShowView(new EventListView());
         }
 
-        public void ShowView(UserControl view)
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainContentHost.Content = view;
+            ViewModel.CurrentViewModel = new EventListViewModel();
         }
-
-        private void HomeButton_Click(object sender, RoutedEventArgs e) => ShowView(new EventListView());
 
         private void OpstartButton_Click(object sender, RoutedEventArgs e)
         {
-            ShowView(new EventListView());
+            ViewModel.CurrentViewModel = new EventListViewModel();
             ToggleMenu(false);
         }
 
         private void StatistikButton_Click(object sender, RoutedEventArgs e)
         {
-            ShowView(new StatistikView());
+            ViewModel.CurrentViewModel = new StatistikViewModel();
             ToggleMenu(false);
         }
 
         private void KatalogButton_Click(object sender, RoutedEventArgs e)
         {
-            ShowView(new KatalogView());
+            ViewModel.CurrentViewModel = new KatalogViewModel();
             ToggleMenu(false);
         }
 
         private void TilfoejIngrediensButton_Click(object sender, RoutedEventArgs e)
         {
-            ShowView(new TilfoejIngrediensView());
+            ViewModel.CurrentViewModel = new TilfoejIngrediensViewModel();
             ToggleMenu(false);
         }
 
         private void TilfoejDrinkButton_Click(object sender, RoutedEventArgs e)
         {
-            ShowView(new TilfoejDrinkView());
+            ViewModel.CurrentViewModel = new TilfoejDrinkViewModel();
             ToggleMenu(false);
         }
 
         private void TilfoejMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            ShowView(new TilfoejMenuView());
+            ViewModel.CurrentViewModel = new TilfoejMenuViewModel();
             ToggleMenu(false);
         }
 
         private void TilfoejEventButton_Click(object sender, RoutedEventArgs e)
         {
-            ShowView(new TilfoejEventView());
+            ViewModel.CurrentViewModel = new TilfoejEventViewModel();
             ToggleMenu(false);
         }
 

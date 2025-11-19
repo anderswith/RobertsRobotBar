@@ -121,48 +121,13 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>   <!-- Top bar -->
+            <!-- Remove local top bar; only content and bottom buttons remain -->
             <RowDefinition Height="*"/>      <!-- Content -->
             <RowDefinition Height="Auto"/>   <!-- Bottom buttons -->
         </Grid.RowDefinitions>
 
-        <!-- TOP BAR -->
-        <Border Grid.Row="0" Background="{StaticResource TopBarBrush}" Height="74">
-            <Grid Margin="18,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <!-- Home button -->
-                <Button Grid.Column="0"
-                        Background="Transparent" BorderThickness="0" Cursor="Hand"
-                        Click="HomeButton_Click">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Viewbox Width="28" Height="28" Margin="0,0,10,0">
-                            <Canvas Width="24" Height="24">
-                                <Polygon Points="12,0 24,10 24,24 16,24 16,14 8,14 8,24 0,24 0,10"
-                                         Fill="White"/>
-                            </Canvas>
-                        </Viewbox>
-                        <TextBlock Text="Robert's robotbar" Foreground="White" FontWeight="Bold" FontSize="28"/>
-                    </StackPanel>
-                </Button>
-
-                <!-- Centered title -->
-                <TextBlock Grid.Column="1"
-                           Text="Ny event"
-                           Foreground="White"
-                           FontWeight="Bold"
-                           FontSize="28"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"/>
-            </Grid>
-        </Border>
-
         <!-- CONTENT -->
-        <Grid Grid.Row="1" Margin="26,18">
+        <Grid Grid.Row="0" Margin="26,18">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>   <!-- Left: fields + rack -->
                 <ColumnDefinition Width="2*"/>   <!-- Right: ingredients -->
@@ -233,7 +198,7 @@
         </Grid>
 
         <!-- BOTTOM BUTTONS -->
-        <Grid Grid.Row="2" Margin="26,0,26,22">
+        <Grid Grid.Row="1" Margin="26,0,26,22">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>

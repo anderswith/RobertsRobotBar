@@ -1,10 +1,20 @@
 ﻿<Window x:Class="RobotBarApp.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:RobotBarApp.ViewModels"
+        xmlns:view="clr-namespace:RobotBarApp.View"
+        mc:Ignorable="d"
         Title="Robert's robotbar"
         WindowState="Maximized"
         WindowStyle="None"
         Background="#FFE5E5E5">
+
+    <Window.DataContext>
+        <!-- Design-time only; runtime DataContext is set in code-behind for now -->
+        <vm:MainWindowViewModel d:IsDesignTimeCreatable="True" />
+    </Window.DataContext>
 
     <Window.Resources>
         <!-- Simple drop shadow for cards -->
@@ -12,6 +22,29 @@
                           BlurRadius="10"
                           ShadowDepth="3"
                           Opacity="0.4" />
+
+        <!-- Map ViewModels to Views for ContentControl -->
+        <DataTemplate DataType="{x:Type vm:EventListViewModel}">
+            <view:EventListView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:StatistikViewModel}">
+            <view:StatistikView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:KatalogViewModel}">
+            <view:KatalogView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TilfoejIngrediensViewModel}">
+            <view:TilfoejIngrediensView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TilfoejDrinkViewModel}">
+            <view:TilfoejDrinkView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TilfoejMenuViewModel}">
+            <view:TilfoejMenuView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TilfoejEventViewModel}">
+            <view:TilfoejEventView />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -72,8 +105,8 @@
         <Grid Grid.Row="1">
             <!-- Main content -->
             <Border Background="#FFE5E5E5">
-                <!-- Host for dynamic views -->
-                <ContentControl x:Name="MainContentHost" />
+                <!-- Host for dynamic views via MVVM -->
+                <ContentControl Content="{Binding CurrentViewModel}" />
             </Border>
 
             <!-- Overlay (appears when menu is open) -->
