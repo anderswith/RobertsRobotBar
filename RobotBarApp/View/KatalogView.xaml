@@ -1,13 +1,155 @@
 <UserControl x:Class="RobotBarApp.View.KatalogView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Background="Transparent">
-    <Grid>
-        <TextBlock Text="Katalog - Placeholder"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   FontSize="32"
-                   FontWeight="Bold"
-                   Foreground="#555"/>
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:view="clr-namespace:RobotBarApp.View"
+             mc:Ignorable="d"
+             d:DesignHeight="600"
+             d:DesignWidth="1000"
+             Background="#FFE5E5E5">
+
+    <UserControl.Resources>
+
+        <!-- Pill style for the four filter buttons -->
+        <Style x:Key="FilterToggleButtonStyle" TargetType="ToggleButton">
+            <Setter Property="Margin" Value="5,0,0,0" />
+            <Setter Property="Padding" Value="25,8" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Background" Value="#FFB0B0B0" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#FF888888" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border CornerRadius="15"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="5,2"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Background" Value="#FF5C87B2"/> <!-- blue -->
+                    <Setter Property="BorderBrush" Value="#FF3C6182"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Simple style for the search TextBox without conflicting Text triggers -->
+        <Style x:Key="SearchTextBoxStyle" TargetType="TextBox">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="#FF555555" />
+        </Style>
+
+        <!-- DataTemplate for each card using the separate UserControl -->
+        <DataTemplate x:Key="KatalogItemTemplate">
+            <view:KatalogItemView />
+        </DataTemplate>
+
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- search + filters -->
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="*"/>     <!-- items -->
+        </Grid.RowDefinitions>
+
+        <!-- Top row: search + filter buttons -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>  <!-- search -->
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="Auto"/>  <!-- filters -->
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Search box -->
+            <Border Grid.Column="0"
+                    Width="330"
+                    Height="45"
+                    CornerRadius="20"
+                    Background="White"
+                    BorderBrush="#FFB0B0B0"
+                    BorderThickness="1">
+                <Grid Margin="12,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Simple magnifying glass icon -->
+                    <TextBlock Grid.Column="0"
+                               VerticalAlignment="Center"
+                               FontSize="18"
+                               Foreground="#FF808080"
+                               Text="🔍"/>
+                    <TextBox Grid.Column="2"
+                             Style="{StaticResource SearchTextBoxStyle}"
+                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </Grid>
+            </Border>
+
+            <!-- Filter buttons -->
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+
+                <ToggleButton Content="Ingredienser"
+                              Style="{StaticResource FilterToggleButtonStyle}"
+                              IsChecked="{Binding IsIngredientsFilterSelected, Mode=TwoWay}"
+                              Command="{Binding FilterCommand}"
+                              CommandParameter="Ingredients"/>
+
+                <ToggleButton Content="Drinks"
+                              Style="{StaticResource FilterToggleButtonStyle}"
+                              IsChecked="{Binding IsDrinksFilterSelected, Mode=TwoWay}"
+                              Command="{Binding FilterCommand}"
+                              CommandParameter="Drinks"/>
+
+                <ToggleButton Content="Menuer"
+                              Style="{StaticResource FilterToggleButtonStyle}"
+                              IsChecked="{Binding IsMenusFilterSelected, Mode=TwoWay}"
+                              Command="{Binding FilterCommand}"
+                              CommandParameter="Menus"/>
+
+                <ToggleButton Content="Events"
+                              Style="{StaticResource FilterToggleButtonStyle}"
+                              IsChecked="{Binding IsEventsFilterSelected, Mode=TwoWay}"
+                              Command="{Binding FilterCommand}"
+                              CommandParameter="Events"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Item list -->
+        <ScrollViewer Grid.Row="2"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding CatalogItems}"
+                          ItemTemplate="{StaticResource KatalogItemTemplate}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <!-- Wrap items like your screenshot -->
+                        <WrapPanel IsItemsHost="True"
+                                   Margin="10"
+                                   Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
+
     </Grid>
 </UserControl>
