@@ -1,9 +1,10 @@
 using RobotBarApp.BE;
+using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.DAL.Repositories.Interfaces;
 
 namespace RobotBarApp.BLL;
 
-public class DrinkLogic
+public class DrinkLogic : IDrinkLogic
 {
     private readonly IDrinkRepository _drinkRepository;
     public DrinkLogic(IDrinkRepository drinkRepository)
@@ -103,6 +104,7 @@ public class DrinkLogic
         _drinkRepository.DeleteDrink(drink);
     }
     
+
     public void UpdateDrink(Guid drinkId, string name, string image, bool isMocktail, List<Guid> ingredientIds, List<string> scriptNames)
     {
         if (string.IsNullOrEmpty(name))

@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using RobotBarApp.BE;
+using RobotBarApp.BLL.Interfaces;
+using RobotBarApp.DAL.Repositories.Interfaces;
 
 namespace RobotBarApp.DAL.Repositories;
 
-public class DrinkRepository
+public class DrinkRepository : IDrinkRepository
 {
     private readonly RobotBarContext _context;
     
