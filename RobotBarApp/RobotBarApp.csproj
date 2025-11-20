@@ -15,6 +15,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
       <PackageReference Include="UnderAutomation.UniversalRobots" Version="8.1.0" />
     </ItemGroup>
 
