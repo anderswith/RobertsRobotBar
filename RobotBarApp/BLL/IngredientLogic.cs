@@ -11,7 +11,7 @@ public class IngredientLogic : IIngredientLogic
     {
         _ingredientRepository = ingredientRepository;
     }
-    public void AddIngredient(string name, string type, string image, double size, string dose, List<string> scriptNames)
+    public void AddIngredient(string name, string type, string image, double size, string dose, int positionNumber, List<string> scriptNames)
     {
         if(string.IsNullOrEmpty(name))
         {
@@ -35,6 +35,10 @@ public class IngredientLogic : IIngredientLogic
         {
             throw new ArgumentException("Ingredient dose has to be single or double.");
         }
+        if(positionNumber <= 0)
+        {
+            throw new ArgumentException("Ingredient position number cannot be negative.");
+        }
 
         if (scriptNames == null || scriptNames.Count == 0)
         {
@@ -54,6 +58,7 @@ public class IngredientLogic : IIngredientLogic
             Image = image,
             Size = size,
             Dose = dose,
+            PositionNumber = positionNumber,
             IngredientScripts = new List<IngredientScript>()
         };
         
@@ -65,7 +70,6 @@ public class IngredientLogic : IIngredientLogic
                 ScriptId = Guid.NewGuid(),
                 UrScript = scriptName,
                 Number = number++,
-                PositionNumber = 0, 
                 IngredientId = ingredient.IngredientId
             });
         }
@@ -101,7 +105,7 @@ public class IngredientLogic : IIngredientLogic
         _ingredientRepository.DeleteIngredient(ingredient);
         
     }
-    public void UpdateIngredient(Guid ingredientId, string name, string type, string image, double size, string dose, List<string> scriptNames)
+    public void UpdateIngredient(Guid ingredientId, string name, string type, string image, double size, string dose, int positionNumber, List<string> scriptNames)
     {
         if(string.IsNullOrEmpty(name))
         {
@@ -124,6 +128,10 @@ public class IngredientLogic : IIngredientLogic
         {
             throw new ArgumentException("Ingredient dose has to be single or double.");
         }
+        if(positionNumber <= 0)
+        {
+            throw new ArgumentException("Ingredient position number cannot be negative.");
+        }
         if (scriptNames == null || scriptNames.Count == 0)
         {
             throw new ArgumentException("Ingredient must have at least one script.");
@@ -145,6 +153,7 @@ public class IngredientLogic : IIngredientLogic
         existingIngredient.Image = image;
         existingIngredient.Size = size;
         existingIngredient.Dose = dose;
+        existingIngredient.PositionNumber = positionNumber;
         
         var currentScripts = existingIngredient.IngredientScripts?.ToList() ?? new List<IngredientScript>();
 
@@ -166,7 +175,6 @@ public class IngredientLogic : IIngredientLogic
                 ScriptId = Guid.NewGuid(),
                 UrScript = scriptName,
                 Number = nextNumber++,
-                PositionNumber = 0,
                 IngredientId = existingIngredient.IngredientId
             });
         }

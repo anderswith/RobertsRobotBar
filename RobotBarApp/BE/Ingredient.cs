@@ -11,6 +11,7 @@ public class Ingredient
     public string Image { get; set; }
     public double Size { get; set; }
     public string Dose { get; set; }
+    public int PositionNumber { get; set; }
     
     public ICollection<DrinkContent> DrinkContents { get; set; }
     public ICollection<BarSetup> BarSetups { get; set; }
