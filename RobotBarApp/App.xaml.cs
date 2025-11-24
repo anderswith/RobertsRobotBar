@@ -11,6 +11,7 @@ using RobotBarApp.Services.Interfaces;
 using RobotBarApp.View;
 using RobotBarApp.ViewModels;
 
+
 namespace RobotBarApp;
 
 public partial class App : Application
@@ -66,6 +67,11 @@ public partial class App : Application
                 services.AddTransient<TilfoejMenuView>();
                 
                 services.AddSingleton<INavigationService, NavigationService>();
+                services.AddSingleton<RobotLogMonitor>(provider =>
+                {
+                    var logLogic = provider.GetRequiredService<ILogLogic>();
+                    return new RobotLogMonitor("192.168.0.101", logLogic);
+                });
 
 
             })
@@ -75,6 +81,8 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        var monitor = AppHost.Services.GetRequiredService<RobotLogMonitor>();
+        await monitor.StartAsync();
 
         var main = AppHost.Services.GetRequiredService<MainWindow>();
         main.Show();
