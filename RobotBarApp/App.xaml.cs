@@ -6,6 +6,8 @@ using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.DAL;
 using RobotBarApp.DAL.Repositories;
 using RobotBarApp.DAL.Repositories.Interfaces;
+using RobotBarApp.Services;
+using RobotBarApp.Services.Interfaces;
 using RobotBarApp.View;
 using RobotBarApp.ViewModels;
 
@@ -58,13 +60,14 @@ public partial class App : Application
                 services.AddTransient<KatalogItemView>();
                 services.AddTransient<KatalogView>();
                 services.AddTransient<MainWindow>();
-                services.AddTransient<MixingWindow>();
                 services.AddTransient<OpstartView>();
                 services.AddTransient<StatistikView>();
                 services.AddTransient<TilfoejDrinkView>();
                 services.AddTransient<TilfoejEventView>();
                 services.AddTransient<TilfoejIngrediensView>();
                 services.AddTransient<TilfoejMenuView>();
+                
+                services.AddSingleton<INavigationService, NavigationService>();
 
 
             })

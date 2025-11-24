@@ -1,65 +1,50 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using Microsoft.Win32;
+using RobotBarApp.Services.Interfaces;
+using RobotBarApp.BLL.Interfaces;
+using System.Collections.Generic;
 
 namespace RobotBarApp.ViewModels
 {
     public class TilfoejIngrediensViewModel : ViewModelBase
     {
-        private string _ingredientName = string.Empty;
-        private string _sizeCl = string.Empty;
-        private string? _imagePreview;
-        private bool _isAlkohol;
-        private bool _isMock;
-        private bool _isSyrup;
-        private bool _isSoda;
-        private string _scriptText = string.Empty;
-        private string? _selectedHolder;
+        private readonly INavigationService _navigation;
+        private readonly IIngredientLogic _ingredientLogic;
 
+        // --- FIELDS BOUND TO XAML ------------------------------------------------------------
+
+        private string _ingredientName = "";
         public string IngredientName
         {
             get => _ingredientName;
             set => SetProperty(ref _ingredientName, value);
         }
 
+        private string _sizeCl = "";
         public string SizeCl
         {
             get => _sizeCl;
             set => SetProperty(ref _sizeCl, value);
         }
 
-        public string? ImagePreview
+        private string _imagePreview;
+        public string ImagePreview
         {
             get => _imagePreview;
             set => SetProperty(ref _imagePreview, value);
         }
 
-        public bool IsAlkohol
-        {
-            get => _isAlkohol;
-            set => SetProperty(ref _isAlkohol, value);
-        }
+        public bool IsAlkohol { get; set; }
+        public bool IsMock { get; set; }
+        public bool IsSyrup { get; set; }
+        public bool IsSoda { get; set; }
 
-        public bool IsMock
-        {
-            get => _isMock;
-            set => SetProperty(ref _isMock, value);
-        }
+        // Holder = PositionNumber
+        public ObservableCollection<int> Holders { get; } = new();
 
-        public bool IsSyrup
-        {
-            get => _isSyrup;
-            set => SetProperty(ref _isSyrup, value);
-        }
-
-        public bool IsSoda
-        {
-            get => _isSoda;
-            set => SetProperty(ref _isSoda, value);
-        }
-
-        public ObservableCollection<string> Holders { get; } = new();
-
-        public string? SelectedHolder
+        private int _selectedHolder;
+        public int SelectedHolder
         {
             get => _selectedHolder;
             set => SetProperty(ref _selectedHolder, value);
@@ -68,28 +53,111 @@ namespace RobotBarApp.ViewModels
         public bool IsSingleDose { get; set; } = true;
         public bool IsDoubleDose { get; set; }
 
+        private string _scriptText = "";
         public string ScriptText
         {
             get => _scriptText;
             set => SetProperty(ref _scriptText, value);
         }
 
+        // --- COMMANDS ------------------------------------------------------------------------
         public ICommand ChooseImageCommand { get; }
         public ICommand GuideCommand { get; }
         public ICommand CancelCommand { get; }
         public ICommand SaveCommand { get; }
 
-        public TilfoejIngrediensViewModel()
+        public TilfoejIngrediensViewModel(
+            INavigationService navigation,
+            IIngredientLogic ingredientLogic)
         {
-            // Sample holders; replace with real data later
-            Holders.Add("Holder 1");
-            Holders.Add("Holder 2");
-            Holders.Add("Holder 3");
+            _navigation = navigation;
+            _ingredientLogic = ingredientLogic;
 
-            ChooseImageCommand = new RelayCommand(_ => { /* TODO: open file dialog */ });
-            GuideCommand = new RelayCommand(_ => { /* TODO: show guide */ });
-            CancelCommand = new RelayCommand(_ => { /* TODO: navigate back */ });
-            SaveCommand = new RelayCommand(_ => { /* TODO: save ingredient */ });
+            // Example: Position numbers 1..24 (but change if needed)
+            for (int i = 1; i <= 24; i++)
+                Holders.Add(i);
+
+            SelectedHolder = Holders.FirstOrDefault();
+
+            ChooseImageCommand = new RelayCommand(_ => ChooseImage());
+            GuideCommand = new RelayCommand(_ => ShowGuide());
+            CancelCommand = new RelayCommand(_ => Cancel());
+            SaveCommand = new RelayCommand(_ => Save());
+        }
+
+        // --- COMMAND IMPLEMENTATION ----------------------------------------------------------
+
+        private void ChooseImage()
+        {
+            var dlg = new OpenFileDialog
+            {
+                Filter = "Images|*.png;*.jpg;*.jpeg;*.bmp"
+            };
+
+            if (dlg.ShowDialog() == true)
+                ImagePreview = dlg.FileName;
+        }
+
+        private void ShowGuide()
+        {
+            System.Windows.MessageBox.Show("Guide kommer senere :)");
+        }
+
+        private void Cancel()
+        {
+            _navigation.NavigateTo<MainWindowViewModel>(); 
+        }
+
+        private void Save()
+        {
+            // VALIDATION ----------------------------------------------------------------------
+            if (string.IsNullOrWhiteSpace(IngredientName))
+            {
+                System.Windows.MessageBox.Show("Du skal angive et navn.");
+                return;
+            }
+
+            if (!double.TryParse(SizeCl, out double sizeParsed))
+            {
+                System.Windows.MessageBox.Show("Størrelsen (cl) skal være et tal.");
+                return;
+            }
+
+            if (SelectedHolder == 0)
+            {
+                System.Windows.MessageBox.Show("Vælg en holder.");
+                return;
+            }
+
+            // TYPE MAPPING ---------------------------------------------------------------------
+            string type = "Ukendt";
+            if (IsAlkohol) type = "Alkohol";
+            else if (IsMock) type = "Mock";
+            else if (IsSyrup) type = "Syrup";
+            else if (IsSoda) type = "Soda";
+
+            // DOSE MAPPING ---------------------------------------------------------------------
+            string dose = IsSingleDose ? "Single" : "Double";
+
+            // SCRIPT MAPPING -------------------------------------------------------------------
+            List<string> scripts = new();
+            if (!string.IsNullOrWhiteSpace(ScriptText))
+                scripts.Add(ScriptText);
+
+            // SAVE THROUGH LOGIC LAYER ---------------------------------------------------------
+            _ingredientLogic.AddIngredient(
+                name: IngredientName,
+                type: type,
+                image: ImagePreview,
+                size: sizeParsed,
+                dose: dose,
+                positionNumber: SelectedHolder,
+                scriptNames: scripts
+            );
+
+            System.Windows.MessageBox.Show("Ingrediens tilføjet!");
+
+            _navigation.NavigateTo<MainWindowViewModel>(); // skift tilbage
         }
     }
 }
