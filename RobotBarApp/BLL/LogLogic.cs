@@ -28,9 +28,10 @@ public class LogLogic : ILogLogic
         Log log = new Log
         {
             LogId = Guid.NewGuid(),
+            TimeStamp = DateTime.Now,
             LogMsg = logMsg,
             Type = type,
-            TimeStamp = DateTime.Now
+            
         };
 
         _logRepository.AddLog(log);
