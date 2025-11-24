@@ -23,6 +23,11 @@ public class RobotBarContext : DbContext
     public DbSet<DrinkUseCount> DrinkUseCounts { get; set; }
     public DbSet<IngredientUseCount> IngredientUseCounts { get; set; }
     
+    public RobotBarContext(DbContextOptions<RobotBarContext> options)
+        : base(options)
+    {
+        Console.WriteLine($"USING SQLITE DB: {Database.GetDbConnection().DataSource}");
+    }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var basePath = AppContext.BaseDirectory; // bin/Debug/net9.0/
@@ -47,26 +52,27 @@ public class RobotBarContext : DbContext
             .HasForeignKey(s => s.SopId)
             .OnDelete(DeleteBehavior.Cascade); //delete all SopSteps if Sop is deleted
         
-        // Each Drink has many DrinkContents
+        // DRINK → DRINKCONTENT (1-to-many)
         modelBuilder.Entity<Drink>()
             .HasMany(d => d.DrinkContents)
-            .WithOne()
+            .WithOne(dc => dc.Drink)
             .HasForeignKey(dc => dc.DrinkId)
-            .OnDelete(DeleteBehavior.Cascade); // delete all DrinkContents if Drink is deleted
-        
-        // Each Drink has many DrinkScripts
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // INGREDIENT → DRINKCONTENT (1-to-many)
+        modelBuilder.Entity<Ingredient>()
+            .HasMany(i => i.DrinkContents)
+            .WithOne(dc => dc.Ingredient)
+            .HasForeignKey(dc => dc.IngredientId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // DRINK → DRINKSCRIPT (1-to-many)
         modelBuilder.Entity<Drink>()
             .HasMany(d => d.DrinkScripts)
-            .WithOne(s => s.Drink)
-            .HasForeignKey(s => s.DrinkId)
-            .OnDelete(DeleteBehavior.Cascade); // delete all DrinkScripts if Drink is deleted
-
-        // Each Ingredient can appear in many DrinkContents
-        modelBuilder.Entity<Ingredient>()
-            .HasMany<DrinkContent>()
-            .WithOne()
-            .HasForeignKey(dc => dc.IngredientId)
-            .OnDelete(DeleteBehavior.Restrict); // don’t delete ingredients when DrinkContent is deleted
+            .WithOne(ds => ds.Drink)
+            .HasForeignKey(ds => ds.DrinkId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
     }
     
 }

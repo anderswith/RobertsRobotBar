@@ -28,6 +28,10 @@ public class DrinkLogic : IDrinkLogic
 
     public void AddDrink(string name, string image, bool IsMocktail, List<Guid> ingredientIds, List<string> scriptNames)
     {
+        foreach (var id in ingredientIds)
+        {
+            Console.WriteLine($"{id}");
+        }
         if (string.IsNullOrEmpty(name))
         {
             throw new ArgumentException("Drink name cannot be null or empty.");
@@ -64,6 +68,7 @@ public class DrinkLogic : IDrinkLogic
             DrinkContents = new List<DrinkContent>(),
             DrinkScripts = new List<DrinkScript>()
         };
+        
         // Add DrinkContents
         foreach (var ingredientId in ingredientIds)
         {

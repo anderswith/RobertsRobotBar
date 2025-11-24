@@ -12,7 +12,7 @@ namespace RobotBarApp.ViewModels
         private readonly INavigationService _navigation;
         private readonly IIngredientLogic _ingredientLogic;
 
-        // --- FIELDS BOUND TO XAML ------------------------------------------------------------
+
 
         private string _ingredientName = "";
         public string IngredientName
@@ -40,7 +40,7 @@ namespace RobotBarApp.ViewModels
         public bool IsSyrup { get; set; }
         public bool IsSoda { get; set; }
 
-        // Holder = PositionNumber
+
         public ObservableCollection<int> Holders { get; } = new();
 
         private int _selectedHolder;
@@ -60,7 +60,7 @@ namespace RobotBarApp.ViewModels
             set => SetProperty(ref _scriptText, value);
         }
 
-        // --- COMMANDS ------------------------------------------------------------------------
+
         public ICommand ChooseImageCommand { get; }
         public ICommand GuideCommand { get; }
         public ICommand CancelCommand { get; }
@@ -73,7 +73,7 @@ namespace RobotBarApp.ViewModels
             _navigation = navigation;
             _ingredientLogic = ingredientLogic;
 
-            // Example: Position numbers 1..24 (but change if needed)
+            //  Position numbers 1 to 24 
             for (int i = 1; i <= 24; i++)
                 Holders.Add(i);
 
@@ -85,7 +85,7 @@ namespace RobotBarApp.ViewModels
             SaveCommand = new RelayCommand(_ => Save());
         }
 
-        // --- COMMAND IMPLEMENTATION ----------------------------------------------------------
+
 
         private void ChooseImage()
         {
@@ -110,7 +110,7 @@ namespace RobotBarApp.ViewModels
 
         private void Save()
         {
-            // VALIDATION ----------------------------------------------------------------------
+
             if (string.IsNullOrWhiteSpace(IngredientName))
             {
                 System.Windows.MessageBox.Show("Du skal angive et navn.");
@@ -129,22 +129,20 @@ namespace RobotBarApp.ViewModels
                 return;
             }
 
-            // TYPE MAPPING ---------------------------------------------------------------------
             string type = "Ukendt";
             if (IsAlkohol) type = "Alkohol";
             else if (IsMock) type = "Mock";
             else if (IsSyrup) type = "Syrup";
             else if (IsSoda) type = "Soda";
 
-            // DOSE MAPPING ---------------------------------------------------------------------
+
             string dose = IsSingleDose ? "Single" : "Double";
 
-            // SCRIPT MAPPING -------------------------------------------------------------------
+
             List<string> scripts = new();
             if (!string.IsNullOrWhiteSpace(ScriptText))
                 scripts.Add(ScriptText);
-
-            // SAVE THROUGH LOGIC LAYER ---------------------------------------------------------
+            
             _ingredientLogic.AddIngredient(
                 name: IngredientName,
                 type: type,
@@ -157,7 +155,7 @@ namespace RobotBarApp.ViewModels
 
             System.Windows.MessageBox.Show("Ingrediens tilføjet!");
 
-            _navigation.NavigateTo<MainWindowViewModel>(); // skift tilbage
+            _navigation.NavigateTo<TilfoejIngrediensViewModel>(); 
         }
     }
 }

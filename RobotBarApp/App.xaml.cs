@@ -47,13 +47,11 @@ public partial class App : Application
                 services.AddTransient<EventListViewModel>();
                 services.AddTransient<KatalogViewModel>();
                 services.AddTransient<MainWindowViewModel>();
-                services.AddTransient<RelayCommand>();
                 services.AddTransient<StatistikViewModel>();
                 services.AddTransient<TilfoejDrinkViewModel>();
                 services.AddTransient<TilfoejEventViewModel>();
                 services.AddTransient<TilfoejIngrediensViewModel>();
                 services.AddTransient<TilfoejMenuViewModel>();
-                //services.AddTransient<ViewModelBase>();
                 
                 // Views
                 services.AddTransient<EventListView>();

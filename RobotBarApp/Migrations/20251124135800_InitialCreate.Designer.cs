@@ -11,8 +11,8 @@ using RobotBarApp.DAL;
 namespace RobotBarApp.Migrations
 {
     [DbContext(typeof(RobotBarContext))]
-    [Migration("20251124115106_UpdatedEntities")]
-    partial class UpdatedEntities
+    [Migration("20251124135800_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,24 +75,14 @@ namespace RobotBarApp.Migrations
                     b.Property<Guid>("DrinkId")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("DrinkId1")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("IngredientId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("IngredientId1")
                         .HasColumnType("TEXT");
 
                     b.HasKey("DrinkContentId");
 
                     b.HasIndex("DrinkId");
 
-                    b.HasIndex("DrinkId1");
-
                     b.HasIndex("IngredientId");
-
-                    b.HasIndex("IngredientId1");
 
                     b.ToTable("DrinkContents");
                 });
@@ -366,28 +356,16 @@ namespace RobotBarApp.Migrations
 
             modelBuilder.Entity("RobotBarApp.BE.DrinkContent", b =>
                 {
-                    b.HasOne("RobotBarApp.BE.Drink", null)
+                    b.HasOne("RobotBarApp.BE.Drink", "Drink")
                         .WithMany("DrinkContents")
                         .HasForeignKey("DrinkId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RobotBarApp.BE.Drink", "Drink")
-                        .WithMany()
-                        .HasForeignKey("DrinkId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RobotBarApp.BE.Ingredient", null)
-                        .WithMany()
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("RobotBarApp.BE.Ingredient", "Ingredient")
                         .WithMany("DrinkContents")
-                        .HasForeignKey("IngredientId1")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Drink");

@@ -195,6 +195,6 @@ public class IngredientLogic : IIngredientLogic
 
     public IEnumerable<Ingredient> GetSoda()
     {
-        return _ingredientRepository.GetIngredientByType("Sodavand");
+        return _ingredientRepository.GetIngredientByType("Soda");
     }
 }
