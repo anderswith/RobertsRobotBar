@@ -10,68 +10,72 @@
         WindowState="Maximized"
         WindowStyle="None"
         Background="#FFE5E5E5">
-
-    <Window.DataContext>
-        <!-- Design-time only; runtime DataContext is set in code-behind for now -->
-        <vm:MainWindowViewModel d:IsDesignTimeCreatable="True" />
-    </Window.DataContext>
+    
 
     <Window.Resources>
-        <!-- Simple drop shadow for cards -->
+
+        <!-- Shadow -->
         <DropShadowEffect x:Key="CardShadow"
                           BlurRadius="10"
                           ShadowDepth="3"
                           Opacity="0.4" />
 
-        <!-- Map ViewModels to Views for ContentControl -->
+        <!-- ViewModel -> View templates -->
         <DataTemplate DataType="{x:Type vm:EventListViewModel}">
             <view:EventListView />
         </DataTemplate>
+
         <DataTemplate DataType="{x:Type vm:StatistikViewModel}">
             <view:StatistikView />
         </DataTemplate>
+
         <DataTemplate DataType="{x:Type vm:KatalogViewModel}">
             <view:KatalogView />
         </DataTemplate>
+
         <DataTemplate DataType="{x:Type vm:TilfoejIngrediensViewModel}">
             <view:TilfoejIngrediensView />
         </DataTemplate>
+
         <DataTemplate DataType="{x:Type vm:TilfoejDrinkViewModel}">
             <view:TilfoejDrinkView />
         </DataTemplate>
+
         <DataTemplate DataType="{x:Type vm:TilfoejMenuViewModel}">
             <view:TilfoejMenuView />
         </DataTemplate>
+
         <DataTemplate DataType="{x:Type vm:TilfoejEventViewModel}">
             <view:TilfoejEventView />
         </DataTemplate>
+
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>    <!-- Top bar -->
-            <RowDefinition Height="*"/>       <!-- Content + overlay/menu -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- TOP BAR -->
         <Border Grid.Row="0"
                 Background="#4F7C97"
-                Height="110"> <!-- increased from 70 -->
+                Height="110">
             <Grid Margin="20,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>  <!-- Logo + title -->
-                    <ColumnDefinition Width="*"/>     <!-- Spacer -->
-                    <ColumnDefinition Width="Auto"/>  <!-- Menu button -->
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Logo + title -->
+                <!-- Logo -->
                 <Button Grid.Column="0"
                         VerticalAlignment="Center"
                         Padding="0"
                         Background="Transparent"
                         BorderThickness="0"
                         Cursor="Hand"
-                        Click="HomeButton_Click">
+                        Command="{Binding NavigateHomeCommand}">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Image Source="/RobotBarApp;component/Resources/Icons/Roberts_robotbar_logo.png"
                                Margin="0,5,10,10"
@@ -79,7 +83,7 @@
                     </StackPanel>
                 </Button>
 
-                <!-- Hamburger menu button -->
+                <!-- Hamburger menu -->
                 <Button Grid.Column="2"
                         Width="70"
                         Height="70"
@@ -91,35 +95,32 @@
                         BorderThickness="0"
                         Cursor="Hand"
                         Click="MenuButton_Click">
-                    <!-- Use the new menu icon from Resources/Icons/menu.png -->
-                    <Image
-                           Height="59"
+                    <Image Height="59"
                            VerticalAlignment="Center"
                            Source="/RobotBarApp;component/Resources/Icons/menu.png"
                            Stretch="Uniform"/>
                 </Button>
+
             </Grid>
         </Border>
 
-        <!-- MAIN CONTENT + OVERLAY + SLIDING SIDE MENU -->
+        <!-- MAIN CONTENT + MENU -->
         <Grid Grid.Row="1">
-            <!-- Main content -->
+
+            <!-- MAIN CONTENT -->
             <Border Background="#FFE5E5E5">
-                <!-- Host for dynamic views via MVVM -->
                 <ContentControl Content="{Binding CurrentViewModel}" />
             </Border>
 
-            <!-- Overlay (appears when menu is open) -->
+            <!-- OVERLAY -->
             <Rectangle x:Name="MenuOverlay"
                        Fill="Black"
                        Opacity="0"
                        IsHitTestVisible="False"
                        Panel.ZIndex="1"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Stretch"
                        MouseLeftButtonDown="MenuOverlay_MouseLeftButtonDown"/>
 
-            <!-- Sliding Side Menu -->
+            <!-- SIDE MENU -->
             <Border x:Name="SideMenu"
                     Width="260"
                     Background="#FFDDDDDD"
@@ -127,22 +128,53 @@
                     Panel.ZIndex="2"
                     RenderTransformOrigin="0.5,0.5">
                 <Border.RenderTransform>
-                    <TranslateTransform X="260" />
+                    <TranslateTransform X="260"/>
                 </Border.RenderTransform>
+
                 <StackPanel Margin="20">
                     <TextBlock Text="Menu"
                                FontSize="24"
                                FontWeight="Bold"
                                Margin="0,0,0,20"/>
-                    <Button Content="Opstart" Margin="0,0,0,10" Height="35" Click="OpstartButton_Click"/>
-                    <Button Content="Statistik" Margin="0,0,0,10" Height="35" Click="StatistikButton_Click"/>
-                    <Button Content="Katalog" Margin="0,0,0,10" Height="35" Click="KatalogButton_Click"/>
-                    <Button Content="Tilføj Ingrediens" Margin="0,0,0,10" Height="35" Click="TilfoejIngrediensButton_Click"/>
-                    <Button Content="Tilføj Drink" Margin="0,0,0,10" Height="35" Click="TilfoejDrinkButton_Click"/>
-                    <Button Content="Tilføj Menu" Margin="0,0,0,10" Height="35" Click="TilfoejMenuButton_Click"/>
-                    <Button Content="Tilføj Event" Margin="0,0,0,10" Height="35" Click="TilfoejEventButton_Click"/>
+
+                    <Button Content="Opstart"
+                            Height="35"
+                            Margin="0,0,0,10"
+                            Command="{Binding NavigateHomeCommand}"/>
+
+                    <Button Content="Statistik"
+                            Height="35"
+                            Margin="0,0,0,10"
+                            Command="{Binding NavigateStatistikCommand}"/>
+
+                    <Button Content="Katalog"
+                            Height="35"
+                            Margin="0,0,0,10"
+                            Command="{Binding NavigateKatalogCommand}"/>
+
+                    <Button Content="Tilføj Ingrediens"
+                            Height="35"
+                            Margin="0,0,0,10"
+                            Command="{Binding NavigateTilfoejIngrediensCommand}"/>
+
+                    <Button Content="Tilføj Drink"
+                            Height="35"
+                            Margin="0,0,0,10"
+                            Command="{Binding NavigateTilfoejDrinkCommand}"/>
+
+                    <Button Content="Tilføj Menu"
+                            Height="35"
+                            Margin="0,0,0,10"
+                            Command="{Binding NavigateTilfoejMenuCommand}"/>
+
+                    <Button Content="Tilføj Event"
+                            Height="35"
+                            Margin="0,0,0,10"
+                            Command="{Binding NavigateTilfoejEventCommand}"/>
+
                 </StackPanel>
             </Border>
         </Grid>
     </Grid>
+
 </Window>

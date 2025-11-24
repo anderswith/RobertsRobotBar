@@ -1,31 +1,61 @@
 using System.Windows.Input;
+using RobotBarApp.Services.Interfaces;
 
 namespace RobotBarApp.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private object? _currentViewModel;
-        private bool _isMenuOpen;
+        private readonly INavigationService _navigationService;
 
-        public object? CurrentViewModel
+        public ViewModelBase CurrentViewModel => _navigationService.CurrentViewModel;
+
+        // Commands
+        public ICommand NavigateHomeCommand { get; }
+        public ICommand NavigateStatistikCommand { get; }
+        public ICommand NavigateKatalogCommand { get; }
+        public ICommand NavigateTilfoejIngrediensCommand { get; }
+        public ICommand NavigateTilfoejDrinkCommand { get; }
+        public ICommand NavigateTilfoejMenuCommand { get; }
+        public ICommand NavigateTilfoejEventCommand { get; }
+
+        public MainWindowViewModel(INavigationService navigationService)
         {
-            get => _currentViewModel;
-            set => SetProperty(ref _currentViewModel, value);
-        }
+            _navigationService = navigationService;
 
-        public bool IsMenuOpen
-        {
-            get => _isMenuOpen;
-            set => SetProperty(ref _isMenuOpen, value);
-        }
+            // Reager på ViewModel-skift i NavigationService
+            _navigationService.OnViewModelChanged += () =>
+                OnPropertyChanged(nameof(CurrentViewModel));
 
-        public ICommand ToggleMenuCommand { get; }
-        public ICommand CloseMenuCommand { get; }
+            // Home / Opstart
+            NavigateHomeCommand = new RelayCommand(_ =>
+                _navigationService.NavigateTo<EventListViewModel>());
 
-        public MainWindowViewModel()
-        {
-            ToggleMenuCommand = new RelayCommand(_ => IsMenuOpen = !IsMenuOpen);
-            CloseMenuCommand = new RelayCommand(_ => IsMenuOpen = false);
+            // Statistik
+            NavigateStatistikCommand = new RelayCommand(_ =>
+                _navigationService.NavigateTo<StatistikViewModel>());
+
+            // Katalog
+            NavigateKatalogCommand = new RelayCommand(_ =>
+                _navigationService.NavigateTo<KatalogViewModel>());
+
+            // Tilføj Ingrediens
+            NavigateTilfoejIngrediensCommand = new RelayCommand(_ =>
+                _navigationService.NavigateTo<TilfoejIngrediensViewModel>());
+
+            // Tilføj Drink
+            NavigateTilfoejDrinkCommand = new RelayCommand(_ =>
+                _navigationService.NavigateTo<TilfoejDrinkViewModel>());
+
+            // Tilføj Menu
+            NavigateTilfoejMenuCommand = new RelayCommand(_ =>
+                _navigationService.NavigateTo<TilfoejMenuViewModel>());
+
+            // Tilføj Event
+            NavigateTilfoejEventCommand = new RelayCommand(_ =>
+                _navigationService.NavigateTo<TilfoejEventViewModel>());
+
+            // Set default view
+            _navigationService.NavigateTo<EventListViewModel>();
         }
     }
 }
