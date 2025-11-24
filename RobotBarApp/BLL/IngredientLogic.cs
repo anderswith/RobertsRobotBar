@@ -182,4 +182,19 @@ public class IngredientLogic : IIngredientLogic
         _ingredientRepository.UpdateIngredient(existingIngredient);
         
     }
+
+    public IEnumerable<Ingredient> GetAlcohol()
+    {
+        return _ingredientRepository.GetIngredientByType("Alkohol");
+    }
+
+    public IEnumerable<Ingredient> GetSyrups()
+    {
+        return _ingredientRepository.GetIngredientByType("Syrup");
+    }
+
+    public IEnumerable<Ingredient> GetSoda()
+    {
+        return _ingredientRepository.GetIngredientByType("Sodavand");
+    }
 }

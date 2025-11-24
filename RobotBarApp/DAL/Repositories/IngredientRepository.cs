@@ -35,5 +35,11 @@ public class IngredientRepository : IIngredientRepository
         _context.Ingredients.Update(ingredient);
         _context.SaveChanges();
     }
-    
+
+    public IEnumerable<Ingredient> GetIngredientByType(string type)
+    {
+        return _context.Ingredients.
+            Where(i => i.Type == type)
+            .ToList();
+    }
 }
