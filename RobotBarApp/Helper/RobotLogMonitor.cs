@@ -69,6 +69,8 @@ public class RobotLogMonitor
                 if (string.IsNullOrWhiteSpace(msg))
                     continue;
 
+                Console.WriteLine($"[ROBOT STREAM] {msg}");
+
                 ProcessMessage(msg);
             }
         }
@@ -83,7 +85,7 @@ public class RobotLogMonitor
         if (msg.Contains("Program finished"))
         {
             ProgramFinished?.Invoke();
-            _log.AddLog("Robot finished executing program.", "RobotInfo");
+            _log.AddLog(msg, "RobotInfo");
             return;
         }
 
