@@ -2,12 +2,12 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-public class RoboComms
+public class RobotComms
 {
     private readonly string _robotIp;
     private const int DASHBOARD_PORT = 29999;
 
-    public RoboComms(string robotIp)
+    public RobotComms(string robotIp)
     {
         _robotIp = robotIp;
     }

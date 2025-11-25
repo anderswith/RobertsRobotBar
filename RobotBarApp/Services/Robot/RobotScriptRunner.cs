@@ -3,14 +3,14 @@ using RobotBarApp.BLL.Interfaces;
 
 public class RobotScriptRunner
 {
-    private readonly RoboComms _comms;
+    private readonly RobotComms _comms;
     private readonly ILogLogic _log;
     private readonly ConcurrentQueue<string> _queue = new();
 
     private bool _isRunning = false;
     private readonly object _lock = new();
 
-    public RobotScriptRunner(RoboComms comms, RobotLogMonitor monitor, ILogLogic logLogic)
+    public RobotScriptRunner(RobotComms comms, RobotDashboardStreamReader monitor, ILogLogic logLogic)
     {
         _comms = comms;
         _log = logLogic;

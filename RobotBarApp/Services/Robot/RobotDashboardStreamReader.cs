@@ -2,7 +2,7 @@ using System.Net.Sockets;
 using System.Text;
 using RobotBarApp.BLL.Interfaces;
 
-public class RobotLogMonitor
+public class RobotDashboardStreamReader
 {
     private readonly string _robotIp;
     private readonly ILogLogic _log;
@@ -17,7 +17,7 @@ public class RobotLogMonitor
     public event Action<string>? OnRobotMessage;
     public event Action<string>? OnRobotError;
 
-    public RobotLogMonitor(string robotIp, ILogLogic logLogic)
+    public RobotDashboardStreamReader(string robotIp, ILogLogic logLogic)
     {
         _robotIp = robotIp;
         _log = logLogic;
