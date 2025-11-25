@@ -1,120 +1,74 @@
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using RobotBarApp.BLL.Interfaces;
 
 public class RobotScriptRunner
 {
-    private readonly RoboComms _robo;
+    private readonly RoboComms _comms;
     private readonly ILogLogic _log;
-
     private readonly ConcurrentQueue<string> _queue = new();
+
+    private bool _isRunning = false;
     private readonly object _lock = new();
-    private bool _workerRunning;
 
-    public RobotScriptRunner(RoboComms roboComms, ILogLogic logLogic)
+    public RobotScriptRunner(RoboComms comms, RobotLogMonitor monitor, ILogLogic logLogic)
     {
-        _robo = roboComms;
+        _comms = comms;
         _log = logLogic;
+
+        monitor.ProgramFinished += OnScriptFinished;   // <--- KEY PART
     }
 
-    public void EnqueueScript(string scriptName)
+    public void EnqueueScripts(IEnumerable<string> scripts)
     {
-        if (!string.IsNullOrWhiteSpace(scriptName))
-        {
-            _queue.Enqueue(scriptName);
-            _log.AddLog($"Queued script '{scriptName}'", "RobotInfo");
-            StartWorkerIfNeeded();
-        }
+        foreach (var s in scripts)
+            if (!string.IsNullOrWhiteSpace(s))
+                _queue.Enqueue(s);
+
+        TryStartNext();
     }
 
-    public void EnqueueScripts(IEnumerable<string> scriptNames)
-    {
-        foreach (var script in scriptNames)
-        {
-            if (!string.IsNullOrWhiteSpace(script))
-            {
-                _queue.Enqueue(script);
-                _log.AddLog($"Queued script '{script}'", "RobotInfo");
-            }
-        }
-
-        StartWorkerIfNeeded();
-    }
-
-    private void StartWorkerIfNeeded()
+    private void TryStartNext()
     {
         lock (_lock)
         {
-            if (_workerRunning) return;
-            _workerRunning = true;
-            _ = Task.Run(RunQueueAsync);
+            if (_isRunning) return;
+            if (!_queue.TryDequeue(out var next)) return;
+
+            _isRunning = true;
+            _ = RunScript(next);
         }
     }
 
-    private async Task RunQueueAsync()
+    private async Task RunScript(string scriptName)
     {
         try
         {
-            while (_queue.TryDequeue(out var scriptName))
-            {
-                await RunSingleScript(scriptName);
-            }
-        }
-        finally
-        {
-            lock (_lock)
-            {
-                _workerRunning = false;
-            }
-        }
-    }
+            _log.AddLog($"Loading script: {scriptName}", "RobotInfo");
+            await _comms.LoadProgramAsync(scriptName);
 
-    private async Task RunSingleScript(string scriptName)
-    {
-        try
-        {
-            _log.AddLog($"Running robot script '{scriptName}'", "RobotInfo");
-
-            await _robo.LoadProgramAsync(scriptName);
-            await _robo.PlayAsync();
-
-            await WaitForProgramToFinish(scriptName);
-
-            _log.AddLog($"Script '{scriptName}' completed.", "RobotInfo");
+            _log.AddLog($"Playing script: {scriptName}", "RobotInfo");
+            await _comms.PlayAsync();
         }
         catch (Exception ex)
         {
-            _log.AddLog($"Error while executing '{scriptName}': {ex.Message}", "RobotError");
+            _log.AddLog($"Script run error: {ex.Message}", "RobotError");
+
+            lock (_lock)
+            {
+                _isRunning = false;
+            }
+
+            TryStartNext();
         }
     }
 
-    private async Task WaitForProgramToFinish(string scriptName)
+    private void OnScriptFinished()
     {
-        while (true)
+        lock (_lock)
         {
-            await Task.Delay(500);
-
-            string state;
-
-            try
-            {
-                state = await _robo.GetProgramStateAsync();
-            }
-            catch
-            {
-                _log.AddLog($"Lost program state while waiting for '{scriptName}'.", "RobotError");
-                return;
-            }
-
-            string lower = state.ToLower();
-
-            if (lower.Contains("running") || lower.Contains("playing"))
-                continue;
-
-            // STOPPED, IDLE, READY, etc.
-            return;
+            _isRunning = false;
         }
+
+        TryStartNext();
     }
 }

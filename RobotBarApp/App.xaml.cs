@@ -73,13 +73,16 @@ public partial class App : Application
                     return new RobotLogMonitor("192.168.0.101", logLogic);
                 });
                 services.AddSingleton<RoboComms>(provider =>
-                    new RoboComms("192.168.0.101"));
+                {
+                    return new RoboComms("192.168.0.101");
+                });
                 
                 services.AddSingleton<RobotScriptRunner>(provider =>
                 {
                     var comms = provider.GetRequiredService<RoboComms>();
+                    var monitor = provider.GetRequiredService<RobotLogMonitor>();
                     var log   = provider.GetRequiredService<ILogLogic>();
-                    return new RobotScriptRunner(comms, log);
+                    return new RobotScriptRunner(comms, monitor, log);
                 });
                 services.AddSingleton<RobotLogic>();
                     

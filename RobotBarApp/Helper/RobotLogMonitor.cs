@@ -6,57 +6,50 @@ public class RobotLogMonitor
 {
     private readonly string _robotIp;
     private readonly ILogLogic _log;
+
     private TcpClient? _client;
     private NetworkStream? _stream;
     private CancellationTokenSource? _cts;
 
     private const int DASHBOARD_PORT = 29999;
 
+    public event Action? ProgramFinished;  //  <-- Script finished event
+    public event Action<string>? OnRobotMessage;
+    public event Action<string>? OnRobotError;
+
     public RobotLogMonitor(string robotIp, ILogLogic logLogic)
     {
         _robotIp = robotIp;
         _log = logLogic;
     }
-    
-    public async Task<bool> TryConnectWithTimeout(string ip, int port, int timeoutMs)
-    {
-        using var client = new TcpClient();
 
-        var connectTask = client.ConnectAsync(ip, port);
-        var timeoutTask = Task.Delay(timeoutMs);
-
-        var finished = await Task.WhenAny(connectTask, timeoutTask);
-
-        if (finished == timeoutTask)
-            return false; // timeout
-
-        return true; // connected
-    }
     public async Task StartAsync()
     {
         _cts = new CancellationTokenSource();
-        _client = new TcpClient();
 
         try
         {
-            // gives 2000ms to connect, if not then log timeout and continue without connection
-            bool connected = await TryConnectWithTimeout(_robotIp, DASHBOARD_PORT, 2000);
+            _client = new TcpClient();
+            var connectTask = _client.ConnectAsync(_robotIp, DASHBOARD_PORT);
+            var timeoutTask = Task.Delay(2000);
 
-            if (!connected)
+            var result = await Task.WhenAny(connectTask, timeoutTask);
+            if (result == timeoutTask)
             {
-                _log.AddLog("Robot did not respond (timeout). Starting without connection.", "RobotWarning");
-                return; 
+                _log.AddLog("Robot dashboard timeout — starting without connection.", "RobotWarning");
+                return;
             }
 
-            await _client.ConnectAsync(_robotIp, DASHBOARD_PORT); 
+            await connectTask;
+
             _stream = _client.GetStream();
+            _log.AddLog("Connected to robot dashboard.", "RobotInfo");
 
             _ = Task.Run(() => ListenLoop(_cts.Token));
-            _log.AddLog("Connected to robot dashboard server.", "RobotInfo");
         }
         catch (Exception ex)
         {
-            _log.AddLog($"Error while connecting to robot: {ex.Message}", "RobotWarning");
+            _log.AddLog($"Error connecting to robot: {ex.Message}", "RobotWarning");
         }
     }
 
@@ -69,10 +62,10 @@ public class RobotLogMonitor
             while (!token.IsCancellationRequested)
             {
                 int read = await _stream!.ReadAsync(buffer, 0, buffer.Length, token);
-                if (read == 0) continue;
+                if (read == 0)
+                    continue;
 
                 string msg = Encoding.ASCII.GetString(buffer, 0, read).Trim();
-
                 if (string.IsNullOrWhiteSpace(msg))
                     continue;
 
@@ -81,20 +74,19 @@ public class RobotLogMonitor
         }
         catch (Exception ex)
         {
-            _log.AddLog($"Dashboard connection error: {ex.Message}", "RobotError");
+            _log.AddLog($"Dashboard connection lost: {ex.Message}", "RobotError");
         }
     }
-    public event Action<string>? OnRobotMessage;
-    public event Action<string>? OnRobotError;
-    public event Action? ProgramFinished;
 
     private void ProcessMessage(string msg)
     {
         if (msg.Contains("Program finished"))
         {
             ProgramFinished?.Invoke();
+            _log.AddLog("Robot finished executing program.", "RobotInfo");
             return;
         }
+
         if (msg.Contains("Protective stop") ||
             msg.Contains("emergency") ||
             msg.Contains("fault"))
@@ -103,7 +95,7 @@ public class RobotLogMonitor
             OnRobotError?.Invoke(msg);
             return;
         }
-    
+
         _log.AddLog(msg, "RobotMessage");
         OnRobotMessage?.Invoke(msg);
     }
