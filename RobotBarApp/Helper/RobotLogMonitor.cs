@@ -17,7 +17,21 @@ public class RobotLogMonitor
         _robotIp = robotIp;
         _log = logLogic;
     }
+    
+    public async Task<bool> TryConnectWithTimeout(string ip, int port, int timeoutMs)
+    {
+        using var client = new TcpClient();
 
+        var connectTask = client.ConnectAsync(ip, port);
+        var timeoutTask = Task.Delay(timeoutMs);
+
+        var finished = await Task.WhenAny(connectTask, timeoutTask);
+
+        if (finished == timeoutTask)
+            return false; // timeout
+
+        return true; // connected
+    }
     public async Task StartAsync()
     {
         _cts = new CancellationTokenSource();
@@ -25,20 +39,24 @@ public class RobotLogMonitor
 
         try
         {
-            await _client.ConnectAsync(_robotIp, DASHBOARD_PORT);
+            // gives 2000ms to connect, if not then log timeout and continue without connection
+            bool connected = await TryConnectWithTimeout(_robotIp, DASHBOARD_PORT, 2000);
+
+            if (!connected)
+            {
+                _log.AddLog("Robot did not respond (timeout). Starting without connection.", "RobotWarning");
+                return; 
+            }
+
+            await _client.ConnectAsync(_robotIp, DASHBOARD_PORT); 
             _stream = _client.GetStream();
 
             _ = Task.Run(() => ListenLoop(_cts.Token));
-
             _log.AddLog("Connected to robot dashboard server.", "RobotInfo");
         }
         catch (Exception ex)
         {
-
-            _log.AddLog($"Could not connect to robot: {ex.Message}", "RobotWarning");
-
-            // Allow the application to continue running
-            return;
+            _log.AddLog($"Error while connecting to robot: {ex.Message}", "RobotWarning");
         }
     }
 
