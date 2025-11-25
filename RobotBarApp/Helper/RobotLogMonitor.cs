@@ -84,21 +84,21 @@ public class RobotLogMonitor
             _log.AddLog($"Dashboard connection error: {ex.Message}", "RobotError");
         }
     }
+    public event Action<string>? OnRobotMessage;
+    public event Action<string>? OnRobotError;
 
     private void ProcessMessage(string msg)
     {
-        // These messages come straight from UR Dashboard Server
         if (msg.Contains("Protective stop") ||
             msg.Contains("emergency") ||
-            msg.Contains("fault") ||
-            msg.Contains("not ready") ||
-            msg.Contains("Violation"))
+            msg.Contains("fault"))
         {
             _log.AddLog(msg, "RobotError");
+            OnRobotError?.Invoke(msg);
+            return;
         }
-        else
-        {
-            _log.AddLog(msg, "RobotMessage");
-        }
+    
+        _log.AddLog(msg, "RobotMessage");
+        OnRobotMessage?.Invoke(msg);
     }
 }

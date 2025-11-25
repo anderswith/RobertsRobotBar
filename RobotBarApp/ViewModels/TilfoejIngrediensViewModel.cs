@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using RobotBarApp.Services.Interfaces;
 using RobotBarApp.BLL.Interfaces;
 using System.Collections.Generic;
+using RobotBarApp.BLL;
 
 namespace RobotBarApp.ViewModels
 {
@@ -11,6 +12,7 @@ namespace RobotBarApp.ViewModels
     {
         private readonly INavigationService _navigation;
         private readonly IIngredientLogic _ingredientLogic;
+        private readonly RobotLogic _robotLogic;
 
 
 
@@ -65,13 +67,17 @@ namespace RobotBarApp.ViewModels
         public ICommand GuideCommand { get; }
         public ICommand CancelCommand { get; }
         public ICommand SaveCommand { get; }
+        public ICommand RunTestScriptCommand { get; }
 
         public TilfoejIngrediensViewModel(
             INavigationService navigation,
-            IIngredientLogic ingredientLogic)
+            IIngredientLogic ingredientLogic,
+            RobotLogic robotLogic
+            )
         {
             _navigation = navigation;
             _ingredientLogic = ingredientLogic;
+            _robotLogic = robotLogic;
 
             //  Position numbers 1 to 24 
             for (int i = 1; i <= 24; i++)
@@ -83,6 +89,18 @@ namespace RobotBarApp.ViewModels
             GuideCommand = new RelayCommand(_ => ShowGuide());
             CancelCommand = new RelayCommand(_ => Cancel());
             SaveCommand = new RelayCommand(_ => Save());
+            RunTestScriptCommand = new RelayCommand(_ => RunTestScripts());
+        }
+
+        public void RunTestScripts()
+        {
+            var testScripts = new List<string>
+            {
+                "test_script1.urp",
+                "test_script2.urp"
+            };
+
+            _robotLogic.RunRobotScripts(testScripts);
         }
 
 
