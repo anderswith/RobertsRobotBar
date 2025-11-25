@@ -23,11 +23,23 @@ public class RobotLogMonitor
         _cts = new CancellationTokenSource();
         _client = new TcpClient();
 
-        await _client.ConnectAsync(_robotIp, DASHBOARD_PORT);
-        _stream = _client.GetStream();
+        try
+        {
+            await _client.ConnectAsync(_robotIp, DASHBOARD_PORT);
+            _stream = _client.GetStream();
 
-        // Dashboard server sends a welcome message immediately
-        _ = Task.Run(() => ListenLoop(_cts.Token));
+            _ = Task.Run(() => ListenLoop(_cts.Token));
+
+            _log.AddLog("Connected to robot dashboard server.", "RobotInfo");
+        }
+        catch (Exception ex)
+        {
+
+            _log.AddLog($"Could not connect to robot: {ex.Message}", "RobotWarning");
+
+            // Allow the application to continue running
+            return;
+        }
     }
 
     private async Task ListenLoop(CancellationToken token)
