@@ -78,8 +78,8 @@ public partial class App : Application
                 services.AddSingleton<RobotScriptRunner>(provider =>
                 {
                     var comms = provider.GetRequiredService<RoboComms>();
-                    var monitor = provider.GetRequiredService<RobotLogMonitor>();
-                    return new RobotScriptRunner(comms, monitor);
+                    var log   = provider.GetRequiredService<ILogLogic>();
+                    return new RobotScriptRunner(comms, log);
                 });
                 services.AddSingleton<RobotLogic>();
                     

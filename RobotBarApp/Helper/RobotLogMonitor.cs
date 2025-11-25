@@ -86,9 +86,15 @@ public class RobotLogMonitor
     }
     public event Action<string>? OnRobotMessage;
     public event Action<string>? OnRobotError;
+    public event Action? ProgramFinished;
 
     private void ProcessMessage(string msg)
     {
+        if (msg.Contains("Program finished"))
+        {
+            ProgramFinished?.Invoke();
+            return;
+        }
         if (msg.Contains("Protective stop") ||
             msg.Contains("emergency") ||
             msg.Contains("fault"))

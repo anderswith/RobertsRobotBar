@@ -1,49 +1,120 @@
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using RobotBarApp.BLL.Interfaces;
 
 public class RobotScriptRunner
 {
-    private readonly RoboComms _comms;
-    private readonly RobotLogMonitor _monitor;
+    private readonly RoboComms _robo;
+    private readonly ILogLogic _log;
 
     private readonly ConcurrentQueue<string> _queue = new();
-    private bool _isRunning = false;
+    private readonly object _lock = new();
+    private bool _workerRunning;
 
-    public RobotScriptRunner(RoboComms comms, RobotLogMonitor monitor)
+    public RobotScriptRunner(RoboComms roboComms, ILogLogic logLogic)
     {
-        _comms = comms;
-        _monitor = monitor;
-
-        _monitor.OnRobotMessage += HandleRobotMessage;
+        _robo = roboComms;
+        _log = logLogic;
     }
 
-    public void EnqueueScripts(IEnumerable<string> scripts)
+    public void EnqueueScript(string scriptName)
     {
-        foreach (var s in scripts)
-            _queue.Enqueue(s);
-
-        TryRunNext();
-    }
-
-    private async void TryRunNext()
-    {
-        if (_isRunning) return;
-        if (!_queue.TryDequeue(out var script)) return;
-
-        _isRunning = true;
-
-        await _comms.LoadProgram(script);
-        await Task.Delay(200); // small delay to ensure load completed
-        await _comms.Play();
-    }
-
-    private void HandleRobotMessage(string msg)
-    {
-        if (msg.Contains("Program finished") ||
-            msg.Contains("Stopped") ||
-            msg.Contains("not running"))
+        if (!string.IsNullOrWhiteSpace(scriptName))
         {
-            _isRunning = false;
-            TryRunNext();
+            _queue.Enqueue(scriptName);
+            _log.AddLog($"Queued script '{scriptName}'", "RobotInfo");
+            StartWorkerIfNeeded();
+        }
+    }
+
+    public void EnqueueScripts(IEnumerable<string> scriptNames)
+    {
+        foreach (var script in scriptNames)
+        {
+            if (!string.IsNullOrWhiteSpace(script))
+            {
+                _queue.Enqueue(script);
+                _log.AddLog($"Queued script '{script}'", "RobotInfo");
+            }
+        }
+
+        StartWorkerIfNeeded();
+    }
+
+    private void StartWorkerIfNeeded()
+    {
+        lock (_lock)
+        {
+            if (_workerRunning) return;
+            _workerRunning = true;
+            _ = Task.Run(RunQueueAsync);
+        }
+    }
+
+    private async Task RunQueueAsync()
+    {
+        try
+        {
+            while (_queue.TryDequeue(out var scriptName))
+            {
+                await RunSingleScript(scriptName);
+            }
+        }
+        finally
+        {
+            lock (_lock)
+            {
+                _workerRunning = false;
+            }
+        }
+    }
+
+    private async Task RunSingleScript(string scriptName)
+    {
+        try
+        {
+            _log.AddLog($"Running robot script '{scriptName}'", "RobotInfo");
+
+            await _robo.LoadProgramAsync(scriptName);
+            await _robo.PlayAsync();
+
+            await WaitForProgramToFinish(scriptName);
+
+            _log.AddLog($"Script '{scriptName}' completed.", "RobotInfo");
+        }
+        catch (Exception ex)
+        {
+            _log.AddLog($"Error while executing '{scriptName}': {ex.Message}", "RobotError");
+        }
+    }
+
+    private async Task WaitForProgramToFinish(string scriptName)
+    {
+        while (true)
+        {
+            await Task.Delay(500);
+
+            string state;
+
+            try
+            {
+                state = await _robo.GetProgramStateAsync();
+            }
+            catch
+            {
+                _log.AddLog($"Lost program state while waiting for '{scriptName}'.", "RobotError");
+                return;
+            }
+
+            string lower = state.ToLower();
+
+            if (lower.Contains("running") || lower.Contains("playing"))
+                continue;
+
+            // STOPPED, IDLE, READY, etc.
+            return;
         }
     }
 }

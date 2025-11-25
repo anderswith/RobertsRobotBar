@@ -1,12 +1,11 @@
+using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 public class RoboComms
 {
     private readonly string _robotIp;
-    private TcpClient? _client;
-    private NetworkStream? _stream;
-
     private const int DASHBOARD_PORT = 29999;
 
     public RoboComms(string robotIp)
@@ -14,41 +13,32 @@ public class RoboComms
         _robotIp = robotIp;
     }
 
-    public async Task<bool> ConnectAsync()
+    public async Task<string> SendDashboardCommand(string command)
     {
-        try
-        {
-            _client = new TcpClient();
-            await _client.ConnectAsync(_robotIp, DASHBOARD_PORT);
-            _stream = _client.GetStream();
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+        using var client = new TcpClient();
+        await client.ConnectAsync(_robotIp, DASHBOARD_PORT);
+
+        using var stream = client.GetStream();
+
+        byte[] cmdBytes = Encoding.ASCII.GetBytes(command + "\n");
+        await stream.WriteAsync(cmdBytes, 0, cmdBytes.Length);
+
+        var buffer = new byte[4096];
+        int read = await stream.ReadAsync(buffer, 0, buffer.Length);
+        if (read <= 0) return string.Empty;
+
+        return Encoding.ASCII.GetString(buffer, 0, read).Trim();
     }
 
-    public async Task SendCommand(string cmd)
-    {
-        if (_stream == null) return;
+    public Task<string> LoadProgramAsync(string programName)
+        => SendDashboardCommand($"load {programName}");
 
-        byte[] data = Encoding.ASCII.GetBytes(cmd + "\n");
-        await _stream.WriteAsync(data, 0, data.Length);
-    }
+    public Task<string> PlayAsync()
+        => SendDashboardCommand("play");
 
-    public async Task LoadProgram(string program)
-    {
-        await SendCommand($"load {program}");
-    }
+    public Task<string> StopAsync()
+        => SendDashboardCommand("stop");
 
-    public async Task Play()
-    {
-        await SendCommand("play");
-    }
-
-    public async Task Stop()
-    {
-        await SendCommand("stop");
-    }
+    public Task<string> GetProgramStateAsync()
+        => SendDashboardCommand("programState");
 }
