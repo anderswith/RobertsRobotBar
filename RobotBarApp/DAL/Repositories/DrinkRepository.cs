@@ -47,4 +47,12 @@ public class DrinkRepository : IDrinkRepository
         _context.SaveChanges();
     }
     
+    public Drink? GetDrinkWithScripts(Guid drinkId)
+    {
+        return _context.Drinks
+            .Include(d => d.DrinkScripts)
+            .FirstOrDefault(d => d.DrinkId == drinkId);
+    }
+    
+    
 }

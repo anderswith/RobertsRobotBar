@@ -221,5 +221,8 @@ public class DrinkLogic : IDrinkLogic
         _drinkRepository.UpdateDrink(existingDrink);
     }
 
-    
+    public Drink? GetDrinksWithScripts(Guid drinkId)
+    {
+        return _drinkRepository.GetDrinkWithScripts(drinkId);
+    }
 }

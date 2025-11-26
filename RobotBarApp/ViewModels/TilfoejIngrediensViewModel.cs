@@ -12,7 +12,7 @@ namespace RobotBarApp.ViewModels
     {
         private readonly INavigationService _navigation;
         private readonly IIngredientLogic _ingredientLogic;
-        private readonly RobotLogic _robotLogic;
+        private readonly IRobotLogic _robotLogic;
 
 
 
@@ -72,7 +72,7 @@ namespace RobotBarApp.ViewModels
         public TilfoejIngrediensViewModel(
             INavigationService navigation,
             IIngredientLogic ingredientLogic,
-            RobotLogic robotLogic
+            IRobotLogic robotLogic
             )
         {
             _navigation = navigation;

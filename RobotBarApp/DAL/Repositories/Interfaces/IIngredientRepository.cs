@@ -10,4 +10,5 @@ public interface IIngredientRepository
     void DeleteIngredient(Ingredient ingredient);
     void UpdateIngredient(Ingredient ingredient);
     IEnumerable<Ingredient> GetIngredientByType(string type);
+    IEnumerable<Ingredient> GetIngredientsWithScripts(List<Guid> ingredientIds);
 }

@@ -12,5 +12,6 @@ public interface IIngredientLogic
     IEnumerable<Ingredient> GetAlcohol();
     IEnumerable<Ingredient> GetSyrups();
     IEnumerable<Ingredient> GetSoda();
+    IEnumerable<Ingredient> GetIngredientsWithScripts(List<Guid> ingredientIds);
 
 }

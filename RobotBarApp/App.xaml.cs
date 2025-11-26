@@ -8,6 +8,7 @@ using RobotBarApp.DAL.Repositories;
 using RobotBarApp.DAL.Repositories.Interfaces;
 using RobotBarApp.Services;
 using RobotBarApp.Services.Interfaces;
+using RobotBarApp.Services.Robot.Interfaces;
 using RobotBarApp.View;
 using RobotBarApp.ViewModels;
 
@@ -43,6 +44,7 @@ public partial class App : Application
                 services.AddScoped<ILogLogic, LogLogic>();
                 services.AddScoped<IMenuLogic, MenuLogic>();
                 services.AddScoped<ISopLogic, SopLogic>();
+                services.AddScoped<IRobotLogic, RobotLogic>();
                 
                 // ViewModels
                 services.AddTransient<EventListViewModel>();
@@ -77,14 +79,14 @@ public partial class App : Application
                     return new RobotComms("192.168.0.101");
                 });
                 
-                services.AddSingleton<RobotScriptRunner>(provider =>
+                services.AddSingleton<IRobotScriptRunner>(provider =>
                 {
                     var comms = provider.GetRequiredService<RobotComms>();
                     var streamReader = provider.GetRequiredService<RobotDashboardStreamReader>();
                     var log   = provider.GetRequiredService<ILogLogic>();
                     return new RobotScriptRunner(comms, streamReader, log);
                 });
-                services.AddSingleton<RobotLogic>();
+
                     
 
 

@@ -197,4 +197,8 @@ public class IngredientLogic : IIngredientLogic
     {
         return _ingredientRepository.GetIngredientByType("Soda");
     }
+    public IEnumerable<Ingredient> GetIngredientsWithScripts(List<Guid> ingredientIds)
+    {
+        return _ingredientRepository.GetIngredientsWithScripts(ingredientIds);
+    }
 }

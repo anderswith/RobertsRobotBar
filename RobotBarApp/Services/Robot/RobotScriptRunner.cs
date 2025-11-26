@@ -1,7 +1,8 @@
 using System.Collections.Concurrent;
 using RobotBarApp.BLL.Interfaces;
+using RobotBarApp.Services.Robot.Interfaces;
 
-public class RobotScriptRunner
+public class RobotScriptRunner : IRobotScriptRunner
 {
     private readonly RobotComms _comms;
     private readonly ILogLogic _log;
@@ -18,7 +19,7 @@ public class RobotScriptRunner
         monitor.ProgramFinished += OnScriptFinished;   // <--- KEY PART
     }
 
-    public void EnqueueScripts(IEnumerable<string> scripts)
+    public void QueueScripts(IEnumerable<string> scripts)
     {
         foreach (var s in scripts)
             if (!string.IsNullOrWhiteSpace(s))
