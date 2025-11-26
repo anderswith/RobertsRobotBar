@@ -69,26 +69,26 @@ public partial class App : Application
                 services.AddTransient<TilfoejMenuView>();
                 
                 services.AddSingleton<INavigationService, NavigationService>();
-                services.AddSingleton<RobotDashboardStreamReader>(provider =>
+                
+                services.AddSingleton<IRobotDashboardStreamReader>(provider =>
                 {
                     var logLogic = provider.GetRequiredService<ILogLogic>();
                     return new RobotDashboardStreamReader("192.168.0.101", logLogic);
                 });
-                services.AddSingleton<RobotComms>(provider =>
+
+                services.AddSingleton<IRobotComms>(provider =>
                 {
                     return new RobotComms("192.168.0.101");
                 });
-                
+
                 services.AddSingleton<IRobotScriptRunner>(provider =>
                 {
-                    var comms = provider.GetRequiredService<RobotComms>();
-                    var streamReader = provider.GetRequiredService<RobotDashboardStreamReader>();
-                    var log   = provider.GetRequiredService<ILogLogic>();
-                    return new RobotScriptRunner(comms, streamReader, log);
+                    var comms = provider.GetRequiredService<IRobotComms>();
+                    var reader = provider.GetRequiredService<IRobotDashboardStreamReader>();
+                    var log = provider.GetRequiredService<ILogLogic>();
+
+                    return new RobotScriptRunner(comms, reader, log);
                 });
-
-                    
-
 
             })
             .Build();
@@ -97,7 +97,7 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        var monitor = AppHost.Services.GetRequiredService<RobotDashboardStreamReader>();
+        var monitor = AppHost.Services.GetRequiredService<IRobotDashboardStreamReader>();
         await monitor.StartAsync();
 
         var main = AppHost.Services.GetRequiredService<MainWindow>();

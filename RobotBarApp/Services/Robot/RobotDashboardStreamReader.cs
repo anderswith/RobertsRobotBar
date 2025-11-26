@@ -1,8 +1,9 @@
 using System.Net.Sockets;
 using System.Text;
 using RobotBarApp.BLL.Interfaces;
+using RobotBarApp.Services.Robot.Interfaces;
 
-public class RobotDashboardStreamReader
+public class RobotDashboardStreamReader : IRobotDashboardStreamReader
 {
     private readonly string _robotIp;
     private readonly ILogLogic _log;

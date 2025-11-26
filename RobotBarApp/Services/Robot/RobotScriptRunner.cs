@@ -4,19 +4,21 @@ using RobotBarApp.Services.Robot.Interfaces;
 
 public class RobotScriptRunner : IRobotScriptRunner
 {
-    private readonly RobotComms _comms;
+    private readonly IRobotComms _comms;
     private readonly ILogLogic _log;
+    private readonly IRobotDashboardStreamReader _reader;
     private readonly ConcurrentQueue<string> _queue = new();
 
     private bool _isRunning = false;
     private readonly object _lock = new();
 
-    public RobotScriptRunner(RobotComms comms, RobotDashboardStreamReader monitor, ILogLogic logLogic)
+    public RobotScriptRunner(IRobotComms comms, IRobotDashboardStreamReader reader, ILogLogic logLogic)
     {
         _comms = comms;
+        _reader = reader;
         _log = logLogic;
 
-        monitor.ProgramFinished += OnScriptFinished;   // <--- KEY PART
+        _reader.ProgramFinished += OnScriptFinished;
     }
 
     public void QueueScripts(IEnumerable<string> scripts)

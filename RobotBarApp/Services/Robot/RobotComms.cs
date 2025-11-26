@@ -1,8 +1,9 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using RobotBarApp.Services.Robot.Interfaces;
 
-public class RobotComms
+public class RobotComms : IRobotComms
 {
     private readonly string _robotIp;
     private const int DASHBOARD_PORT = 29999;
