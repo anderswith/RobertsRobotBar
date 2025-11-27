@@ -12,7 +12,7 @@ public class RobotDashboardStreamReader : IRobotDashboardStreamReader
     private NetworkStream? _stream;
     private CancellationTokenSource? _cts;
 
-    private const int DASHBOARD_PORT = 29999;
+    private const int SECONDARY_PORT = 30002;
 
     public event Action? ProgramFinished;  //  <-- Script finished event
     public event Action<string>? OnRobotMessage;
@@ -31,7 +31,7 @@ public class RobotDashboardStreamReader : IRobotDashboardStreamReader
         try
         {
             _client = new TcpClient();
-            var connectTask = _client.ConnectAsync(_robotIp, DASHBOARD_PORT);
+            var connectTask = _client.ConnectAsync(_robotIp, SECONDARY_PORT);
             var timeoutTask = Task.Delay(2000);
 
             var result = await Task.WhenAny(connectTask, timeoutTask);
@@ -99,8 +99,7 @@ public class RobotDashboardStreamReader : IRobotDashboardStreamReader
             OnRobotError?.Invoke(msg);
             return;
         }
-
-        _log.AddLog(msg, "RobotMessage");
+        
         OnRobotMessage?.Invoke(msg);
     }
 }
