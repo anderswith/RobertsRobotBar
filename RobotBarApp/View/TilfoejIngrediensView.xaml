@@ -227,7 +227,7 @@
                         Height="40"
                         Background="White"
                         Margin="0,0,10,0"
-                        Command="{Binding RunTestScripts}" />
+                        Command="{Binding RunTestScriptCommand}" />
                 <Button Content="Annullér"
                         Width="110"
                         Height="40"

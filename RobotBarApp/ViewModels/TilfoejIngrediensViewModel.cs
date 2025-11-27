@@ -96,8 +96,8 @@ namespace RobotBarApp.ViewModels
         {
             var testScripts = new List<string>
             {
-                "test_script1.urp",
-                "test_script2.urp"
+                "test.urp",
+                "test.urp"
             };
 
             _robotLogic.RunRobotScripts(testScripts);

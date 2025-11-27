@@ -83,6 +83,7 @@ public class RobotDashboardStreamReader : IRobotDashboardStreamReader
 
     private void ProcessMessage(string msg)
     {
+        Console.WriteLine($"MSG:{msg}");
         if (msg.Contains("Program finished"))
         {
             ProgramFinished?.Invoke();
