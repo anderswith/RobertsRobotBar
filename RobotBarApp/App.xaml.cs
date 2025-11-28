@@ -72,13 +72,16 @@ public partial class App : Application
                 
                 services.AddSingleton<IRobotDashboardStreamReader>(provider =>
                 {
-                    var logLogic = provider.GetRequiredService<ILogLogic>();
-                    return new RobotDashboardStreamReader("192.168.0.101", logLogic);
+                    var log = provider.GetRequiredService<ILogLogic>();
+                    return new RobotDashboardStreamReader(log);
                 });
 
                 services.AddSingleton<IRobotComms>(provider =>
                 {
-                    return new RobotComms("192.168.0.101");
+                    var reader = provider.GetRequiredService<IRobotDashboardStreamReader>();
+                    var log = provider.GetRequiredService<ILogLogic>();
+
+                    return new RobotComms("192.168.0.101", reader);
                 });
 
                 services.AddSingleton<IRobotScriptRunner>(provider =>
@@ -97,8 +100,8 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        var monitor = AppHost.Services.GetRequiredService<IRobotDashboardStreamReader>();
-        await monitor.StartAsync();
+        var comms = AppHost.Services.GetRequiredService<IRobotComms>();
+        _ = comms.ConnectAsync();
 
         var main = AppHost.Services.GetRequiredService<MainWindow>();
         main.Show();

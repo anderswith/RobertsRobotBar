@@ -1,3 +1,4 @@
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using RobotBarApp.BLL.Interfaces;
@@ -5,101 +6,80 @@ using RobotBarApp.Services.Robot.Interfaces;
 
 public class RobotDashboardStreamReader : IRobotDashboardStreamReader
 {
-    private readonly string _robotIp;
     private readonly ILogLogic _log;
 
+    public event Action<string>? OnRobotError;
+    public event Action? ProgramFinished;
+    public event Action<string>? OnRobotMessage;
+
     private TcpClient? _client;
-    private NetworkStream? _stream;
     private CancellationTokenSource? _cts;
 
-    private const int SECONDARY_PORT = 30002;
-
-    public event Action? ProgramFinished;  //  <-- Script finished event
-    public event Action<string>? OnRobotMessage;
-    public event Action<string>? OnRobotError;
-
-    public RobotDashboardStreamReader(string robotIp, ILogLogic logLogic)
+    public RobotDashboardStreamReader(ILogLogic log)
     {
-        _robotIp = robotIp;
-        _log = logLogic;
+        _log = log;
     }
 
-    public async Task StartAsync()
+    public async Task StartAsync(string robotIp)
     {
+        _client = new TcpClient();
+        await _client.ConnectAsync(robotIp, 30001); // PRIMARY INTERFACE
+
         _cts = new CancellationTokenSource();
+        _ = Task.Run(() => Listen(_cts.Token));
 
-        try
-        {
-            _client = new TcpClient();
-            var connectTask = _client.ConnectAsync(_robotIp, SECONDARY_PORT);
-            var timeoutTask = Task.Delay(2000);
-
-            var result = await Task.WhenAny(connectTask, timeoutTask);
-            if (result == timeoutTask)
-            {
-                _log.AddLog("Robot dashboard timeout — starting without connection.", "RobotWarning");
-                return;
-            }
-
-            await connectTask;
-
-            _stream = _client.GetStream();
-            _log.AddLog("Connected to robot dashboard.", "RobotInfo");
-
-            _ = Task.Run(() => ListenLoop(_cts.Token));
-        }
-        catch (Exception ex)
-        {
-            _log.AddLog($"Error connecting to robot: {ex.Message}", "RobotWarning");
-        }
+        Console.WriteLine("Connected to Primary Interface (30001)");
     }
 
-    private async Task ListenLoop(CancellationToken token)
+    private async Task Listen(CancellationToken token)
     {
+        var stream = _client!.GetStream();
         byte[] buffer = new byte[4096];
 
-        try
+        while (!token.IsCancellationRequested)
         {
-            while (!token.IsCancellationRequested)
+            if (!stream.DataAvailable)
             {
-                int read = await _stream!.ReadAsync(buffer, 0, buffer.Length, token);
-                if (read == 0)
-                    continue;
+                await Task.Delay(1);
+                continue;
+            }
 
-                string msg = Encoding.ASCII.GetString(buffer, 0, read).Trim();
-                if (string.IsNullOrWhiteSpace(msg))
-                    continue;
+            int bytes = await stream.ReadAsync(buffer, 0, buffer.Length, token);
+            if (bytes == 0)
+                continue;
 
-                Console.WriteLine($"[ROBOT STREAM] {msg}");
+            string data = Encoding.ASCII.GetString(buffer, 0, bytes);
 
-                ProcessMessage(msg);
+            foreach (var line in data.Split('\n'))
+            {
+                var trimmed = line.Trim();
+                if (trimmed.Length == 0) continue;
+
+                //Console.WriteLine("30001 << " + trimmed);
+
+                if (trimmed.Contains("textmsg", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("30001 << " + trimmed);
+                    OnRobotMessage?.Invoke(trimmed);
+                }
+
+                if (trimmed.Contains("protect", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.Contains("fault", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.Contains("emergency", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("30002 << " + trimmed);
+                    _log.AddLog($"Error: {trimmed}", "RobotError");
+                    OnRobotError?.Invoke(trimmed);
+                    
+                }
+
+                if (trimmed.Contains("finished", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.Contains("stopped", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("30002 << " + trimmed);
+                    ProgramFinished?.Invoke();
+                }
             }
         }
-        catch (Exception ex)
-        {
-            _log.AddLog($"Dashboard connection lost: {ex.Message}", "RobotError");
-        }
-    }
-
-    private void ProcessMessage(string msg)
-    {
-        Console.WriteLine($"MSG:{msg}");
-        if (msg.Contains("Program finished"))
-        {
-            ProgramFinished?.Invoke();
-            _log.AddLog(msg, "RobotInfo");
-            return;
-        }
-
-        if (msg.Contains("Protective stop") ||
-            msg.Contains("emergency") ||
-            msg.Contains("fault"))
-        {
-            _log.AddLog(msg, "RobotError");
-            OnRobotError?.Invoke(msg);
-            return;
-        }
-        
-        OnRobotMessage?.Invoke(msg);
     }
 }

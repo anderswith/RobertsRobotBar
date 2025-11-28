@@ -1,35 +1,46 @@
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using RobotBarApp.Services.Robot.Interfaces;
 
 public class RobotComms : IRobotComms
 {
-    private readonly string _robotIp;
-    private const int DASHBOARD_PORT = 29999;
+    private readonly IRobotDashboardStreamReader _reader;
+    private readonly string _ip;
 
-    public RobotComms(string robotIp)
+    public RobotComms(string ip, IRobotDashboardStreamReader reader)
     {
-        _robotIp = robotIp;
+        _ip = ip;
+        _reader = reader;
     }
 
-    private async Task SendAsync(string command)
+    public async Task ConnectAsync()
     {
-        using var client = new TcpClient();
-        await client.ConnectAsync(_robotIp, DASHBOARD_PORT);
+        // Start Primary Interface Reader (30001)
+        await _reader.StartAsync(_ip);
 
-        using var stream = client.GetStream();
-
-        byte[] data = Encoding.ASCII.GetBytes(command + "\n");
-        await stream.WriteAsync(data, 0, data.Length);
+        Console.WriteLine("RobotComms connected (reader running on 30001)");
     }
 
     public Task LoadProgramAsync(string programName)
-        => SendAsync($"load {programName}");
+        => SendDashboardCommand($"load {programName}");
 
     public Task PlayAsync()
-        => SendAsync("play");
+        => SendDashboardCommand("play");
 
     public Task StopAsync()
-        => SendAsync("stop");
+        => SendDashboardCommand("stop");
+
+    private async Task SendDashboardCommand(string cmd)
+    {
+        using var client = new TcpClient();
+        await client.ConnectAsync(_ip, 29999);
+
+        var stream = client.GetStream();
+        var writer = new StreamWriter(stream, Encoding.ASCII) { AutoFlush = true };
+
+        await writer.WriteLineAsync(cmd);
+
+        Console.WriteLine($">> {cmd}");
+    }
 }
