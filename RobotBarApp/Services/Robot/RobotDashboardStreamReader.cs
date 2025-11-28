@@ -19,16 +19,36 @@ public class RobotDashboardStreamReader : IRobotDashboardStreamReader
     {
         _log = log;
     }
-
+    
     public async Task StartAsync(string robotIp)
     {
-        _client = new TcpClient();
-        await _client.ConnectAsync(robotIp, 30001); // PRIMARY INTERFACE
-
         _cts = new CancellationTokenSource();
-        _ = Task.Run(() => Listen(_cts.Token));
 
-        Console.WriteLine("Connected to Primary Interface (30001)");
+        try
+        {
+            _client = new TcpClient();
+            
+            var connectTask = _client.ConnectAsync(robotIp, 30001);
+            var timeoutTask = Task.Delay(2000);
+
+            var result = await Task.WhenAny(connectTask, timeoutTask);
+
+            if (result == timeoutTask)
+            {
+                Console.WriteLine("Robot dashboard timeout — starting without connection.");
+                _log.AddLog("Robot dashboard timeout — starting without connection.", "RobotWarning");
+                return;
+            }
+
+            await connectTask;
+            Console.WriteLine("Connected to Primary Interface (30001)");
+            _ = Task.Run(() => Listen(_cts.Token));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error connecting to robot: {ex.Message}");
+            _log.AddLog($"Error connecting to robot: {ex.Message}", "RobotWarning");
+        }
     }
 
     private async Task Listen(CancellationToken token)
