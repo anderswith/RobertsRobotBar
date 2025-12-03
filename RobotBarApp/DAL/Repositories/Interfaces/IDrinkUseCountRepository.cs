@@ -8,3 +8,5 @@ public interface IDrinkUseCountRepository
     IEnumerable<DrinkUseCount> GetAllDrinkUseCounts();
     IEnumerable<DrinkUseCount> GetAllDrinkUseCountByTimeFrame(DateTime start, DateTime end);
 }
+
+

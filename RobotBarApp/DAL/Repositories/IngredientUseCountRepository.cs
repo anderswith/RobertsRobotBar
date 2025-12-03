@@ -1,8 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using RobotBarApp.BE;
+using RobotBarApp.DAL.Repositories.Interfaces;
 
 namespace RobotBarApp.DAL.Repositories;
 
-public class IngredientUseCountRepository
+public class IngredientUseCountRepository : IIngredientUseCountRepository
 {
     private readonly RobotBarContext _context;
     public IngredientUseCountRepository(RobotBarContext context)
@@ -25,6 +27,8 @@ public class IngredientUseCountRepository
     {
         return _context.IngredientUseCounts
             .Where(iuc => iuc.TimeStamp >= start && iuc.TimeStamp <= end)
+            .Include(icu => icu.Ingredient)
             .ToList();
     }
+
 }

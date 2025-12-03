@@ -8,12 +8,17 @@ public class RobotLogic : IRobotLogic
     private readonly IRobotScriptRunner _scriptRunner;
     private readonly IIngredientLogic _ingredientLogic;
     private readonly IDrinkLogic _drinkLogic;
+    private readonly IDrinkUseCountLogic _drinkUseCountLogic;
+    private readonly IIngredientUseCountLogic _ingredientUseCountLogic;
     
-    public RobotLogic(IRobotScriptRunner scriptRunner, IIngredientLogic ingredientLogic, IDrinkLogic drinkLogic)
+    public RobotLogic(IRobotScriptRunner scriptRunner, IIngredientLogic ingredientLogic, IDrinkLogic drinkLogic,
+        IIngredientUseCountLogic ingredientUseCountLogic, IDrinkUseCountLogic drinkUseCountLogic)
     {
         _scriptRunner = scriptRunner;
         _ingredientLogic = ingredientLogic;
         _drinkLogic = drinkLogic;
+        _ingredientUseCountLogic = ingredientUseCountLogic;
+        _drinkUseCountLogic = drinkUseCountLogic;
     }
     
     public void RunRobotScripts(IEnumerable<string> scripts)
@@ -23,7 +28,20 @@ public class RobotLogic : IRobotLogic
 
     public void RunIngredientScript(List<Guid> ingredientIds)
     {
+        if(ingredientIds == null || ingredientIds.Count == 0)
+        {
+            throw new ArgumentException("Ingredient IDs cannot be null or empty.");
+        }
+        
         var ingredients = _ingredientLogic.GetIngredientsWithScripts(ingredientIds);
+        if(ingredients == null || ingredients.Count() == 0)
+        {
+            throw new ArgumentException("No ingredients found with the provided IDs.");
+        }
+        foreach(var ingredientId in ingredientIds)
+        {
+            _ingredientUseCountLogic.AddIngredientUseCount(ingredientId);
+        }
 
         var scripts = new List<string>();
 
@@ -40,10 +58,25 @@ public class RobotLogic : IRobotLogic
 
     public void RunDrinkScripts(Guid drinkId)
     {
+        if(drinkId == Guid.Empty)
+        {
+            throw new ArgumentException("Drink ID cannot be empty.");
+        }
+        
         var drink = _drinkLogic.GetDrinksWithScripts(drinkId);
         if (drink == null)
         {
             throw new ArgumentException("Drink not found.");
+        }
+        _drinkUseCountLogic.AddDrinkUseCount(drinkId);
+        
+        var ingredientIds = drink.DrinkContents
+            .Select(dc => dc.IngredientId)
+            .ToList();
+
+        foreach (var ingredientId in ingredientIds)
+        {
+            _ingredientUseCountLogic.AddIngredientUseCount(ingredientId);
         }
 
         var scripts = new List<string>();

@@ -35,6 +35,8 @@ public partial class App : Application
                 services.AddScoped<ILogRepository, LogRepository>();
                 services.AddScoped<IMenuRepository, MenuRepository>();
                 services.AddScoped<ISopRepository, SopRepository>();
+                services.AddScoped<IIngredientUseCountRepository, IngredientUseCountRepository>();
+                services.AddScoped<IDrinkUseCountRepository, DrinkUseCountRepository>();
 
                 // Logic
                 services.AddScoped<IBarSetupLogic, BarSetupLogic>();
@@ -45,6 +47,8 @@ public partial class App : Application
                 services.AddScoped<IMenuLogic, MenuLogic>();
                 services.AddScoped<ISopLogic, SopLogic>();
                 services.AddScoped<IRobotLogic, RobotLogic>();
+                services.AddScoped<IIngredientUseCountLogic, IIngredientUseCountLogic>();
+                services.AddScoped<IDrinkUseCountLogic, IDrinkUseCountLogic>();
                 
                 // ViewModels
                 services.AddTransient<EventListViewModel>();
