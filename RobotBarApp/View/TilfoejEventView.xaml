@@ -11,13 +11,13 @@
         <!-- Main container -->
         <Grid Margin="40">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <!-- TOP TEXT (handled by MainWindow, so empty here) -->
-            <TextBlock Grid.Row="0"/>
+            <TextBlock Grid.Row="0" />
 
             <!-- STEP CONTENT -->
             <Grid Grid.Row="1">
@@ -27,34 +27,34 @@
                       Visibility="{Binding Step, ConverterParameter=1,
                                            Converter={StaticResource StepToVisibilityConverter}}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
                     <!-- Name -->
                     <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,40,0,20">
                         <TextBlock Text="Navn:" FontSize="26" Foreground="Gray" Margin="0,0,0,10"
-                                   HorizontalAlignment="Center"/>
+                                   HorizontalAlignment="Center" />
                         <Border Width="400" Height="50" Background="White" CornerRadius="20">
                             <TextBox Text="{Binding EventName}" FontSize="24" Padding="10"
-                                     Background="Transparent" BorderThickness="0"/>
+                                     Background="Transparent" BorderThickness="0" />
                         </Border>
                     </StackPanel>
 
                     <!-- Image -->
                     <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,20,0,20">
                         <TextBlock Text="Billede:" FontSize="26" Foreground="Gray"
-                                   HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                        
+                                   HorizontalAlignment="Center" Margin="0,0,0,10" />
+
                         <Border Width="140" Height="140" CornerRadius="20" Background="White"
                                 BorderBrush="#DDD" BorderThickness="1">
-                            <Image Source="{Binding EventImage}" Stretch="Uniform"/>
+                            <Image Source="{Binding EventImage}" Stretch="Uniform" />
                         </Border>
 
                         <Button Content="Vælg" Command="{Binding ChooseImageCommand}"
                                 Width="120" Height="40" Margin="0,10,0,0"
-                                Style="{StaticResource RoundButton}"/>
+                                Style="{StaticResource RoundButton}" />
                     </StackPanel>
                 </Grid>
 
@@ -63,18 +63,18 @@
                       Visibility="{Binding Step, ConverterParameter=2,
                                            Converter={StaticResource StepToVisibilityConverter}}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
                     <!-- Search + label -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,20,0,10">
                         <TextBlock Text="Ingredienser:" FontSize="24" Foreground="Gray"
-                                   Margin="0,0,20,0"/>
+                                   Margin="0,0,20,0" />
                         <TextBox Text="{Binding IngredientSearch}"
                                  Width="200" Height="40" Padding="10"
-                                 FontSize="20"/>
+                                 FontSize="20" />
                     </StackPanel>
 
                     <!-- Scrollable ingredient list -->
@@ -83,7 +83,7 @@
                         <ItemsControl ItemsSource="{Binding FilteredIngredients}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal"/>
+                                    <StackPanel Orientation="Horizontal" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
 
@@ -94,11 +94,12 @@
                                             CornerRadius="15"
                                             Margin="5"
                                             BorderBrush="#DDD" BorderThickness="1">
-                                        <Button Command="{Binding DataContext.AddIngredientCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}">
+                                        <Button
+                                            Command="{Binding DataContext.AddIngredientCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}">
                                             <TextBlock Text="{Binding Name}" FontSize="20"
                                                        HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center"/>
+                                                       VerticalAlignment="Center" />
                                         </Button>
                                     </Border>
                                 </DataTemplate>
@@ -109,62 +110,198 @@
                     <!-- Rack + Menu -->
                     <Grid Grid.Row="2" Margin="0,30,0,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="1*" />
                         </Grid.ColumnDefinitions>
 
                         <!-- Rack -->
-                        <UniformGrid Columns="8" Rows="3" Grid.Column="0">
-                            <ItemsControl ItemsSource="{Binding RackItems}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                                            <Image Source="{Binding ImageSource}" Height="70" />
-                                            <Rectangle Width="50" Height="5" Fill="Black"
-                                                       VerticalAlignment="Bottom" Margin="0,40,0,0"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </UniformGrid>
+                        <ItemsControl Grid.Column="0"
+                                      ItemsSource="{Binding RackItems}">
+                            <!-- 8 columns, 3 rows ALWAYS visible (24 RackSlot items) -->
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="8" Rows="3" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Margin="4,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Ingredient image (optional) -->
+                                        <Image Grid.Row="0"
+                                               Source="{Binding ImageSource}"
+                                               Height="70"
+                                               VerticalAlignment="Bottom" />
+
+                                        <!-- Black bar -->
+                                        <Rectangle Grid.Row="1"
+                                                   Width="50"
+                                                   Height="5"
+                                                   Fill="Black"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,4,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
 
                         <!-- Menu -->
                         <StackPanel Grid.Column="1" Margin="20,0,0,0"
                                     Visibility="{Binding HasMenu, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <TextBlock Text="Menukort:" FontSize="22" Foreground="Gray" Margin="0,0,0,10"/>
-                             <Border Background="White" CornerRadius="10"
-                                     Padding="10" Height="250">
-                                 <ListBox ItemsSource="{Binding MenuDrinks}" FontSize="18"/>
-                             </Border>
-                         </StackPanel>
+                            <TextBlock Text="Menukort:" FontSize="22" Foreground="Gray" Margin="0,0,0,10" />
+                            <Border Background="White" CornerRadius="10"
+                                    Padding="10" Height="250">
+                                <ListBox ItemsSource="{Binding MenuDrinks}" FontSize="18" />
+                            </Border>
+                        </StackPanel>
 
+                    </Grid>
+                </Grid>
+                <!-- ============ STEP 3 ============ -->
+                <Grid x:Name="Step3"
+                      Visibility="{Binding Step, ConverterParameter=3,
+                                       Converter={StaticResource StepToVisibilityConverter}}">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Rack + Menu summary -->
+                    <Grid Grid.Row="0" Margin="0,30,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- RACK: reuse the SAME ItemsControl you use in Step 2 -->
+                        <!-- If you’re using the UniformGrid version, copy it here -->
+                        <ItemsControl Grid.Column="0"
+                                      ItemsSource="{Binding RackItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="8" Rows="3" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Margin="4,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Ingredient image -->
+                                        <Image Grid.Row="0"
+                                               Source="{Binding ImageSource}"
+                                               Height="70"
+                                               VerticalAlignment="Bottom" />
+
+                                        <!-- Black bar -->
+                                        <Rectangle Grid.Row="1"
+                                                   Width="50"
+                                                   Height="5"
+                                                   Fill="Black"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,4,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- MENU -->
+                        <StackPanel Grid.Column="1" Margin="20,0,0,0"
+                                    Visibility="{Binding HasMenu,
+                                                 Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock Text="Menukort:" FontSize="22" Foreground="Gray" Margin="0,0,0,10" />
+                            <Border Background="White" CornerRadius="10"
+                                    Padding="10" Height="250">
+                                <ListBox ItemsSource="{Binding MenuDrinks}" FontSize="18" />
+                            </Border>
+                        </StackPanel>
                     </Grid>
                 </Grid>
             </Grid>
 
             <!-- Bottom buttons -->
             <Grid Grid.Row="2" Margin="0,20,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Content="Annuller" Command="{Binding CancelCommand}"
-                        Width="140" Height="50" Style="{StaticResource RoundButton}"/>
+                <!-- STEP 1: Annuller + Næste -->
+                <Grid
+                    Visibility="{Binding Step, ConverterParameter=1,
+                                       Converter={StaticResource StepToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="2" Content="Næste" Command="{Binding NextCommand}"
-                        Width="140" Height="50" Style="{StaticResource RoundButton}"
-                        HorizontalAlignment="Center"
-                        Visibility="{Binding Step, ConverterParameter=1,
-                                             Converter={StaticResource StepToVisibilityConverter}}"/>
+                    <Button Grid.Column="0" Content="Annuller" Command="{Binding CancelCommand}"
+                            Width="140" Height="50" Style="{StaticResource RoundButton}"
+                            HorizontalAlignment="Left" />
 
-                <Button Grid.Column="3" Content="Gem" Command="{Binding SaveCommand}"
-                        Width="140" Height="50" Style="{StaticResource RoundButton}"
-                        Visibility="{Binding Step, ConverterParameter=2,
-                                             Converter={StaticResource StepToVisibilityConverter}}"/>
+                    <Button Grid.Column="3" Content="Næste" Command="{Binding NextCommand}"
+                            Width="140" Height="50" Style="{StaticResource RoundButton}"
+                            HorizontalAlignment="Right" />
+                </Grid>
+
+                <!-- STEP 2: Annuller + Gem -->
+                <Grid
+                    Visibility="{Binding Step, ConverterParameter=2,
+                                       Converter={StaticResource StepToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Content="Annuller" Command="{Binding CancelCommand}"
+                            Width="140" Height="50" Style="{StaticResource RoundButton}"
+                            HorizontalAlignment="Left" />
+
+                    <Button Grid.Column="3" Content="Gem" Command="{Binding SaveCommand}"
+                            Width="140" Height="50" Style="{StaticResource RoundButton}"
+                            HorizontalAlignment="Right" />
+                </Grid>
+
+                <!-- STEP 3: Tilbage + Rediger + Start -->
+                <Grid
+                    Visibility="{Binding Step, ConverterParameter=3,
+                                       Converter={StaticResource StepToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="1" Content="Tilbage" Command="{Binding BackCommand}"
+                            Width="140" Height="50" Style="{StaticResource RoundButton}"
+                            Margin="10,0" />
+
+                    <Button Grid.Column="2" Content="Rediger" Command="{Binding EditCommand}"
+                            Width="140" Height="50" Style="{StaticResource RoundButton}"
+                            Margin="10,0" />
+
+                    <Button Grid.Column="3" Content="Start" Command="{Binding StartCommand}"
+                            Width="140" Height="50" Style="{StaticResource RoundButton}"
+                            Margin="10,0" />
+                </Grid>
             </Grid>
+
         </Grid>
     </Grid>
 </UserControl>

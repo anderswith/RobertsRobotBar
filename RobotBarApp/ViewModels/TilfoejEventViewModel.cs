@@ -36,7 +36,7 @@ namespace RobotBarApp.ViewModels
             Ingredients = new ObservableCollection<Ingredient>(_ingredientLogic.GetAllIngredients());
             FilteredIngredients = new ObservableCollection<Ingredient>(Ingredients);
 
-            RackItems = new ObservableCollection<RackSlot>();
+            RackItems = new ObservableCollection<RackSlot>(Enumerable.Range(1, 24).Select(pos => new RackSlot(pos)));
             MenuDrinks = new ObservableCollection<string>();
             SelectedDrinkIds = new ObservableCollection<Guid>();
 
@@ -45,6 +45,10 @@ namespace RobotBarApp.ViewModels
             CancelCommand = new RelayCommand(_ => _navigationService.NavigateTo<EventListViewModel>());
             AddIngredientCommand = new RelayCommand(AddIngredientToRack);
             SaveCommand = new RelayCommand(_ => SaveEvent());
+            
+            BackCommand  = new RelayCommand(_ => _navigationService.NavigateTo<EventListViewModel>());
+            EditCommand  = new RelayCommand(_ => Step = 2);
+            StartCommand = new RelayCommand(_ => StartEvent());
         }
 
         // -------------------------
@@ -140,11 +144,11 @@ namespace RobotBarApp.ViewModels
         {
             if (param is not Ingredient ing) return;
 
-            RackItems.Add(new RackSlot
-            {
-                Ingredient = ing,
-                ImageSource = ing.Image
-            });
+            var slot = RackItems.FirstOrDefault(r => r.Position == ing.PositionNumber);
+            if (slot == null)
+                return;
+
+            slot.Ingredient = ing;
 
             // Show menu after 1+ ingredient
             HasMenu = true;
@@ -155,13 +159,11 @@ namespace RobotBarApp.ViewModels
             foreach (var drink in _drinkLogic.GetAllDrinks())
             {
                 if (drink.DrinkContents != null &&
-                    drink.DrinkContents.Any(dc => RackItems.Any(r => r.Ingredient.IngredientId == dc.IngredientId)))
+                    drink.DrinkContents.Any(dc => RackItems.Any(r => r.Ingredient != null && r.Ingredient.IngredientId == dc.IngredientId)))
                 {
                     MenuDrinks.Add(drink.Name);
                     if (!SelectedDrinkIds.Contains(drink.DrinkId))
-                    {
                         SelectedDrinkIds.Add(drink.DrinkId);
-                    }
                 }
             }
         }
@@ -214,7 +216,9 @@ namespace RobotBarApp.ViewModels
 
             _eventLogic.AddEvent(EventName, storedEventImagePath, menuId);
 
-            _navigationService.NavigateTo<EventListViewModel>();
+            // Go to summary step
+            Step = 3;
+
         }
 
         private string CopyEventImageToResources()
@@ -251,12 +255,55 @@ namespace RobotBarApp.ViewModels
                 return Path.Combine(baseDir, "Resources", "EventPics");
             }
         }
+        
+        
+        // -------------------------
+        // STEP 3 — OVERVIEW + START
+        // -------------------------
+        public RelayCommand BackCommand { get; }
+        public RelayCommand EditCommand { get; }
+        public RelayCommand StartCommand { get; }
+        
+        private void StartEvent()
+        {
+            // TODO: later you can navigate to a “running event” view instead
+            _navigationService.NavigateTo<EventListViewModel>();
+        }
+
+        
     }
 
     // Helper model for rack position
-    public class RackSlot
+    public class RackSlot : ViewModelBase
     {
-        public Ingredient Ingredient { get; set; } = null!;
-        public string? ImageSource { get; set; }
+        public RackSlot(int position)
+        {
+            Position = position;
+        }
+
+        public int Position { get; }
+
+        public int Row => (Position - 1) / 8;
+        public int Column => (Position - 1) % 8;
+
+        private Ingredient? _ingredient;
+        public Ingredient? Ingredient
+        {
+            get => _ingredient;
+            set
+            {
+                if (SetProperty(ref _ingredient, value))
+                {
+                    ImageSource = _ingredient?.Image;
+                }
+            }
+        }
+
+        private string? _imageSource;
+        public string? ImageSource
+        {
+            get => _imageSource;
+            private set => SetProperty(ref _imageSource, value);
+        }
     }
 }
