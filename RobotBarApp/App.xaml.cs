@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RobotBarApp.BLL;
@@ -10,18 +11,19 @@ using RobotBarApp.Services;
 using RobotBarApp.Services.Interfaces;
 using RobotBarApp.View;
 using RobotBarApp.ViewModels;
+using RobotBarApp.Helper;
 
 
 namespace RobotBarApp;
 
-public partial class App : Application
+public partial class App
 {
-    public static IHost AppHost { get; private set; }
+    public static IHost? AppHost { get; private set; }
 
     public App()
     {
         AppHost = Host.CreateDefaultBuilder()
-            .ConfigureServices((context, services) =>
+            .ConfigureServices((_, services) =>
             {
                 // DbContext
                 services.AddDbContext<RobotBarContext>();
@@ -81,10 +83,28 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        var monitor = AppHost.Services.GetRequiredService<RobotLogMonitor>();
-        await monitor.StartAsync();
 
-        var main = AppHost.Services.GetRequiredService<MainWindow>();
-        main.Show();
+        try
+        {
+            var monitor = AppHost?.Services.GetRequiredService<RobotLogMonitor>();
+            if (monitor != null)
+                await monitor.StartAsync();
+        }
+        catch (Exception ex)
+        {
+            // Log but don't crash.
+            try
+            {
+                var log = AppHost?.Services.GetService<ILogLogic>();
+                log?.AddLog($"RobotLogMonitor failed to start: {ex.Message}", "RobotError");
+            }
+            catch (Exception logEx)
+            {
+                Debug.WriteLine($"Failed to log RobotLogMonitor startup error: {logEx.Message}");
+            }
+        }
+
+        var main = AppHost?.Services.GetRequiredService<MainWindow>();
+        main?.Show();
     }
 }
