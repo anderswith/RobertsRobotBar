@@ -88,7 +88,7 @@ public partial class App
         {
             var monitor = AppHost?.Services.GetRequiredService<RobotLogMonitor>();
             if (monitor != null)
-                _ = monitor.StartAsync();
+                await monitor.StartAsync();
         }
         catch (Exception ex)
         {

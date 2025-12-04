@@ -4,6 +4,8 @@ using Microsoft.Win32;
 using RobotBarApp.Services.Interfaces;
 using RobotBarApp.BLL.Interfaces;
 using System.Collections.Generic;
+using System;
+using System.IO;
 
 namespace RobotBarApp.ViewModels
 {
@@ -28,7 +30,7 @@ namespace RobotBarApp.ViewModels
             set => SetProperty(ref _sizeCl, value);
         }
 
-        private string _imagePreview;
+        private string _imagePreview = string.Empty;
         public string ImagePreview
         {
             get => _imagePreview;
@@ -128,6 +130,12 @@ namespace RobotBarApp.ViewModels
                 System.Windows.MessageBox.Show("Vælg en holder.");
                 return;
             }
+            
+            if (string.IsNullOrWhiteSpace(ImagePreview) || !File.Exists(ImagePreview))
+            {
+                System.Windows.MessageBox.Show("Vælg et billede, så det kan gemmes lokalt.");
+                return;
+            }
 
             string type = "Ukendt";
             if (IsAlkohol) type = "Alkohol";
@@ -143,10 +151,12 @@ namespace RobotBarApp.ViewModels
             if (!string.IsNullOrWhiteSpace(ScriptText))
                 scripts.Add(ScriptText);
             
+            var storedImagePath = CopyImageToResources();
+            
             _ingredientLogic.AddIngredient(
                 name: IngredientName,
                 type: type,
-                image: ImagePreview,
+                image: storedImagePath,
                 size: sizeParsed,
                 dose: dose,
                 positionNumber: SelectedHolder,
@@ -156,6 +166,42 @@ namespace RobotBarApp.ViewModels
             System.Windows.MessageBox.Show("Ingrediens tilføjet!");
 
             _navigation.NavigateTo<TilfoejIngrediensViewModel>(); 
+        }
+
+        private string CopyImageToResources()
+        {
+            var destinationFolder = GetIngredientPicsDirectory();
+            Directory.CreateDirectory(destinationFolder);
+
+            var extension = Path.GetExtension(ImagePreview);
+            var safeName = new string((IngredientName ?? "ingredient").Select(ch =>
+                Path.GetInvalidFileNameChars().Contains(ch) ? '_' : ch).ToArray());
+            if (string.IsNullOrWhiteSpace(safeName))
+                safeName = "ingredient";
+
+            var fileName = $"{safeName}_{DateTime.UtcNow:yyyyMMddHHmmssfff}{extension}";
+            var destinationPath = Path.Combine(destinationFolder, fileName);
+
+            File.Copy(ImagePreview, destinationPath, overwrite: true);
+
+            return Path.GetRelativePath(AppContext.BaseDirectory, destinationPath);
+        }
+
+        private string GetIngredientPicsDirectory()
+        {
+            var baseDir = AppContext.BaseDirectory;
+            var projectResourcePath = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "Resources", "IngredientPics"));
+
+            try
+            {
+                Directory.CreateDirectory(projectResourcePath);
+                return projectResourcePath;
+            }
+            catch
+            {
+                // Fall back to output directory if we cannot reach the project folder
+                return Path.Combine(baseDir, "Resources", "IngredientPics");
+            }
         }
     }
 }
