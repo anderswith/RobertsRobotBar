@@ -24,12 +24,37 @@ public class DrinkUseCountRepository : IDrinkUseCountRepository
         return _context.DrinkUseCounts.ToList();
     }
     
-    public IEnumerable<DrinkUseCount> GetAllDrinkUseCountByTimeFrame(DateTime start, DateTime end)
+    public (List<Drink> Drinks, List<DrinkUseCount> DrinkUses)
+        GetAllDrinksUseCountForEvent(Guid eventId)
     {
-        return _context.DrinkUseCounts
-            .Where(duc => duc.TimeStamp >= start && duc.TimeStamp <= end)
-            .Include(duc => duc.drink)   
+        // 1) Find menu-id
+        var menuId = _context.Events
+            .Where(e => e.EventId == eventId)
+            .Select(e => e.MenuId)
+            .FirstOrDefault();
+
+        if (menuId == Guid.Empty)
+            return (new(), new());
+
+        // 2) Find alle drinks i menuen
+        var drinkIds = _context.MenuContents
+            .Where(mc => mc.MenuId == menuId)
+            .Select(mc => mc.DrinkId)
             .ToList();
+
+        // 3) Hent drinks
+        var drinks = _context.Drinks
+            .Where(d => drinkIds.Contains(d.DrinkId))
+            .ToList();
+
+        // 4) Hent ALLE DrinkUseCounts for disse drinks
+        var drinkUses = _context.DrinkUseCounts
+            .Where(duc => drinkIds.Contains(duc.DrinkId))
+            .ToList();
+
+        return (drinks, drinkUses);
     }
+
+    
     
 }
