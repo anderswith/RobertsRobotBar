@@ -384,5 +384,27 @@ namespace UnitTests
                 i.IngredientScripts.Any(s => s.Number == 4)
             )), Times.Once);
         }
+        
+        // GetIngredientsForPositions 
+        [Test]
+        public void GetIngredientsForPosition_ShouldCallRepository_WhenValidPosition()
+        {
+
+
+            var expectedList = new List<Ingredient>
+            {
+                new Ingredient { IngredientId = Guid.NewGuid(), Name = "Vodka" },
+                new Ingredient { IngredientId = Guid.NewGuid(), Name = "Cola" }
+            };
+
+            _ingredientRepositoryMock
+                .Setup(r => r.GetIngredientsForPositions())
+                .Returns(expectedList);
+
+            var result = _ingredientLogic.GetIngredientsForPositions();
+
+            Assert.That(result, Is.EqualTo(expectedList));
+            _ingredientRepositoryMock.Verify(r => r.GetIngredientsForPositions(), Times.Once);
+        }
     }
 }

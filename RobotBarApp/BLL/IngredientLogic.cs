@@ -187,4 +187,9 @@ public class IngredientLogic : IIngredientLogic
     {
         return _ingredientRepository.GetIngredientsWithScripts(ingredientIds);
     }
+
+    public IEnumerable<Ingredient> GetIngredientsForPositions()
+    {
+        return _ingredientRepository.GetIngredientsForPositions();
+    }
 }
