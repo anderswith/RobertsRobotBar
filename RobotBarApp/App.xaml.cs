@@ -47,8 +47,8 @@ public partial class App : Application
                 services.AddScoped<IMenuLogic, MenuLogic>();
                 services.AddScoped<ISopLogic, SopLogic>();
                 services.AddScoped<IRobotLogic, RobotLogic>();
-                services.AddScoped<IIngredientUseCountLogic, IIngredientUseCountLogic>();
-                services.AddScoped<IDrinkUseCountLogic, IDrinkUseCountLogic>();
+                services.AddScoped<IIngredientUseCountLogic, IngredientUseCountLogic>();
+                services.AddScoped<IDrinkUseCountLogic, DrinkUseCountLogic>();
                 
                 // ViewModels
                 services.AddTransient<EventListViewModel>();
