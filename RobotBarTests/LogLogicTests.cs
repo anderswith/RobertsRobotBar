@@ -223,5 +223,64 @@ namespace UnitTests
 
             Assert.That(result, Is.EqualTo(logs));
         }
+        
+        
+         // AddEventLog
+        [Test]
+        public void AddEventLog_ShouldThrow_WhenEventIdIsEmpty()
+        {
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _logic.AddEventLog(Guid.Empty, "Something happened", "Info"));
+
+            Assert.That(ex!.Message, Is.EqualTo("Event ID must be specified"));
+        }
+
+        [TestCase(null)]
+        [TestCase("")]
+        public void AddEventLog_ShouldThrow_WhenMessageIsNullOrEmpty(string? invalidMsg)
+        {
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _logic.AddEventLog(Guid.NewGuid(), invalidMsg!, "Info"));
+
+            Assert.That(ex!.Message, Is.EqualTo("Log message cannot be null or empty"));
+        }
+
+        [TestCase(null)]
+        [TestCase("")]
+        public void AddEventLog_ShouldThrow_WhenTypeIsNullOrEmpty(string? invalidType)
+        {
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _logic.AddEventLog(Guid.NewGuid(), "Valid log message", invalidType!));
+
+            Assert.That(ex!.Message, Is.EqualTo("Log type cannot be null or empty"));
+        }
+
+        [Test]
+        public void AddEventLog_ShouldCallRepository_WithCorrectLogEntity()
+        {
+            Guid eventId = Guid.NewGuid();
+            string msg = "Event started";
+            string type = "Info";
+
+            Log? captured = null;
+
+            _repoMock
+                .Setup(r => r.AddLog(It.IsAny<Log>()))
+                .Callback<Log>(l => captured = l);
+
+            _logic.AddEventLog(eventId, msg, type);
+
+            _repoMock.Verify(r => r.AddLog(It.IsAny<Log>()), Times.Once);
+            Assert.That(captured, Is.Not.Null);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(captured!.EventId, Is.EqualTo(eventId));
+                Assert.That(captured.LogMsg, Is.EqualTo(msg));
+                Assert.That(captured.Type, Is.EqualTo(type));
+                Assert.That(captured.LogId, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(captured.TimeStamp, Is.Not.EqualTo(default(DateTime)));
+            });
+        }
     }
 }
