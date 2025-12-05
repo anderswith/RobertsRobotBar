@@ -8,8 +8,10 @@ public class Event
     public string Name { get; set; }
     public Guid MenuId { get; set; }
     public string Image { get; set; }
-    public Guid EventBarSetupId { get; set; }
+
+  
     
     public Menu Menu { get; set; }
     public ICollection<BarSetup> BarSetups { get; set; }
+    public ICollection<Log> Logs { get; set; }
 }

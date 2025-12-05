@@ -50,7 +50,7 @@ public class LogLogic : ILogLogic
 
         return _logRepository.GetLogsByType(type);
     }
-    public IEnumerable<Log> GetLogsInTimeFrame(DateTime start, DateTime end)
+    public IEnumerable<Log> GetLogsInTimeFrame(Guid eventId,DateTime start, DateTime end)
     {
         if (start == default || end == default)
         {
@@ -60,14 +60,22 @@ public class LogLogic : ILogLogic
         {
             throw new ArgumentException("Start time must be earlier than end time");
         }
+        if(Guid.Empty == eventId)
+        {
+            throw new ArgumentException("Event ID must be specified");
+        }
 
-        return _logRepository.GetLogsInTimeFrame(start, end);
+        return _logRepository.GetLogsInTimeFrame(eventId, start, end);
     }
-    public IEnumerable<Log> GetLogsByTypeInTimeFrame(string type, DateTime start, DateTime end)
+    public IEnumerable<Log> GetLogsByTypeInTimeFrame(Guid eventId, string type, DateTime start, DateTime end)
     {
         if (string.IsNullOrEmpty(type))
         {
             throw new ArgumentException("Log type cannot be null or empty");
+        }
+        if(Guid.Empty == eventId)
+        {
+            throw new ArgumentException("Event ID must be specified");
         }
         if(start == default || end == default)
         {
@@ -78,7 +86,17 @@ public class LogLogic : ILogLogic
             throw new ArgumentException("Start time must be earlier than end time");
         }
 
-        return _logRepository.GetLogsByTypeInTimeFrame(type, start, end);
+        return _logRepository.GetLogsByTypeInTimeFrame(eventId, type, start, end);
+    }
+    
+    public IEnumerable<Log> GetLogsForEvent(Guid eventId)
+    {
+        if(Guid.Empty == eventId)
+        {
+            throw new ArgumentException("Event ID must be specified");
+        }
+
+        return _logRepository.GetLogsForEvent(eventId);
     }
    
 

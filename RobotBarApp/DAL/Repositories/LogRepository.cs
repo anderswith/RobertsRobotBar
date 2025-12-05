@@ -30,19 +30,32 @@ public class LogRepository: ILogRepository
             .ToList();
     }
     
-    public IEnumerable<Log> GetLogsInTimeFrame(DateTime start, DateTime end)
+    public IEnumerable<Log> GetLogsInTimeFrame(Guid eventId, DateTime start, DateTime end)
     {
         return _context.Logs
-            .Where(l => l.TimeStamp >= start && l.TimeStamp <= end)
+            .Where(l => l.EventId == eventId &&
+                        l.TimeStamp >= start && 
+                        l.TimeStamp <= end)
             .ToList();
     }
     
-    public IEnumerable<Log> GetLogsByTypeInTimeFrame(string type, DateTime start, DateTime end)
+    public IEnumerable<Log> GetLogsByTypeInTimeFrame(Guid eventId, string type, DateTime start, DateTime end)
     {
         return _context.Logs
-            .Where(l => l.Type == type && l.TimeStamp >= start && l.TimeStamp <= end)
+            .Where(l => l.EventId == eventId &&
+                        l.TimeStamp >= start &&
+                        l.TimeStamp <= end)
+            .OrderBy(l => l.TimeStamp)
             .ToList();
     }
+    public List<Log> GetLogsForEvent(Guid eventId)
+    {
+        return _context.Logs
+            .Where(l => l.EventId == eventId)
+            .OrderBy(l => l.TimeStamp)
+            .ToList();
+    }
+    
     
     
     
