@@ -2,143 +2,162 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
-using OxyPlot;
-using OxyPlot.Axes;
-using OxyPlot.Series;
-using RobotBarApp.BLL.Interfaces;
-
 using RobotBarApp.BE;
+using RobotBarApp.BLL.Interfaces;
+using OxyPlot;
 
 namespace RobotBarApp.ViewModels
 {
     public class StatistikViewModel : ViewModelBase
     {
+        private readonly IEventLogic _eventLogic;
         private readonly IDrinkUseCountLogic _drinkLogic;
         private readonly IIngredientUseCountLogic _ingredientLogic;
         private readonly ILogLogic _logLogic;
-        private readonly IEventLogic _eventLogic;
-
-        // Selected filters
-        public Event SelectedEvent { get; set; }
-        public DateTime FromDate { get; set; } = DateTime.Now.AddDays(-7);
-        public DateTime ToDate { get; set; } = DateTime.Now;
-
-        // Dropdown source
-        public ObservableCollection<Event> Events { get; } = new();
-
-        // Graphs
-        public PlotModel DrinkPieChart { get; private set; }
-        public PlotModel IngredientBarChart { get; private set; }
-
-        // Logs
-        public ObservableCollection<LogEntry> Logs { get; } = new();
-
-        // Command
-        public ICommand RefreshCommand { get; }
 
         public StatistikViewModel(
+            IEventLogic eventLogic,
             IDrinkUseCountLogic drinkLogic,
             IIngredientUseCountLogic ingredientLogic,
-            IEventLogic eventLogic,
             ILogLogic logLogic)
         {
+            _eventLogic = eventLogic;
             _drinkLogic = drinkLogic;
             _ingredientLogic = ingredientLogic;
-            _eventLogic = eventLogic;
             _logLogic = logLogic;
 
-            RefreshCommand = new RelayCommand(_ => LoadStatistics());
-
             LoadEvents();
-            LoadStatistics();
+
+            RefreshStatisticsCommand = new RelayCommand(_ => RefreshStatistics());
+            // hours 0-24
+            TimeOptions = new ObservableCollection<TimeSpan>(
+                Enumerable.Range(0, 24).Select(h => new TimeSpan(h, 0, 0)));
         }
+        
+
+        public ObservableCollection<Event> Events { get; } = new();
+
+        private Event _selectedEvent;
+        public Event SelectedEvent
+        {
+            get => _selectedEvent;
+            set
+            {
+                _selectedEvent = value;
+                OnPropertyChanged();
+                RefreshStatistics();
+            }
+        }
+
+        public DateTime? StartDate { get; set; } 
+        public DateTime? EndDate { get; set; }    
+
+        public ObservableCollection<TimeSpan> TimeOptions { get; } 
+
+        private TimeSpan? _startTime;
+        public TimeSpan? StartTime  
+        {
+            get => _startTime;
+            set
+            {
+                _startTime = value;
+                OnPropertyChanged();
+                RefreshStatistics();
+            }
+        }
+
+        private TimeSpan? _endTime;
+        public TimeSpan? EndTime   
+        {
+            get => _endTime;
+            set
+            {
+                _endTime = value;
+                OnPropertyChanged();
+                RefreshStatistics();
+            }
+        }
+
+        public ObservableCollection<(string Name, int Count)> DrinkStats { get; } = new();
+        public ObservableCollection<(string Name, int Count)> IngredientStats { get; } = new();
+        public ObservableCollection<Log> Logs { get; } = new();
+
+
+        public PlotModel DrinkPieChart { get; set; }
+        public PlotModel IngredientBarChart { get; set; }
+
+        public ICommand RefreshStatisticsCommand { get; }
+
 
         private void LoadEvents()
         {
             Events.Clear();
             foreach (var ev in _eventLogic.GetAllEvents())
                 Events.Add(ev);
-
-            if (SelectedEvent == null && Events.Count > 0)
-                SelectedEvent = Events.First();
         }
 
-        private void LoadStatistics()
+        private void RefreshStatistics()
         {
             if (SelectedEvent == null)
                 return;
 
-            // =============================
-            // FILTERED DRINK DATA
-            // =============================
-            var drinkData = _drinkLogic
-                .GetDrinkUseCountsForEvent(SelectedEvent.EventId, FromDate, ToDate)
-                .GroupBy(x => x.Drink.Name)
-                .Select(g => new { Name = g.Key, Count = g.Count() })
-                .OrderByDescending(x => x.Count)
-                .ToList();
+            Guid eventId = SelectedEvent.EventId;
+            
 
-            DrinkPieChart = new PlotModel { Title = $"Drink brug – {SelectedEvent.Name}" };
+            bool hasStartDate = StartDate.HasValue;
+            bool hasEndDate = EndDate.HasValue;
 
-            var pie = new PieSeries
+            DateTime start = DateTime.MinValue;
+            DateTime end = DateTime.MaxValue;
+
+
+            if (hasStartDate)
             {
-                StrokeThickness = 2,
-                AngleSpan = 360,
-                StartAngle = 0,
-                OutsideLabelFormat = "{1}: {0}",
-                InsideLabelFormat = ""
-            };
-
-            foreach (var d in drinkData)
-                pie.Slices.Add(new PieSlice(d.Name, d.Count));
-
-            DrinkPieChart.Series.Clear();
-            DrinkPieChart.Series.Add(pie);
+                var date = StartDate.Value.Date;
+                var time = StartTime ?? TimeSpan.Zero; 
+                start = date + time;
+            }
 
 
-            // =============================
-            // FILTERED INGREDIENT DATA
-            // =============================
-            var ingredientData = _ingredientLogic
-                .GetIngredientUseCountsForEvent(SelectedEvent.EventId, FromDate, ToDate)
-                .GroupBy(i => i.Ingredient.Name)
-                .Select(g => new { Name = g.Key, Count = g.Count() })
-                .OrderByDescending(x => x.Count)
-                .ToList();
-
-            IngredientBarChart = new PlotModel { Title = "Ingrediens brug" };
-
-            // X = brug count, Y = ingredienser
-            var categoryAxis = new CategoryAxis { Position = AxisPosition.Left };
-            categoryAxis.Labels.AddRange(ingredientData.Select(i => i.Name));
-
-            var valueAxis = new LinearAxis
+            if (hasEndDate)
             {
-                Position = AxisPosition.Bottom,
-                Minimum = 0
-            };
-
-            var barSeries = new BarSeries();
-            barSeries.Items.AddRange(ingredientData.Select(i => new BarItem(i.Count)));
-
-            IngredientBarChart.Axes.Add(categoryAxis);
-            IngredientBarChart.Axes.Add(valueAxis);
-            IngredientBarChart.Series.Add(barSeries);
+                var date = EndDate.Value.Date;
+                var time = EndTime ?? new TimeSpan(23, 59, 59);
+                end = date + time;
+            }
 
 
-            // =============================
-            // LOG DATA
-            // =============================
+            bool useTimeFrame = hasStartDate || hasEndDate;
+
+            if (useTimeFrame && start > end)
+                return;
+            
+            DrinkStats.Clear();
+            IngredientStats.Clear();
             Logs.Clear();
-            foreach (var log in _logLogic.GetLogsForEvent(SelectedEvent.EventId, FromDate, ToDate))
-                Logs.Add(new LogEntry(log.Timestamp, log.Message));
 
-            // 🔔 Notify UI
-            OnPropertyChanged(nameof(DrinkPieChart));
-            OnPropertyChanged(nameof(IngredientBarChart));
-            OnPropertyChanged(nameof(Logs));
+            var drinkStats = useTimeFrame
+                ? _drinkLogic.GetAllDrinkUseCountByTimeFrame(eventId, start, end)
+                : _drinkLogic.GetAllDrinksUseCountForEvent(eventId);
+
+            foreach (var d in drinkStats)
+                DrinkStats.Add((d.DrinkName, d.TotalUseCount));
+
+
+            var ingredientStats = useTimeFrame
+                ? _ingredientLogic.GetIngredientUseCountByTimeFrame(eventId, start, end)
+                : _ingredientLogic.GetAllIngredientsUseCountForEvent(eventId);
+
+            foreach (var i in ingredientStats)
+                IngredientStats.Add((i.IngredientName, i.TotalUseCount));
+            
+            var logs = useTimeFrame
+                ? _logLogic.GetLogsInTimeFrame(eventId, start, end)
+                : _logLogic.GetLogsForEvent(eventId);
+
+            foreach (var log in logs)
+                Logs.Add(log);
+            
         }
     }
-
-    public record LogEntry(DateTime Timestamp, string Message);
 }
