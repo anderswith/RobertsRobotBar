@@ -7,6 +7,7 @@ public interface ILogLogic
     void AddLog(string type, string message);
     IEnumerable<Log> GetAllLogs();
     IEnumerable<Log> GetLogsByType(string type);
-    IEnumerable<Log> GetLogsInTimeFrame(DateTime start, DateTime end);
-    IEnumerable<Log> GetLogsByTypeInTimeFrame(string type, DateTime start, DateTime end);
+    IEnumerable<Log> GetLogsInTimeFrame(Guid eventId, DateTime start, DateTime end);
+    IEnumerable<Log> GetLogsByTypeInTimeFrame(Guid eventId, string type, DateTime start, DateTime end);
+    IEnumerable<Log> GetLogsForEvent(Guid eventId);
 }

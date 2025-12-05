@@ -9,4 +9,7 @@ public class Log
     public DateTime TimeStamp { get; set; }
     public string LogMsg { get; set; }
     public string Type { get; set; }
+    public Guid EventId { get; set; }
+    
+    public Event Event { get; set; }
 }

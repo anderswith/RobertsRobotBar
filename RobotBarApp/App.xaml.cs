@@ -7,23 +7,24 @@ using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.DAL;
 using RobotBarApp.DAL.Repositories;
 using RobotBarApp.DAL.Repositories.Interfaces;
+using RobotBarApp.Helper;
 using RobotBarApp.Services;
 using RobotBarApp.Services.Interfaces;
+using RobotBarApp.Services.Robot.Interfaces;
 using RobotBarApp.View;
 using RobotBarApp.ViewModels;
-using RobotBarApp.Helper;
 
 
 namespace RobotBarApp;
 
-public partial class App
+public partial class App : Application
 {
-    public static IHost? AppHost { get; private set; }
+    public static IHost AppHost { get; private set; }
 
     public App()
     {
         AppHost = Host.CreateDefaultBuilder()
-            .ConfigureServices((_, services) =>
+            .ConfigureServices((context, services) =>
             {
                 // DbContext
                 services.AddDbContext<RobotBarContext>();
@@ -36,6 +37,8 @@ public partial class App
                 services.AddScoped<ILogRepository, LogRepository>();
                 services.AddScoped<IMenuRepository, MenuRepository>();
                 services.AddScoped<ISopRepository, SopRepository>();
+                services.AddScoped<IIngredientUseCountRepository, IngredientUseCountRepository>();
+                services.AddScoped<IDrinkUseCountRepository, DrinkUseCountRepository>();
 
                 // Logic
                 services.AddScoped<IBarSetupLogic, BarSetupLogic>();
@@ -45,6 +48,9 @@ public partial class App
                 services.AddScoped<ILogLogic, LogLogic>();
                 services.AddScoped<IMenuLogic, MenuLogic>();
                 services.AddScoped<ISopLogic, SopLogic>();
+                services.AddScoped<IRobotLogic, RobotLogic>();
+                services.AddScoped<IIngredientUseCountLogic, IngredientUseCountLogic>();
+                services.AddScoped<IDrinkUseCountLogic, DrinkUseCountLogic>();
                 
                 // ViewModels
                 services.AddTransient<EventListViewModel>();
@@ -75,6 +81,14 @@ public partial class App
                     return new RobotLogMonitor("192.168.0.101", logLogic);
                 });
 
+                services.AddSingleton<IRobotScriptRunner>(provider =>
+                {
+                    var comms = provider.GetRequiredService<IRobotComms>();
+                    var reader = provider.GetRequiredService<IRobotDashboardStreamReader>();
+                    var log = provider.GetRequiredService<ILogLogic>();
+
+                    return new RobotScriptRunner(comms, reader, log);
+                });
 
             })
             .Build();
@@ -104,7 +118,7 @@ public partial class App
             }
         }
 
-        var main = AppHost?.Services.GetRequiredService<MainWindow>();
-        main?.Show();
+        var main = AppHost.Services.GetRequiredService<MainWindow>();
+        main.Show();
     }
 }

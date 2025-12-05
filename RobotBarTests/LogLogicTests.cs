@@ -12,188 +12,216 @@ namespace UnitTests
     [TestFixture]
     public class LogLogicTests
     {
-        private Mock<ILogRepository> _logRepositoryMock;
-        private LogLogic _logLogic;
+        private Mock<ILogRepository> _repoMock;
+        private LogLogic _logic;
 
         [SetUp]
         public void Setup()
         {
-            _logRepositoryMock = new Mock<ILogRepository>();
-            _logLogic = new LogLogic(_logRepositoryMock.Object);
+            _repoMock = new Mock<ILogRepository>();
+            _logic = new LogLogic(_repoMock.Object);
         }
 
-        // ---------- AddLog ----------
+        // AddLog
+        [TestCase(null)]
+        [TestCase("")]
+        public void AddLog_Throws_WhenMessageIsInvalid(string? invalidMsg)
+        {
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _logic.AddLog(invalidMsg, "Info"));
+
+            Assert.That(ex!.Message, Is.EqualTo("Log message cannot be null or empty"));
+        }
 
         [TestCase(null)]
         [TestCase("")]
-        public void AddLog_ShouldThrow_WhenMessageIsNullOrEmpty(string? invalidMsg)
+        public void AddLog_Throws_WhenTypeIsInvalid(string? invalidType)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _logLogic.AddLog(invalidMsg, "Error"));
+                _logic.AddLog("Hello", invalidType));
 
-            Assert.That(ex.Message, Is.EqualTo("Log message cannot be null or empty"));
-        }
-
-        [TestCase(null)]
-        [TestCase("")]
-        public void AddLog_ShouldThrow_WhenTypeIsNullOrEmpty(string? invalidType)
-        {
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _logLogic.AddLog("System started", invalidType));
-
-            Assert.That(ex.Message, Is.EqualTo("Log type cannot be null or empty"));
+            Assert.That(ex!.Message, Is.EqualTo("Log type cannot be null or empty"));
         }
 
         [Test]
-        public void AddLog_ShouldCallRepository_WhenValidData()
+        public void AddLog_CreatesLogAndCallsRepository()
         {
-            var message = "System started";
-            var type = "Info";
+            string message = "Started";
+            string type = "Info";
 
-            _logLogic.AddLog(message, type);
+            _logic.AddLog(message, type);
 
-            _logRepositoryMock.Verify(r => r.AddLog(It.Is<Log>(l =>
+            _repoMock.Verify(r => r.AddLog(It.Is<Log>(l =>
                 l.LogMsg == message &&
                 l.Type == type &&
-                l.TimeStamp <= DateTime.Now &&
-                l.LogId != Guid.Empty
+                l.LogId != Guid.Empty &&
+                l.TimeStamp <= DateTime.Now
             )), Times.Once);
         }
 
-        // ---------- GetAllLogs----------
-
+        // GetAllLogs
         [Test]
-        public void GetAllLogs_ShouldReturnAllLogsFromRepository()
+        public void GetAllLogs_ReturnsRepositoryValue()
         {
-            var logs = new List<Log>
+            var fakeLogs = new List<Log>
             {
-                new Log { LogId = Guid.NewGuid(), Type = "Info", LogMsg = "Startup" },
-                new Log { LogId = Guid.NewGuid(), Type = "Error", LogMsg = "Crash" }
+                new Log { LogMsg = "A" },
+                new Log { LogMsg = "B" }
             };
 
-            _logRepositoryMock.Setup(r => r.GetAllLogs()).Returns(logs);
+            _repoMock.Setup(r => r.GetAllLogs()).Returns(fakeLogs);
 
-            var result = _logLogic.GetAllLogs().ToList();
+            var result = _logic.GetAllLogs();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.Count, Is.EqualTo(2));
-                Assert.That(result, Is.EqualTo(logs));
-            });
+            Assert.That(result, Is.EqualTo(fakeLogs));
         }
 
-        // ---------- GetLogsByType----------
-
+        // GetLogsByType
         [TestCase(null)]
         [TestCase("")]
-        public void GetLogsByType_ShouldThrow_WhenTypeIsNullOrEmpty(string? invalidType)
+        public void GetLogsByType_Throws_WhenTypeInvalid(string? invalidType)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _logLogic.GetLogsByType(invalidType));
+                _logic.GetLogsByType(invalidType));
 
-            Assert.That(ex.Message, Is.EqualTo("Log type cannot be null or empty"));
+            Assert.That(ex!.Message, Is.EqualTo("Log type cannot be null or empty"));
         }
 
         [Test]
-        public void GetLogsByType_ShouldCallRepository_WhenValidType()
+        public void GetLogsByType_ReturnsRepositoryValue()
         {
-            var logs = new List<Log> { new Log { Type = "Info", LogMsg = "Valid" } };
-            _logRepositoryMock.Setup(r => r.GetLogsByType("Info")).Returns(logs);
+            var logs = new List<Log> { new Log { Type = "Info" } };
+            _repoMock.Setup(r => r.GetLogsByType("Info")).Returns(logs);
 
-            var result = _logLogic.GetLogsByType("Info");
+            var result = _logic.GetLogsByType("Info");
 
             Assert.That(result, Is.EqualTo(logs));
-            _logRepositoryMock.Verify(r => r.GetLogsByType("Info"), Times.Once);
         }
 
-        // ---------- GetLogsByTimeframe----------
+        // GetLogsInTimeFrame
+        [Test]
+        public void GetLogsInTimeFrame_Throws_WhenEventIdIsEmpty()
+        {
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _logic.GetLogsInTimeFrame(Guid.Empty, DateTime.Now.AddHours(-1), DateTime.Now));
+
+            Assert.That(ex!.Message, Is.EqualTo("Event ID must be specified"));
+        }
 
         [Test]
-        public void GetLogsInTimeFrame_ShouldThrow_WhenStartAfterEnd()
+        public void GetLogsInTimeFrame_Throws_WhenStartOrEndDefault()
         {
-            var start = DateTime.Now;
-            var end = start.AddHours(-1);
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _logic.GetLogsInTimeFrame(Guid.NewGuid(), default, DateTime.Now));
+
+            Assert.That(ex!.Message, Is.EqualTo("Start and end times must be specified"));
+        }
+
+        [Test]
+        public void GetLogsInTimeFrame_Throws_WhenStartAfterEnd()
+        {
+            DateTime start = DateTime.Now.AddHours(1);
+            DateTime end = DateTime.Now;
 
             var ex = Assert.Throws<ArgumentException>(() =>
-                _logLogic.GetLogsInTimeFrame(start, end));
+                _logic.GetLogsInTimeFrame(Guid.NewGuid(), start, end));
 
-            Assert.That(ex.Message, Is.EqualTo("Start time must be earlier than end time"));
+            Assert.That(ex!.Message, Is.EqualTo("Start time must be earlier than end time"));
         }
 
         [Test]
-        public void GetLogsInTimeFrame_ShouldCallRepository_WhenValidDates()
+        public void GetLogsInTimeFrame_ReturnsRepositoryValue()
         {
+            Guid eventId = Guid.NewGuid();
             var start = DateTime.Now.AddHours(-2);
             var end = DateTime.Now;
-            var logs = new List<Log> { new Log { LogMsg = "In range" } };
 
-            _logRepositoryMock.Setup(r => r.GetLogsInTimeFrame(start, end)).Returns(logs);
+            var fakeLogs = new List<Log> { new Log { LogMsg = "Test" } };
 
-            var result = _logLogic.GetLogsInTimeFrame(start, end);
+            _repoMock.Setup(r => r.GetLogsInTimeFrame(eventId, start, end))
+                .Returns(fakeLogs);
 
-            Assert.That(result, Is.EqualTo(logs));
-            _logRepositoryMock.Verify(r => r.GetLogsInTimeFrame(start, end), Times.Once);
+            var result = _logic.GetLogsInTimeFrame(eventId, start, end);
+
+            Assert.That(result, Is.EqualTo(fakeLogs));
         }
 
-        // (Optional — for DateTime? nullable scenario)
-        [Test]
-        public void GetLogsInTimeFrame_ShouldThrow_WhenStartOrEndIsDefault()
-        {
-            // Simulate “null” check logic by passing default(DateTime)
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _logLogic.GetLogsInTimeFrame(default(DateTime), default(DateTime)));
-
-            Assert.That(ex.Message, Is.EqualTo("Start and end times must be specified"));
-        }
-
-        // ----------------------- GetLogByTypeInTimeframe-----------------------
-
+        // GetLogsByTypeInTimeFrame
         [TestCase(null)]
         [TestCase("")]
-        public void GetLogsByTypeInTimeFrame_ShouldThrow_WhenTypeIsNullOrEmpty(string? invalidType)
+        public void GetLogsByTypeInTimeFrame_Throws_WhenTypeInvalid(string? invalidType)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _logLogic.GetLogsByTypeInTimeFrame(invalidType, DateTime.Now.AddHours(-1), DateTime.Now));
+                _logic.GetLogsByTypeInTimeFrame(Guid.NewGuid(), invalidType, DateTime.Now.AddHours(-1), DateTime.Now));
 
-            Assert.That(ex.Message, Is.EqualTo("Log type cannot be null or empty"));
+            Assert.That(ex!.Message, Is.EqualTo("Log type cannot be null or empty"));
         }
 
         [Test]
-        public void GetLogsByTypeInTimeFrame_ShouldThrow_WhenStartAfterEnd()
+        public void GetLogsByTypeInTimeFrame_Throws_WhenEventIdEmpty()
         {
-            var start = DateTime.Now;
-            var end = start.AddHours(-1);
-
             var ex = Assert.Throws<ArgumentException>(() =>
-                _logLogic.GetLogsByTypeInTimeFrame("Error", start, end));
+                _logic.GetLogsByTypeInTimeFrame(Guid.Empty, "Error", DateTime.Now.AddHours(-1), DateTime.Now));
 
-            Assert.That(ex.Message, Is.EqualTo("Start time must be earlier than end time"));
+            Assert.That(ex!.Message, Is.EqualTo("Event ID must be specified"));
         }
 
         [Test]
-        public void GetLogsByTypeInTimeFrame_ShouldThrow_WhenStartOrEndIsDefault()
+        public void GetLogsByTypeInTimeFrame_Throws_WhenStartOrEndDefault()
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _logLogic.GetLogsByTypeInTimeFrame("Info", default(DateTime), default(DateTime)));
+                _logic.GetLogsByTypeInTimeFrame(Guid.NewGuid(), "Info", default, default));
 
-            Assert.That(ex.Message, Is.EqualTo("Start and end times must be specified"));
+            Assert.That(ex!.Message, Is.EqualTo("Start and end times must be specified"));
         }
 
         [Test]
-        public void GetLogsByTypeInTimeFrame_ShouldCallRepository_WhenValidData()
+        public void GetLogsByTypeInTimeFrame_Throws_WhenStartAfterEnd()
         {
-            var start = DateTime.Now.AddHours(-2);
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _logic.GetLogsByTypeInTimeFrame(Guid.NewGuid(), "Error", DateTime.Now, DateTime.Now.AddHours(-1)));
+
+            Assert.That(ex!.Message, Is.EqualTo("Start time must be earlier than end time"));
+        }
+
+        [Test]
+        public void GetLogsByTypeInTimeFrame_ReturnsRepositoryValue()
+        {
+            Guid eventId = Guid.NewGuid();
+            var start = DateTime.Now.AddHours(-5);
             var end = DateTime.Now;
-            var logs = new List<Log> { new Log { Type = "Info", LogMsg = "Valid" } };
 
-            _logRepositoryMock
-                .Setup(r => r.GetLogsByTypeInTimeFrame("Info", start, end))
-                .Returns(logs);
+            var fakeLogs = new List<Log> { new Log { Type = "Error" } };
 
-            var result = _logLogic.GetLogsByTypeInTimeFrame("Info", start, end);
+            _repoMock.Setup(r => r.GetLogsByTypeInTimeFrame(eventId, "Error", start, end))
+                .Returns(fakeLogs);
+
+            var result = _logic.GetLogsByTypeInTimeFrame(eventId, "Error", start, end);
+
+            Assert.That(result, Is.EqualTo(fakeLogs));
+        }
+
+        // GetLogsForEvent
+        [Test]
+        public void GetLogsForEvent_Throws_WhenEventIdEmpty()
+        {
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _logic.GetLogsForEvent(Guid.Empty));
+
+            Assert.That(ex!.Message, Is.EqualTo("Event ID must be specified"));
+        }
+
+        [Test]
+        public void GetLogsForEvent_ReturnsRepositoryValue()
+        {
+            Guid eventId = Guid.NewGuid();
+            var logs = new List<Log> { new Log { LogMsg = "Hello" } };
+
+            _repoMock.Setup(r => r.GetLogsForEvent(eventId)).Returns(logs);
+
+            var result = _logic.GetLogsForEvent(eventId);
 
             Assert.That(result, Is.EqualTo(logs));
-            _logRepositoryMock.Verify(r => r.GetLogsByTypeInTimeFrame("Info", start, end), Times.Once);
         }
     }
 }

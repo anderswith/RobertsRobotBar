@@ -6,5 +6,9 @@ public interface IDrinkUseCountRepository
 {
     void AddDrinkUseCount(DrinkUseCount drinkUseCount);
     IEnumerable<DrinkUseCount> GetAllDrinkUseCounts();
-    IEnumerable<DrinkUseCount> GetAllDrinkUseCountByTimeFrame(DateTime start, DateTime end);
+
+    (List<Drink> Drinks, List<DrinkUseCount> DrinkUses)
+        GetAllDrinksUseCountForEvent(Guid eventId);
 }
+
+

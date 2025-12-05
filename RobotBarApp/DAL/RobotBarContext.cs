@@ -22,6 +22,7 @@ public class RobotBarContext : DbContext
     public DbSet<DrinkScript> DrinkScripts { get; set; }
     public DbSet<DrinkUseCount> DrinkUseCounts { get; set; }
     public DbSet<IngredientUseCount> IngredientUseCounts { get; set; }
+    public DbSet<IngredientPosition> IngredientPositions { get; set; }
     
     public RobotBarContext(DbContextOptions<RobotBarContext> options)
         : base(options)

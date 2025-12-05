@@ -1,8 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using RobotBarApp.BE;
+using RobotBarApp.DAL.Repositories.Interfaces;
 
 namespace RobotBarApp.DAL.Repositories;
 
-public class IngredientUseCountRepository
+public class IngredientUseCountRepository : IIngredientUseCountRepository
 {
     private readonly RobotBarContext _context;
     public IngredientUseCountRepository(RobotBarContext context)
@@ -21,10 +23,30 @@ public class IngredientUseCountRepository
         return _context.IngredientUseCounts.ToList();
     }
     
-    public IEnumerable<IngredientUseCount> GetAllIngredientUseCountByTimeFrame(DateTime start, DateTime end)
+    public (List<Ingredient> Ingredients, List<IngredientUseCount> IngredientUses)
+        GetIngredientUseCountForEvent(Guid eventId)
     {
-        return _context.IngredientUseCounts
-            .Where(iuc => iuc.TimeStamp >= start && iuc.TimeStamp <= end)
+        // 1) Get all ingredient IDs that are part of the event setup
+        var ingredientIds = _context.BarSetups
+            .Where(e => e.EventId == eventId)
+            .Select(e => e.IngredientId)
+            .Distinct()
             .ToList();
+
+        if (!ingredientIds.Any())
+            return (new(), new());
+
+        // 2) Load ingredients
+        var ingredients = _context.Ingredients
+            .Where(i => ingredientIds.Contains(i.IngredientId))
+            .ToList();
+
+        // 3) Load all use counts for these ingredients
+        var uses = _context.IngredientUseCounts
+            .Where(u => ingredientIds.Contains(u.IngredientId))
+            .ToList();
+
+        return (ingredients, uses);
     }
+
 }

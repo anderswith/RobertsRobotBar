@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using RobotBarApp.BE;
 using RobotBarApp.DAL.Repositories.Interfaces;
 
@@ -42,4 +43,15 @@ public class IngredientRepository : IIngredientRepository
             Where(i => i.Type == type)
             .ToList();
     }
+    
+    public IEnumerable<Ingredient> GetIngredientsWithScripts(List<Guid> ingredientIds)
+    {
+        return _context.Ingredients
+            .Where(i => ingredientIds.Contains(i.IngredientId))
+            .Include(i => i.IngredientScripts)
+            .ToList();
+    }
+    
+    
+    
 }
