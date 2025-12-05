@@ -15,6 +15,10 @@ public class LogLogic : ILogLogic
     
     public void AddEventLog(Guid eventId, string logMsg, string type)
     {
+        if(Guid.Empty == eventId)
+        {
+            throw new ArgumentException("Event ID must be specified");
+        }
         if (string.IsNullOrEmpty(logMsg))
         {
             throw new ArgumentException("Log message cannot be null or empty");
