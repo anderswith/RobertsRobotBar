@@ -144,11 +144,11 @@ namespace RobotBarApp.ViewModels
         {
             if (param is not Ingredient ing) return;
 
-            var slot = RackItems.FirstOrDefault(r => r.Position == ing.PositionNumber);
-            if (slot == null)
-                return;
+            //var slot = RackItems.FirstOrDefault(r => r.Position == ing.PositionNumber);
+            //if (slot == null)
+                //return;
 
-            slot.Ingredient = ing;
+            //slot.Ingredient = ing;
 
             // Show menu after 1+ ingredient
             HasMenu = true;

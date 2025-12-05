@@ -75,10 +75,17 @@ public partial class App : Application
                 services.AddTransient<TilfoejMenuView>();
                 
                 services.AddSingleton<INavigationService, NavigationService>();
-                services.AddSingleton<RobotLogMonitor>(provider =>
+                
+                services.AddSingleton<IRobotDashboardStreamReader>(provider =>
                 {
-                    var logLogic = provider.GetRequiredService<ILogLogic>();
-                    return new RobotLogMonitor("192.168.0.101", logLogic);
+                    var log = provider.GetRequiredService<ILogLogic>();
+                    return new RobotDashboardStreamReader(log);
+                });
+
+                services.AddSingleton<IRobotComms>(provider =>
+                {
+                    var reader = provider.GetRequiredService<IRobotDashboardStreamReader>();
+                    return new RobotComms("192.168.0.101", reader);
                 });
 
                 services.AddSingleton<IRobotScriptRunner>(provider =>
@@ -97,7 +104,7 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-
+        
         try
         {
             var monitor = AppHost?.Services.GetRequiredService<RobotLogMonitor>();
@@ -106,17 +113,33 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            // Log but don't crash.
             try
             {
                 var log = AppHost?.Services.GetService<ILogLogic>();
                 log?.AddLog($"RobotLogMonitor failed to start: {ex.Message}", "RobotError");
             }
-            catch (Exception logEx)
-            {
-                Debug.WriteLine($"Failed to log RobotLogMonitor startup error: {logEx.Message}");
-            }
+            catch { }
         }
+
+        try
+        {
+            var comms = AppHost.Services.GetRequiredService<IRobotComms>();
+
+            // Fire-and-forget — do NOT await or UI will freeze
+            _ = comms.ConnectAsync();
+        }
+        catch (Exception ex)
+        {
+            try
+            {
+                var log = AppHost.Services.GetService<ILogLogic>();
+                log?.AddLog($"Robot connection failed: {ex.Message}", "RobotError");
+            }
+            catch { }
+        }
+
+
+        await Task.Delay(2000);
 
         var main = AppHost.Services.GetRequiredService<MainWindow>();
         main.Show();
