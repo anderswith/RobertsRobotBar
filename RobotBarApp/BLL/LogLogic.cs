@@ -80,6 +80,7 @@ public class LogLogic : ILogLogic
 
         return _logRepository.GetLogsByTypeInTimeFrame(type, start, end);
     }
+   
 
 }
 

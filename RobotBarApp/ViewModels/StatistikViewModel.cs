@@ -6,7 +6,7 @@ using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using RobotBarApp.BLL.Interfaces;
-using RobotBarApp.Commands;
+
 using RobotBarApp.BE;
 
 namespace RobotBarApp.ViewModels

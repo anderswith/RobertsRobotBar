@@ -29,31 +29,40 @@ public class IngredientUseCountLogic : IIngredientUseCountLogic
     {
         return _ingredientUseCountRepository.GetAllIngredientUseCounts();
     }
-
-    public IEnumerable<(string IngredientName, int TotalUseCount)> GetAllIngredientUseCountByTimeFrame(DateTime start, DateTime end)
+    public IEnumerable<(string IngredientName, int TotalUseCount)>
+        GetAllIngredientsUseCountForEvent(Guid eventId)
     {
-        if(start >= end)
-        {
-            throw new ArgumentException("Start time must be earlier than end time.");
-        }
-        if(start == default || end == default)
-        {
-            throw new ArgumentException("Start time and end time must be valid dates.");
-        }
-        
-        var list = _ingredientUseCountRepository.GetAllIngredientUseCountByTimeFrame(start, end);
-        if(list == null || !list.Any())
-        {
-            throw new InvalidOperationException("No ingredient use counts found in the specified time frame.");
-        }
-        return list
-            .GroupBy(iuc => iuc.IngredientId)
-            .Select(g => 
-                (
-                    IngredientName: g.First().Ingredient.Name, 
-                    TotalUseCount: g.Count() 
-                )
-            )
+        var (ingredients, uses) = _ingredientUseCountRepository
+            .GetIngredientUseCountForEvent(eventId);
+
+        return uses
+            .GroupBy(u => u.IngredientId)
+            .Select(g =>
+            {
+                var name = ingredients.First(i => i.IngredientId == g.Key).Name;
+                return (IngredientName: name, TotalUseCount: g.Count());
+            })
+            .OrderByDescending(x => x.TotalUseCount)
+            .ToList();
+    }
+
+    public IEnumerable<(string IngredientName, int TotalUseCount)>
+        GetIngredientUseCountByTimeFrame(Guid eventId, DateTime start, DateTime end)
+    {
+        var (ingredients, uses) = _ingredientUseCountRepository
+            .GetIngredientUseCountForEvent(eventId);
+
+        var filtered = uses
+            .Where(u => u.TimeStamp >= start && u.TimeStamp <= end)
+            .ToList();
+
+        return filtered
+            .GroupBy(u => u.IngredientId)
+            .Select(g =>
+            {
+                var name = ingredients.First(i => i.IngredientId == g.Key).Name;
+                return (IngredientName: name, TotalUseCount: g.Count());
+            })
             .OrderByDescending(x => x.TotalUseCount)
             .ToList();
     }

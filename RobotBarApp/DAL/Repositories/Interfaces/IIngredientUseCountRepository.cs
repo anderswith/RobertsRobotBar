@@ -6,6 +6,8 @@ public interface IIngredientUseCountRepository
 {
     public void AddIngredientUseCount(IngredientUseCount ingredientUseCount);
     public IEnumerable<IngredientUseCount> GetAllIngredientUseCounts();
-    public IEnumerable<IngredientUseCount> GetAllIngredientUseCountByTimeFrame(DateTime start, DateTime end);
-    
+
+    (List<Ingredient> Ingredients, List<IngredientUseCount> IngredientUses)
+        GetIngredientUseCountForEvent(Guid eventId);
+
 }
