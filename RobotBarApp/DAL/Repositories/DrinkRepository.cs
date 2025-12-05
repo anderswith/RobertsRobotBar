@@ -21,7 +21,10 @@ public class DrinkRepository : IDrinkRepository
     }
     public IEnumerable<Drink> GetAllDrinks()
     {
-        return _context.Drinks.ToList();
+        return _context.Drinks
+            .Include(d => d.DrinkContents)
+            .ThenInclude(dc => dc.Ingredient)
+            .ToList();
     }
     public Drink? GetDrinkById(Guid drinkId)
     {

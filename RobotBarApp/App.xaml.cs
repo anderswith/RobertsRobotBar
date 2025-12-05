@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RobotBarApp.BLL;
@@ -6,6 +7,7 @@ using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.DAL;
 using RobotBarApp.DAL.Repositories;
 using RobotBarApp.DAL.Repositories.Interfaces;
+using RobotBarApp.Helper;
 using RobotBarApp.Services;
 using RobotBarApp.Services.Interfaces;
 using RobotBarApp.Services.Robot.Interfaces;
@@ -73,19 +75,10 @@ public partial class App : Application
                 services.AddTransient<TilfoejMenuView>();
                 
                 services.AddSingleton<INavigationService, NavigationService>();
-                
-                services.AddSingleton<IRobotDashboardStreamReader>(provider =>
+                services.AddSingleton<RobotLogMonitor>(provider =>
                 {
-                    var log = provider.GetRequiredService<ILogLogic>();
-                    return new RobotDashboardStreamReader(log);
-                });
-
-                services.AddSingleton<IRobotComms>(provider =>
-                {
-                    var reader = provider.GetRequiredService<IRobotDashboardStreamReader>();
-                    var log = provider.GetRequiredService<ILogLogic>();
-
-                    return new RobotComms("192.168.0.101", reader);
+                    var logLogic = provider.GetRequiredService<ILogLogic>();
+                    return new RobotLogMonitor("192.168.0.101", logLogic);
                 });
 
                 services.AddSingleton<IRobotScriptRunner>(provider =>
@@ -104,8 +97,26 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        var comms = AppHost.Services.GetRequiredService<IRobotComms>();
-        _ = comms.ConnectAsync();
+
+        try
+        {
+            var monitor = AppHost?.Services.GetRequiredService<RobotLogMonitor>();
+            if (monitor != null)
+                await monitor.StartAsync();
+        }
+        catch (Exception ex)
+        {
+            // Log but don't crash.
+            try
+            {
+                var log = AppHost?.Services.GetService<ILogLogic>();
+                log?.AddLog($"RobotLogMonitor failed to start: {ex.Message}", "RobotError");
+            }
+            catch (Exception logEx)
+            {
+                Debug.WriteLine($"Failed to log RobotLogMonitor startup error: {logEx.Message}");
+            }
+        }
 
         var main = AppHost.Services.GetRequiredService<MainWindow>();
         main.Show();

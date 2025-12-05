@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:RobotBarApp.ViewModels"
         xmlns:view="clr-namespace:RobotBarApp.View"
-        xmlns:global="clr-namespace:"
+        xmlns:viewModel="clr-namespace:RobotBarApp.ViewModels"
         mc:Ignorable="d"
         Title="Robert's robotbar"
         WindowState="Maximized"
