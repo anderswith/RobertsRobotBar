@@ -11,4 +11,5 @@ public interface IIngredientRepository
     void UpdateIngredient(Ingredient ingredient);
     IEnumerable<Ingredient> GetIngredientByType(string type);
     IEnumerable<Ingredient> GetIngredientsWithScripts(List<Guid> ingredientIds);
+    IEnumerable<Ingredient> GetIngredientsForPositions();
 }

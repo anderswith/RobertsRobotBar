@@ -51,7 +51,13 @@ public class IngredientRepository : IIngredientRepository
             .Include(i => i.IngredientScripts)
             .ToList();
     }
-    
+
+    public IEnumerable<Ingredient> GetIngredientsForPositions()
+    {
+        return _context.Ingredients
+            .Include(i => i.IngredientPositions)
+            .ToList();
+    }
     
     
 }
