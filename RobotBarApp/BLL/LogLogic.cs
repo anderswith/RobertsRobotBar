@@ -12,7 +12,35 @@ public class LogLogic : ILogLogic
     {
         _logRepository = logRepository;
     }
+    
+    public void AddEventLog(Guid eventId, string logMsg, string type)
+    {
+        if (string.IsNullOrEmpty(logMsg))
+        {
+            throw new ArgumentException("Log message cannot be null or empty");
+        }
 
+        if (string.IsNullOrEmpty(type))
+        {
+            throw new ArgumentException("Log type cannot be null or empty");
+        }
+        if(Guid.Empty == eventId)
+        {
+            throw new ArgumentException("Event ID must be specified");
+        }
+
+        Log log = new Log
+        {
+            LogId = Guid.NewGuid(),
+            TimeStamp = DateTime.Now,
+            LogMsg = logMsg,
+            Type = type,
+            EventId = eventId
+        };
+
+        _logRepository.AddLog(log);
+    }
+    
     public void AddLog(string logMsg, string type)
     {
         if (string.IsNullOrEmpty(logMsg))

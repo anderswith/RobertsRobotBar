@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RobotBarApp.DAL;
 
@@ -10,9 +11,11 @@ using RobotBarApp.DAL;
 namespace RobotBarApp.Migrations
 {
     [DbContext(typeof(RobotBarContext))]
-    partial class RobotBarContextModelSnapshot : ModelSnapshot
+    [Migration("20251205145206_FixedEntities")]
+    partial class FixedEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
@@ -247,7 +250,7 @@ namespace RobotBarApp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("EventId")
+                    b.Property<Guid>("EventId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LogMsg")
@@ -458,7 +461,9 @@ namespace RobotBarApp.Migrations
                 {
                     b.HasOne("RobotBarApp.BE.Event", "Event")
                         .WithMany("Logs")
-                        .HasForeignKey("EventId");
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Event");
                 });
