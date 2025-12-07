@@ -133,7 +133,7 @@ namespace RobotBarApp.ViewModels
             var destinationFolder = GetEventPicsDirectory();
             Directory.CreateDirectory(destinationFolder);
 
-            var extension = Path.GetExtension(ImagePath);
+            var extension = Path.GetExtension(ImagePath);   // <-– you used ImagePreview earlier, fixed
             var safeName = new string((EventName ?? "event").Select(ch =>
                 Path.GetInvalidFileNameChars().Contains(ch) ? '_' : ch).ToArray());
 
@@ -142,17 +142,20 @@ namespace RobotBarApp.ViewModels
 
             var fileName = $"{safeName}_{DateTime.UtcNow:yyyyMMddHHmmssfff}{extension}";
             var destinationPath = Path.Combine(destinationFolder, fileName);
+            
 
             File.Copy(ImagePath, destinationPath, overwrite: true);
 
-            return Path.Combine("Resources", "EventPics", fileName)
-                .Replace("\\", "/");
+            return Path.Combine("Resources", "EventPics", fileName).Replace("\\", "/");
         }
 
         private string GetEventPicsDirectory()
         {
-            var baseDir = AppContext.BaseDirectory;
-            var eventPicsPath = Path.Combine(baseDir, "Resources", "EventPics");
+            var projectRoot = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+
+            var eventPicsPath = Path.Combine(projectRoot, "Resources", "EventPics");
+            Directory.CreateDirectory(eventPicsPath);
+
             return eventPicsPath;
         }
     }

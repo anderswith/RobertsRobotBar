@@ -208,13 +208,13 @@ namespace RobotBarApp.ViewModels
 
         private string GetIngredientPicsDirectory()
         {
-            // Always copy to output Resources folder
-            var baseDir = AppContext.BaseDirectory;
-            var ingredientPicsPath = Path.Combine(baseDir, "Resources", "IngredientPics");
-
+            var projectRoot = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+            var ingredientPicsPath = Path.Combine(projectRoot, "Resources", "IngredientPics");
             Directory.CreateDirectory(ingredientPicsPath);
 
             return ingredientPicsPath;
         }
+        
+
     }
 }
