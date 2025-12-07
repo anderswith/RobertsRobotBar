@@ -14,7 +14,6 @@ public class EventRepository : IEventRepository
     
     public void AddEvent(Event evt)
     {
-        Console.WriteLine("Adding Event to database: " + evt.Name);
         _context.Events.Add(evt);
         _context.SaveChanges();
     }

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using RobotBarApp.BLL;
 using System;
 using System.IO;
+using System.Windows;
 
 namespace RobotBarApp.ViewModels
 {
@@ -130,28 +131,11 @@ namespace RobotBarApp.ViewModels
 
         private void Save()
         {
-
-            if (string.IsNullOrWhiteSpace(IngredientName))
-            {
-                System.Windows.MessageBox.Show("Du skal angive et navn.");
-                return;
-            }
+            
 
             if (!double.TryParse(SizeCl, out double sizeParsed))
             {
-                System.Windows.MessageBox.Show("Størrelsen (cl) skal være et tal.");
-                return;
-            }
-
-            if (SelectedHolder == 0)
-            {
-                System.Windows.MessageBox.Show("Vælg en holder.");
-                return;
-            }
-            
-            if (string.IsNullOrWhiteSpace(ImagePreview) || !File.Exists(ImagePreview))
-            {
-                System.Windows.MessageBox.Show("Vælg et billede, så det kan gemmes lokalt.");
+                System.Windows.MessageBox.Show("Size (cl) has to be a valid number.");
                 return;
             }
 
@@ -166,24 +150,37 @@ namespace RobotBarApp.ViewModels
 
 
             List<string> scripts = new();
+            if (!ScriptText.Contains(".urp"))
+            {
+                MessageBox.Show("Script name has to end with .urp");
+            }
             if (!string.IsNullOrWhiteSpace(ScriptText))
                 scripts.Add(ScriptText);
             
-            var storedImagePath = CopyImageToResources();
+
             
-            _ingredientLogic.AddIngredient(
-                name: IngredientName,
-                type: type,
-                image: storedImagePath,
-                size: sizeParsed,
-                dose: dose,
-                positionNumber: SelectedHolder,
-                scriptNames: scripts
-            );
+            try
+            {
+                var storedImagePath = CopyImageToResources();
 
-            System.Windows.MessageBox.Show("Ingrediens tilføjet!");
+                _ingredientLogic.AddIngredient(
+                    name: IngredientName,
+                    type: type,
+                    image: storedImagePath,
+                    size: sizeParsed,
+                    dose: dose,
+                    positionNumber: SelectedHolder,
+                    scriptNames: scripts
+                );
 
-            _navigation.NavigateTo<TilfoejIngrediensViewModel>(); 
+                MessageBox.Show("Ingrediens tilføjet!");
+                _navigation.NavigateTo<TilfoejIngrediensViewModel>();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Fejl", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            
         }
 
         private string CopyImageToResources()
