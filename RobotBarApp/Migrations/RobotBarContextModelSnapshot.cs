@@ -136,7 +136,7 @@ namespace RobotBarApp.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("MenuId")
+                    b.Property<Guid?>("MenuId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -415,8 +415,7 @@ namespace RobotBarApp.Migrations
                     b.HasOne("RobotBarApp.BE.Menu", "Menu")
                         .WithMany("Events")
                         .HasForeignKey("MenuId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Menu");
                 });

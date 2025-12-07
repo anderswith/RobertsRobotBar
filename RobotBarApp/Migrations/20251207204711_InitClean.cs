@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RobotBarApp.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitClean : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,26 +34,11 @@ namespace RobotBarApp.Migrations
                     Type = table.Column<string>(type: "TEXT", nullable: false),
                     Image = table.Column<string>(type: "TEXT", nullable: false),
                     Size = table.Column<double>(type: "REAL", nullable: false),
-                    Dose = table.Column<string>(type: "TEXT", nullable: false),
-                    PositionNumber = table.Column<int>(type: "INTEGER", nullable: false)
+                    Dose = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ingredients", x => x.IngredientId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Logs",
-                columns: table => new
-                {
-                    LogId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    TimeStamp = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    LogMsg = table.Column<string>(type: "TEXT", nullable: false),
-                    Type = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Logs", x => x.LogId);
                 });
 
             migrationBuilder.CreateTable(
@@ -146,6 +131,25 @@ namespace RobotBarApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "IngredientPositions",
+                columns: table => new
+                {
+                    IngredientPositionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IngredientId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Position = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IngredientPositions", x => x.IngredientPositionId);
+                    table.ForeignKey(
+                        name: "FK_IngredientPositions_Ingredients_IngredientId",
+                        column: x => x.IngredientId,
+                        principalTable: "Ingredients",
+                        principalColumn: "IngredientId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "IngredientScripts",
                 columns: table => new
                 {
@@ -190,9 +194,8 @@ namespace RobotBarApp.Migrations
                 {
                     EventId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    MenuId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Image = table.Column<string>(type: "TEXT", nullable: false),
-                    EventBarSetupId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    MenuId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    Image = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -202,7 +205,7 @@ namespace RobotBarApp.Migrations
                         column: x => x.MenuId,
                         principalTable: "Menus",
                         principalColumn: "MenuId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -277,6 +280,26 @@ namespace RobotBarApp.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Logs",
+                columns: table => new
+                {
+                    LogId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TimeStamp = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LogMsg = table.Column<string>(type: "TEXT", nullable: false),
+                    Type = table.Column<string>(type: "TEXT", nullable: false),
+                    EventId = table.Column<Guid>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Logs", x => x.LogId);
+                    table.ForeignKey(
+                        name: "FK_Logs_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "EventId");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_BarSetups_EventId",
                 table: "BarSetups",
@@ -313,6 +336,11 @@ namespace RobotBarApp.Migrations
                 column: "MenuId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_IngredientPositions_IngredientId",
+                table: "IngredientPositions",
+                column: "IngredientId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_IngredientScripts_IngredientId",
                 table: "IngredientScripts",
                 column: "IngredientId");
@@ -321,6 +349,11 @@ namespace RobotBarApp.Migrations
                 name: "IX_IngredientUseCounts_IngredientId",
                 table: "IngredientUseCounts",
                 column: "IngredientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Logs_EventId",
+                table: "Logs",
+                column: "EventId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MenuContents_DrinkId",
@@ -354,6 +387,9 @@ namespace RobotBarApp.Migrations
                 name: "DrinkUseCounts");
 
             migrationBuilder.DropTable(
+                name: "IngredientPositions");
+
+            migrationBuilder.DropTable(
                 name: "IngredientScripts");
 
             migrationBuilder.DropTable(
@@ -369,10 +405,10 @@ namespace RobotBarApp.Migrations
                 name: "SopSteps");
 
             migrationBuilder.DropTable(
-                name: "Events");
+                name: "Ingredients");
 
             migrationBuilder.DropTable(
-                name: "Ingredients");
+                name: "Events");
 
             migrationBuilder.DropTable(
                 name: "Drinks");

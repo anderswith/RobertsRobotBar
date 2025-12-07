@@ -17,7 +17,7 @@ public class RobotComms : IRobotComms
     public async Task ConnectAsync()
     {
         // Start Primary Interface Reader (30001)
-        await _reader.StartAsync(_ip);
+        await _reader.StartAsync();
 
         Console.WriteLine("RobotComms connected (reader running on 30001)");
     }

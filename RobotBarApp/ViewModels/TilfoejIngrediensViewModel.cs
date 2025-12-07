@@ -202,24 +202,19 @@ namespace RobotBarApp.ViewModels
 
             File.Copy(ImagePreview, destinationPath, overwrite: true);
 
-            return Path.GetRelativePath(AppContext.BaseDirectory, destinationPath);
+            return Path.Combine("Resources", "IngredientPics", fileName)
+                .Replace("\\", "/");
         }
 
         private string GetIngredientPicsDirectory()
         {
-            var baseDir = AppContext.BaseDirectory;
-            var projectResourcePath = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "Resources", "IngredientPics"));
+            var projectRoot = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+            var ingredientPicsPath = Path.Combine(projectRoot, "Resources", "IngredientPics");
+            Directory.CreateDirectory(ingredientPicsPath);
 
-            try
-            {
-                Directory.CreateDirectory(projectResourcePath);
-                return projectResourcePath;
-            }
-            catch
-            {
-                // Fall back to output directory if we cannot reach the project folder
-                return Path.Combine(baseDir, "Resources", "IngredientPics");
-            }
+            return ingredientPicsPath;
         }
+        
+
     }
 }

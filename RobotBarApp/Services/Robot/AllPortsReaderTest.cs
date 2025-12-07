@@ -3,9 +3,10 @@ using System.Text;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.Services.Robot.Interfaces;
 
-public class AllportReaderTest 
+public class AllPortReaderTest : IRobotDashboardStreamReader
 {
     private readonly ILogLogic _log;
+    private readonly string _robotIp;
 
     public event Action<string>? OnRobotError;
     public event Action? ProgramFinished;
@@ -17,12 +18,13 @@ public class AllportReaderTest
     private readonly Dictionary<int, TcpClient> _clients = new();
     private readonly int[] _ports = { 29999, 30001, 30002, 30003 };
 
-    public AllportReaderTest(ILogLogic log)
+    public AllPortReaderTest(string robotIp, ILogLogic log)
     {
+        _robotIp = robotIp;
         _log = log;
     }
 
-    public async Task StartAsync(string robotIp)
+    public async Task StartAsync()
     {
         _cts = new CancellationTokenSource();
 
@@ -31,10 +33,9 @@ public class AllportReaderTest
             try
             {
                 var client = new TcpClient();
-                var connectTask = client.ConnectAsync(robotIp, port);
-                var timeout = Task.Delay(2000);
+                var connectTask = client.ConnectAsync(_robotIp, port);
 
-                if (await Task.WhenAny(connectTask, timeout) != connectTask)
+                if (await Task.WhenAny(connectTask, Task.Delay(2000)) != connectTask)
                 {
                     _log.AddLog($"Timeout connecting to port {port}.", "RobotWarning");
                     continue;
@@ -44,7 +45,6 @@ public class AllportReaderTest
                 _clients[port] = client;
 
                 Console.WriteLine($"Connected to robot port {port}");
-
                 _ = Task.Run(() => ListenToPort(port, client, _cts.Token));
             }
             catch (Exception ex)
@@ -73,34 +73,31 @@ public class AllportReaderTest
                 foreach (var line in lines)
                 {
                     var trimmed = line.Trim();
-                    if (trimmed.Length == 0) continue;
+                    if (trimmed.Length == 0)
+                        continue;
 
                     Console.WriteLine($"{port} << {trimmed}");
-
                     HandlePortMessage(port, trimmed);
                 }
             }
-            catch (Exception)
+            catch
             {
-                await Task.Delay(50);
+                await Task.Delay(50, token);
             }
         }
     }
 
     private void HandlePortMessage(int port, string msg)
     {
-        // BASIC TEXTMSG
         if (msg.Contains("textmsg", StringComparison.OrdinalIgnoreCase))
             OnRobotMessage?.Invoke(msg);
 
-        // PROGRAM FINISHED (ONLY FROM 30001 & 30002)
         if (msg.Contains("finished", StringComparison.OrdinalIgnoreCase) ||
             msg.Contains("stopped", StringComparison.OrdinalIgnoreCase))
         {
             ProgramFinished?.Invoke();
         }
 
-        // ERROR DETECTION — fallback for ANY of the ports
         if (ContainsErrorKeyword(msg))
         {
             _log.AddLog($"Robot error ({port}): {msg}", "RobotError");

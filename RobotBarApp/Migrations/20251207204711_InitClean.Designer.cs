@@ -11,8 +11,8 @@ using RobotBarApp.DAL;
 namespace RobotBarApp.Migrations
 {
     [DbContext(typeof(RobotBarContext))]
-    [Migration("20251205145206_FixedEntities")]
-    partial class FixedEntities
+    [Migration("20251207204711_InitClean")]
+    partial class InitClean
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -139,7 +139,7 @@ namespace RobotBarApp.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("MenuId")
+                    b.Property<Guid?>("MenuId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -250,7 +250,7 @@ namespace RobotBarApp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("EventId")
+                    b.Property<Guid?>("EventId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LogMsg")
@@ -418,8 +418,7 @@ namespace RobotBarApp.Migrations
                     b.HasOne("RobotBarApp.BE.Menu", "Menu")
                         .WithMany("Events")
                         .HasForeignKey("MenuId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Menu");
                 });
@@ -461,9 +460,7 @@ namespace RobotBarApp.Migrations
                 {
                     b.HasOne("RobotBarApp.BE.Event", "Event")
                         .WithMany("Logs")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("EventId");
 
                     b.Navigation("Event");
                 });

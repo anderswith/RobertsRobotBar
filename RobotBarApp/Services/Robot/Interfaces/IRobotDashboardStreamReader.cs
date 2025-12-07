@@ -1,3 +1,5 @@
+using RobotBarApp.BLL.Interfaces;
+
 namespace RobotBarApp.Services.Robot.Interfaces;
 
 public interface IRobotDashboardStreamReader
@@ -7,5 +9,5 @@ public interface IRobotDashboardStreamReader
     event Action? ProgramFinished;
     event Action<string>? OnRobotMessage;
 
-    Task StartAsync(string robotIp);
+    Task StartAsync();
 }

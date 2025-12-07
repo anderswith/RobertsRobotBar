@@ -1,13 +1,12 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
-using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using RobotBarApp.BE;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.Services.Interfaces;
 using System.Windows;
-using System.IO;
 
 namespace RobotBarApp.ViewModels
 {
@@ -16,44 +15,69 @@ namespace RobotBarApp.ViewModels
         private readonly INavigationService _navigationService;
         private readonly IIngredientLogic _ingredientLogic;
         private readonly IEventLogic _eventLogic;
-        private readonly IDrinkLogic _drinkLogic;
-        private readonly IMenuLogic _menuLogic;
+        private readonly IBarSetupLogic _barSetupLogic;
 
-        public TilfoejEventViewModel(INavigationService navigationService,
-                                     IIngredientLogic ingredientLogic,
-                                     IEventLogic eventLogic,
-                                     IDrinkLogic drinkLogic,
-                                     IMenuLogic menuLogic)
+        public TilfoejEventViewModel(
+            INavigationService navigationService,
+            IIngredientLogic ingredientLogic,
+            IEventLogic eventLogic,
+            IBarSetupLogic barSetupLogic)
         {
             _navigationService = navigationService;
             _ingredientLogic = ingredientLogic;
             _eventLogic = eventLogic;
-            _drinkLogic = drinkLogic;
-            _menuLogic = menuLogic;
+            _barSetupLogic = barSetupLogic;
 
             Step = 1;
 
-            Ingredients = new ObservableCollection<Ingredient>(_ingredientLogic.GetAllIngredients());
-            FilteredIngredients = new ObservableCollection<Ingredient>(Ingredients);
+            Ingredients = new ObservableCollection<Ingredient>(_ingredientLogic.GetIngredientsForPositions());
+            FilteredIngredients = new ObservableCollection<Ingredient>();
 
-            RackItems = new ObservableCollection<RackSlot>(Enumerable.Range(1, 24).Select(pos => new RackSlot(pos)));
-            MenuDrinks = new ObservableCollection<string>();
-            SelectedDrinkIds = new ObservableCollection<Guid>();
+            RackItems = new ObservableCollection<RackSlot>(
+                Enumerable.Range(1, 24).Select(i => new RackSlot(i)));
 
-            ChooseImageCommand = new RelayCommand(_ => ChooseImage());
+            SelectSlotCommand = new RelayCommand(SelectSlot);
+            AddIngredientCommand = new RelayCommand(AddIngredient);
+            SaveCommand = new RelayCommand(SaveEvent);
             NextCommand = new RelayCommand(_ => Step = 2);
             CancelCommand = new RelayCommand(_ => _navigationService.NavigateTo<EventListViewModel>());
-            AddIngredientCommand = new RelayCommand(AddIngredientToRack);
-            SaveCommand = new RelayCommand(_ => SaveEvent());
-            
-            BackCommand  = new RelayCommand(_ => _navigationService.NavigateTo<EventListViewModel>());
-            EditCommand  = new RelayCommand(_ => Step = 2);
-            StartCommand = new RelayCommand(_ => StartEvent());
         }
 
-        // -------------------------
-        // STEP MANAGEMENT
-        // -------------------------
+        public RelayCommand SelectSlotCommand { get; }
+        public RelayCommand AddIngredientCommand { get; }
+        public RelayCommand SaveCommand { get; }
+        public RelayCommand NextCommand { get; }
+        public RelayCommand CancelCommand { get; }
+
+        public ObservableCollection<Ingredient> Ingredients { get; }
+        public ObservableCollection<Ingredient> FilteredIngredients { get; }
+        public ObservableCollection<RackSlot> RackItems { get; }
+
+        private RackSlot? _selectedSlot;
+
+        private void SelectSlot(object obj)
+        {
+            if (obj is not RackSlot slot) return;
+            _selectedSlot = slot;
+
+            FilteredIngredients.Clear();
+
+            foreach (var ing in Ingredients.Where(i =>
+                i.IngredientPositions.Any(ip => ip.Position == slot.Position)))
+            {
+                FilteredIngredients.Add(ing);
+            }
+        }
+
+        private void AddIngredient(object param)
+        {
+            if (_selectedSlot == null) return;
+            if (param is not Ingredient ing) return;
+
+            _selectedSlot.Ingredient = ing;
+        }
+
+        // step 1
         private int _step;
         public int Step
         {
@@ -61,164 +85,47 @@ namespace RobotBarApp.ViewModels
             set => SetProperty(ref _step, value);
         }
 
-        // -------------------------
-        // STEP 1 — NAME + IMAGE
-        // -------------------------
-
-        private string _eventName = string.Empty;
+        private string _eventName;
         public string EventName
         {
             get => _eventName;
             set => SetProperty(ref _eventName, value);
         }
 
-        private string _imagePath = string.Empty;
+        private string _imagePath;
         public string ImagePath
         {
             get => _imagePath;
             set => SetProperty(ref _imagePath, value);
         }
 
-        private BitmapImage? _eventImage;
-        public BitmapImage? EventImage
-        {
-            get => _eventImage;
-            set => SetProperty(ref _eventImage, value);
-        }
-
-        public RelayCommand ChooseImageCommand { get; }
-
-        private void ChooseImage()
+        public RelayCommand ChooseImageCommand => new(_ =>
         {
             var dialog = new OpenFileDialog();
-            dialog.Filter = "Image files|*.jpg;*.png;*.jpeg;*.bmp";
-
             if (dialog.ShowDialog() == true)
-            {
                 ImagePath = dialog.FileName;
-                EventImage = new BitmapImage(new Uri(ImagePath));
-            }
-        }
+        });
 
-        public RelayCommand NextCommand { get; }
-        public RelayCommand CancelCommand { get; }
-
-        // -------------------------
-        // STEP 2 — INGREDIENTS + RACK + MENU
-        // -------------------------
-
-        public ObservableCollection<Ingredient> Ingredients { get; }
-        public ObservableCollection<Ingredient> FilteredIngredients { get; }
-
-        private string _ingredientSearch = string.Empty;
-        public string IngredientSearch
+        // SAVE
+        private void SaveEvent(object _)
         {
-            get => _ingredientSearch;
-            set
+            if (string.IsNullOrEmpty(ImagePath))
             {
-                if (SetProperty(ref _ingredientSearch, value))
-                {
-                    FilterIngredients();
-                }
-            }
-        }
-
-        private void FilterIngredients()
-        {
-            FilteredIngredients.Clear();
-
-            foreach (var ing in Ingredients.Where(i => string.IsNullOrEmpty(IngredientSearch) ||
-                                                       i.Name.Contains(IngredientSearch, StringComparison.OrdinalIgnoreCase)))
-            {
-                FilteredIngredients.Add(ing);
-            }
-        }
-
-        public ObservableCollection<RackSlot> RackItems { get; }
-        public ObservableCollection<string> MenuDrinks { get; }
-        public ObservableCollection<Guid> SelectedDrinkIds { get; }
-
-        public RelayCommand AddIngredientCommand { get; }
-
-        private void AddIngredientToRack(object? param)
-        {
-            if (param is not Ingredient ing) return;
-
-            //var slot = RackItems.FirstOrDefault(r => r.Position == ing.PositionNumber);
-            //if (slot == null)
-                //return;
-
-            //slot.Ingredient = ing;
-
-            // Show menu after 1+ ingredient
-            HasMenu = true;
-
-            // Suggest drinks based on selected ingredients
-            MenuDrinks.Clear();
-            SelectedDrinkIds.Clear();
-            foreach (var drink in _drinkLogic.GetAllDrinks())
-            {
-                if (drink.DrinkContents != null &&
-                    drink.DrinkContents.Any(dc => RackItems.Any(r => r.Ingredient != null && r.Ingredient.IngredientId == dc.IngredientId)))
-                {
-                    MenuDrinks.Add(drink.Name);
-                    if (!SelectedDrinkIds.Contains(drink.DrinkId))
-                        SelectedDrinkIds.Add(drink.DrinkId);
-                }
-            }
-        }
-
-        private bool _hasMenu;
-        public bool HasMenu
-        {
-            get => _hasMenu;
-            set => SetProperty(ref _hasMenu, value);
-        }
-
-        // -------------------------
-        // SAVE EVENT
-        // -------------------------
-
-        public RelayCommand SaveCommand { get; }
-
-        private void SaveEvent()
-        {
-            if (string.IsNullOrWhiteSpace(EventName))
-                return;
-
-            if (string.IsNullOrWhiteSpace(ImagePath) || !File.Exists(ImagePath))
-            {
-                MessageBox.Show("Vælg et billede til eventet, før du gemmer.");
+                MessageBox.Show("Please choose an image.");
                 return;
             }
 
-            if (!SelectedDrinkIds.Any())
+            // copy to resources and use relative path
+            var finalImagePath = CopyEventImageToResources();
+
+            var id = _eventLogic.AddEvent(EventName, finalImagePath, null);
+
+            foreach (var slot in RackItems.Where(r => r.Ingredient != null))
             {
-                MessageBox.Show("Tilføj mindst én ingrediens, så der kan vælges drinks til menuen.");
-                return;
+                _barSetupLogic.AddBarSetup(slot.Position, slot.Ingredient.IngredientId, id);
             }
 
-            var storedEventImagePath = CopyEventImageToResources();
-
-            var menuName = string.IsNullOrWhiteSpace(EventName) ? "Menu" : $"{EventName} Menu";
-            _menuLogic.AddMenuWithDrinks(menuName, SelectedDrinkIds.ToList());
-            var menuId = _menuLogic.GetAllMenus()
-                .Where(m => m.Name == menuName)
-                .OrderByDescending(m => m.MenuId)
-                .Select(m => m.MenuId)
-                .FirstOrDefault();
-
-            if (menuId == Guid.Empty)
-            {
-                MessageBox.Show("Kunne ikke oprette menukortet. Prøv igen.");
-                return;
-            }
-
-            _eventLogic.AddEvent(EventName, storedEventImagePath, menuId);
-
-            // Go to summary step
-            Step = 3;
-
+            _navigationService.NavigateTo<EventListViewModel>();
         }
 
         private string CopyEventImageToResources()
@@ -226,84 +133,44 @@ namespace RobotBarApp.ViewModels
             var destinationFolder = GetEventPicsDirectory();
             Directory.CreateDirectory(destinationFolder);
 
-            var extension = Path.GetExtension(ImagePath);
+            var extension = Path.GetExtension(ImagePath);   // <-– you used ImagePreview earlier, fixed
             var safeName = new string((EventName ?? "event").Select(ch =>
                 Path.GetInvalidFileNameChars().Contains(ch) ? '_' : ch).ToArray());
+
             if (string.IsNullOrWhiteSpace(safeName))
                 safeName = "event";
 
             var fileName = $"{safeName}_{DateTime.UtcNow:yyyyMMddHHmmssfff}{extension}";
             var destinationPath = Path.Combine(destinationFolder, fileName);
+            
 
             File.Copy(ImagePath, destinationPath, overwrite: true);
 
-            return Path.GetRelativePath(AppContext.BaseDirectory, destinationPath);
+            return Path.Combine("Resources", "EventPics", fileName).Replace("\\", "/");
         }
 
         private string GetEventPicsDirectory()
         {
-            var baseDir = AppContext.BaseDirectory;
-            var projectResourcePath = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "Resources", "EventPics"));
+            var projectRoot = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
 
-            try
-            {
-                Directory.CreateDirectory(projectResourcePath);
-                return projectResourcePath;
-            }
-            catch
-            {
-                return Path.Combine(baseDir, "Resources", "EventPics");
-            }
-        }
-        
-        
-        // -------------------------
-        // STEP 3 — OVERVIEW + START
-        // -------------------------
-        public RelayCommand BackCommand { get; }
-        public RelayCommand EditCommand { get; }
-        public RelayCommand StartCommand { get; }
-        
-        private void StartEvent()
-        {
-            // TODO: later you can navigate to a “running event” view instead
-            _navigationService.NavigateTo<EventListViewModel>();
-        }
+            var eventPicsPath = Path.Combine(projectRoot, "Resources", "EventPics");
+            Directory.CreateDirectory(eventPicsPath);
 
-        
+            return eventPicsPath;
+        }
     }
 
-    // Helper model for rack position
     public class RackSlot : ViewModelBase
     {
-        public RackSlot(int position)
-        {
-            Position = position;
-        }
+        public RackSlot(int pos) => Position = pos;
 
         public int Position { get; }
-
-        public int Row => (Position - 1) / 8;
-        public int Column => (Position - 1) % 8;
 
         private Ingredient? _ingredient;
         public Ingredient? Ingredient
         {
             get => _ingredient;
-            set
-            {
-                if (SetProperty(ref _ingredient, value))
-                {
-                    ImageSource = _ingredient?.Image;
-                }
-            }
-        }
-
-        private string? _imageSource;
-        public string? ImageSource
-        {
-            get => _imageSource;
-            private set => SetProperty(ref _imageSource, value);
+            set => SetProperty(ref _ingredient, value);
         }
     }
 }
