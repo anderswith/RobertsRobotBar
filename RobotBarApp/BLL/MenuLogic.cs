@@ -123,13 +123,19 @@ public class MenuLogic : IMenuLogic
         {
             throw new KeyNotFoundException("Event not found.");
         }
+        
+        if (ev.MenuId == null)
+        {
+            throw new InvalidOperationException("Event has no menu assigned.");
+        }
 
-        var menu = _menuRepository.GetMenuWithDrinksAndIngredients(ev.MenuId);
+        var menu = _menuRepository.GetMenuWithDrinksAndIngredients(ev.MenuId.Value);
+
         if (menu == null)
         {
             throw new KeyNotFoundException("Menu not found.");
-        } 
-        
+        }
+
         return menu;
     }
 

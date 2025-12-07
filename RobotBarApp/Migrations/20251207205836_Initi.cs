@@ -5,7 +5,7 @@
 namespace RobotBarApp.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCrasdsad : Migration
+    public partial class Initi : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

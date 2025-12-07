@@ -11,8 +11,8 @@ using RobotBarApp.DAL;
 namespace RobotBarApp.Migrations
 {
     [DbContext(typeof(RobotBarContext))]
-    [Migration("20251128132158_InitialCrasdsad")]
-    partial class InitialCrasdsad
+    [Migration("20251207205836_Initi")]
+    partial class Initi
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -135,14 +135,11 @@ namespace RobotBarApp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("EventBarSetupId")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Image")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("MenuId")
+                    b.Property<Guid?>("MenuId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -253,6 +250,9 @@ namespace RobotBarApp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("EventId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("LogMsg")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -265,6 +265,8 @@ namespace RobotBarApp.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("LogId");
+
+                    b.HasIndex("EventId");
 
                     b.ToTable("Logs");
                 });
@@ -416,8 +418,7 @@ namespace RobotBarApp.Migrations
                     b.HasOne("RobotBarApp.BE.Menu", "Menu")
                         .WithMany("Events")
                         .HasForeignKey("MenuId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Menu");
                 });
@@ -453,6 +454,15 @@ namespace RobotBarApp.Migrations
                         .IsRequired();
 
                     b.Navigation("Ingredient");
+                });
+
+            modelBuilder.Entity("RobotBarApp.BE.Log", b =>
+                {
+                    b.HasOne("RobotBarApp.BE.Event", "Event")
+                        .WithMany("Logs")
+                        .HasForeignKey("EventId");
+
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("RobotBarApp.BE.MenuContent", b =>
@@ -499,6 +509,8 @@ namespace RobotBarApp.Migrations
             modelBuilder.Entity("RobotBarApp.BE.Event", b =>
                 {
                     b.Navigation("BarSetups");
+
+                    b.Navigation("Logs");
                 });
 
             modelBuilder.Entity("RobotBarApp.BE.Ingredient", b =>

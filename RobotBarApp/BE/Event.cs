@@ -6,12 +6,12 @@ public class Event
     [Key]
     public Guid EventId { get; set; }
     public string Name { get; set; }
-    public Guid MenuId { get; set; }
+    public Guid? MenuId { get; set; }
     public string Image { get; set; }
 
   
     
-    public Menu Menu { get; set; }
+    public Menu? Menu { get; set; }
     public ICollection<BarSetup> BarSetups { get; set; }
     public ICollection<Log> Logs { get; set; }
 }

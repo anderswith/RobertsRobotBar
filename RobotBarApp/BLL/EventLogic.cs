@@ -13,8 +13,9 @@ public class EventLogic : IEventLogic
         _eventRepository = eventRepository;
     }
     
-    public Guid AddEvent(string name, string image, Guid menuId)
+    public Guid AddEvent(string name, string image, Guid? menuId)
     {
+        Console.WriteLine("AddEvent Logic");
         if (string.IsNullOrEmpty(name))
         {
             throw new ArgumentException("Event name cannot be null or empty");
@@ -24,10 +25,11 @@ public class EventLogic : IEventLogic
         {
             throw new ArgumentException("Event image URL cannot be null or empty");
         }
-        if( menuId == Guid.Empty)
+        if (!menuId.HasValue || menuId.Value == Guid.Empty)
         {
-            throw new ArgumentException("Menu ID cannot be empty");
+            menuId = null;
         }
+        Console.WriteLine("MenuId in AddEvent: " + (menuId.HasValue ? menuId.ToString() : "null"));
 
         Event evt = new Event
         {
