@@ -4,7 +4,7 @@ namespace RobotBarApp.BLL.Interfaces;
 
 public interface IEventLogic
 {
-    void AddEvent(string name, string image, Guid menuId);
+    Guid AddEvent(string name, string image, Guid menuId);
     IEnumerable<Event> GetAllEvents();
     Event? GetEventById(Guid eventId);
     void DeleteEvent(Guid eventId);

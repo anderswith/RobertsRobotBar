@@ -1,4 +1,3 @@
-using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using RobotBarApp.BLL.Interfaces;
@@ -7,6 +6,7 @@ using RobotBarApp.Services.Robot.Interfaces;
 public class RobotDashboardStreamReader : IRobotDashboardStreamReader
 {
     private readonly ILogLogic _log;
+    private readonly string _robotIp;
 
     public event Action<string>? OnRobotError;
     public event Action? ProgramFinished;
@@ -15,45 +15,55 @@ public class RobotDashboardStreamReader : IRobotDashboardStreamReader
     private TcpClient? _client;
     private CancellationTokenSource? _cts;
 
-    public RobotDashboardStreamReader(ILogLogic log)
+    public RobotDashboardStreamReader(string robotIp, ILogLogic log)
     {
+        _robotIp = robotIp;
         _log = log;
     }
-    
-    public async Task StartAsync(string robotIp)
+
+    public async Task StartAsync()
     {
         _cts = new CancellationTokenSource();
 
         try
         {
             _client = new TcpClient();
-            
-            var connectTask = _client.ConnectAsync(robotIp, 30001);
+
+            var connectTask = _client.ConnectAsync(_robotIp, 30001);
             var timeoutTask = Task.Delay(2000);
 
             var result = await Task.WhenAny(connectTask, timeoutTask);
 
             if (result == timeoutTask)
             {
-                Console.WriteLine("Robot dashboard timeout — starting without connection.");
                 _log.AddLog("Robot dashboard timeout — starting without connection.", "RobotWarning");
                 return;
             }
 
             await connectTask;
-            Console.WriteLine("Connected to Primary Interface (30001)");
-            _ = Task.Run(() => Listen(_cts.Token));
+            _log.AddLog("Connected to Primary Interface (30001)", "RobotMessage");
+
+            _ = Task.Run(() => ListenAsync(_cts.Token));
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error connecting to robot: {ex.Message}");
-            _log.AddLog($"Error connecting to robot: {ex.Message}", "RobotWarning");
+            _log.AddLog($"Error connecting to robot: {ex.Message}", "RobotError");
         }
     }
 
-    private async Task Listen(CancellationToken token)
+    private async Task ListenAsync(CancellationToken token)
     {
-        var stream = _client!.GetStream();
+        NetworkStream stream;
+
+        try
+        {
+            stream = _client!.GetStream();
+        }
+        catch
+        {
+            return;
+        }
+
         byte[] buffer = new byte[4096];
 
         while (!token.IsCancellationRequested)
@@ -73,33 +83,33 @@ public class RobotDashboardStreamReader : IRobotDashboardStreamReader
             foreach (var line in data.Split('\n'))
             {
                 var trimmed = line.Trim();
-                if (trimmed.Length == 0) continue;
+                if (trimmed.Length == 0) 
+                    continue;
 
-                //Console.WriteLine("30001 << " + trimmed);
-
-                if (trimmed.Contains("textmsg", StringComparison.OrdinalIgnoreCase))
-                {
-                    Console.WriteLine("30001 << " + trimmed);
-                    OnRobotMessage?.Invoke(trimmed);
-                }
-
-                if (trimmed.Contains("protect", StringComparison.OrdinalIgnoreCase) ||
-                    trimmed.Contains("fault", StringComparison.OrdinalIgnoreCase) ||
-                    trimmed.Contains("emergency", StringComparison.OrdinalIgnoreCase))
-                {
-                    Console.WriteLine("30002 << " + trimmed);
-                    _log.AddLog($"Error: {trimmed}", "RobotError");
-                    OnRobotError?.Invoke(trimmed);
-                    
-                }
-
-                if (trimmed.Contains("finished", StringComparison.OrdinalIgnoreCase) ||
-                    trimmed.Contains("stopped", StringComparison.OrdinalIgnoreCase))
-                {
-                    Console.WriteLine("30002 << " + trimmed);
-                    ProgramFinished?.Invoke();
-                }
+                HandleMessage(trimmed);
             }
+        }
+    }
+
+    private void HandleMessage(string trimmed)
+    {
+        if (trimmed.Contains("textmsg", StringComparison.OrdinalIgnoreCase))
+        {
+            OnRobotMessage?.Invoke(trimmed);
+        }
+
+        if (trimmed.Contains("protect", StringComparison.OrdinalIgnoreCase) ||
+            trimmed.Contains("fault", StringComparison.OrdinalIgnoreCase) ||
+            trimmed.Contains("emergency", StringComparison.OrdinalIgnoreCase))
+        {
+            _log.AddLog($"Error: {trimmed}", "RobotError");
+            OnRobotError?.Invoke(trimmed);
+        }
+
+        if (trimmed.Contains("finished", StringComparison.OrdinalIgnoreCase) ||
+            trimmed.Contains("stopped", StringComparison.OrdinalIgnoreCase))
+        {
+            ProgramFinished?.Invoke();
         }
     }
 }

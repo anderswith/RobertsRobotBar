@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using RobotBarApp.BE;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.DAL.Repositories.Interfaces;
@@ -12,7 +13,7 @@ public class EventLogic : IEventLogic
         _eventRepository = eventRepository;
     }
     
-    public void AddEvent(string name, string image, Guid menuId)
+    public Guid AddEvent(string name, string image, Guid menuId)
     {
         if (string.IsNullOrEmpty(name))
         {
@@ -37,6 +38,7 @@ public class EventLogic : IEventLogic
         };
 
         _eventRepository.AddEvent(evt);
+        return evt.EventId;
     }
     
     public IEnumerable<Event> GetAllEvents()

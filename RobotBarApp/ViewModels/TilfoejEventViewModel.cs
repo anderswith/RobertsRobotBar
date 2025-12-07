@@ -33,7 +33,7 @@ namespace RobotBarApp.ViewModels
 
             Step = 1;
 
-            Ingredients = new ObservableCollection<Ingredient>(_ingredientLogic.GetAllIngredients());
+            Ingredients = new ObservableCollection<Ingredient>(_ingredientLogic.GetIngredientsForPositions());
             FilteredIngredients = new ObservableCollection<Ingredient>(Ingredients);
 
             RackItems = new ObservableCollection<RackSlot>(Enumerable.Range(1, 24).Select(pos => new RackSlot(pos)));
@@ -144,22 +144,28 @@ namespace RobotBarApp.ViewModels
         {
             if (param is not Ingredient ing) return;
 
-            //var slot = RackItems.FirstOrDefault(r => r.Position == ing.PositionNumber);
-            //if (slot == null)
-                //return;
+            // take the first position for this ingredient
+            var pos = ing.IngredientPositions?.FirstOrDefault();
+            if (pos == null) return;
 
-            //slot.Ingredient = ing;
+            var slot = RackItems.FirstOrDefault(r => r.Position == pos.Position);
+            if (slot == null) return;
 
-            // Show menu after 1+ ingredient
+            slot.Ingredient = ing;
+
             HasMenu = true;
 
             // Suggest drinks based on selected ingredients
             MenuDrinks.Clear();
             SelectedDrinkIds.Clear();
+
             foreach (var drink in _drinkLogic.GetAllDrinks())
             {
                 if (drink.DrinkContents != null &&
-                    drink.DrinkContents.Any(dc => RackItems.Any(r => r.Ingredient != null && r.Ingredient.IngredientId == dc.IngredientId)))
+                    drink.DrinkContents.Any(dc =>
+                        RackItems.Any(r =>
+                            r.Ingredient != null &&
+                            r.Ingredient.IngredientId == dc.IngredientId)))
                 {
                     MenuDrinks.Add(drink.Name);
                     if (!SelectedDrinkIds.Contains(drink.DrinkId))
@@ -283,8 +289,7 @@ namespace RobotBarApp.ViewModels
 
         public int Position { get; }
 
-        public int Row => (Position - 1) / 8;
-        public int Column => (Position - 1) % 8;
+        public RelayCommand SelectSlotCommand { get; set; }
 
         private Ingredient? _ingredient;
         public Ingredient? Ingredient
@@ -294,16 +299,20 @@ namespace RobotBarApp.ViewModels
             {
                 if (SetProperty(ref _ingredient, value))
                 {
-                    ImageSource = _ingredient?.Image;
+                    if (_ingredient != null && File.Exists(_ingredient.Image))
+                        ImageSource = new BitmapImage(new Uri(_ingredient.Image));
+                    else
+                        ImageSource = null;
                 }
             }
         }
 
-        private string? _imageSource;
-        public string? ImageSource
+        private BitmapImage? _imageSource;
+        public BitmapImage? ImageSource
         {
             get => _imageSource;
             private set => SetProperty(ref _imageSource, value);
         }
     }
+
 }

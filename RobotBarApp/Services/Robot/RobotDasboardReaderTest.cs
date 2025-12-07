@@ -10,19 +10,22 @@ public class RobotDashboardStreamReaderTest : IRobotDashboardStreamReader
     public event Action<string>? OnRobotError;
     public event Action? ProgramFinished;
     public event Action<string>? OnRobotMessage;
+    private readonly string _robotIp;
 
     private TcpClient? _primaryClient;     // 30001
     private TcpClient? _dashboardClient;   // 29999
     private TcpClient? _rtdeClient;        // 30004
+    private readonly string _ip;
 
     private CancellationTokenSource? _cts;
 
-    public RobotDashboardStreamReaderTest(ILogLogic log)
+    public RobotDashboardStreamReaderTest(string robotIp, ILogLogic log)
     {
+        _robotIp = robotIp;
         _log = log;
     }
 
-    public async Task StartAsync(string robotIp)
+    public async Task StartAsync()
     {
         _cts = new CancellationTokenSource();
         
@@ -30,7 +33,7 @@ public class RobotDashboardStreamReaderTest : IRobotDashboardStreamReader
         try
         {
             _primaryClient = new TcpClient();
-            var connectPrimary = _primaryClient.ConnectAsync(robotIp, 30001);
+            var connectPrimary = _primaryClient.ConnectAsync(_robotIp, 30001);
             if (await Task.WhenAny(connectPrimary, Task.Delay(2000)) != connectPrimary)
             {
                 _log.AddLog("Primary interface timeout — running without 30001", "RobotWarning");
@@ -51,7 +54,7 @@ public class RobotDashboardStreamReaderTest : IRobotDashboardStreamReader
         try
         {
             _dashboardClient = new TcpClient();
-            var connectDash = _dashboardClient.ConnectAsync(robotIp, 29999);
+            var connectDash = _dashboardClient.ConnectAsync(_robotIp, 29999);
             if (await Task.WhenAny(connectDash, Task.Delay(2000)) != connectDash)
             {
                 _log.AddLog("Dashboard timeout — running without 29999", "RobotWarning");
@@ -72,7 +75,7 @@ public class RobotDashboardStreamReaderTest : IRobotDashboardStreamReader
         try
         {
             _rtdeClient = new TcpClient();
-            var connectRtde = _rtdeClient.ConnectAsync(robotIp, 30004);
+            var connectRtde = _rtdeClient.ConnectAsync(_robotIp, 30004);
             if (await Task.WhenAny(connectRtde, Task.Delay(2000)) != connectRtde)
             {
                 _log.AddLog("RTDE timeout — running without safety monitor", "RobotWarning");
