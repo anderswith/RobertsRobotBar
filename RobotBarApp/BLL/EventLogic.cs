@@ -15,7 +15,6 @@ public class EventLogic : IEventLogic
     
     public Guid AddEvent(string name, string image, Guid? menuId)
     {
-        Console.WriteLine("AddEvent Logic");
         if (string.IsNullOrEmpty(name))
         {
             throw new ArgumentException("Event name cannot be null or empty");
@@ -29,7 +28,6 @@ public class EventLogic : IEventLogic
         {
             menuId = null;
         }
-        Console.WriteLine("MenuId in AddEvent: " + (menuId.HasValue ? menuId.ToString() : "null"));
 
         Event evt = new Event
         {

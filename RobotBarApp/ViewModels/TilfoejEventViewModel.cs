@@ -39,9 +39,27 @@ namespace RobotBarApp.ViewModels
             SelectSlotCommand = new RelayCommand(SelectSlot);
             AddIngredientCommand = new RelayCommand(AddIngredient);
             SaveCommand = new RelayCommand(SaveEvent);
-            NextCommand = new RelayCommand(_ => Step = 2);
+            NextCommand = new RelayCommand(_ => GoNextStep());
             CancelCommand = new RelayCommand(_ => _navigationService.NavigateTo<EventListViewModel>());
         }
+        private void GoNextStep()
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(EventName))
+                    throw new Exception("You have to enter a name");
+
+                if (string.IsNullOrWhiteSpace(ImagePath))
+                    throw new Exception("You have to select an image");
+
+                Step = 2;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
 
         public RelayCommand SelectSlotCommand { get; }
         public RelayCommand AddIngredientCommand { get; }
@@ -109,23 +127,23 @@ namespace RobotBarApp.ViewModels
         // SAVE
         private void SaveEvent(object _)
         {
-            if (string.IsNullOrEmpty(ImagePath))
+            try
             {
-                MessageBox.Show("Please choose an image.");
-                return;
+                var finalImagePath = CopyEventImageToResources();
+
+                var id = _eventLogic.AddEvent(EventName, finalImagePath, null);
+
+                foreach (var slot in RackItems.Where(r => r.Ingredient != null))
+                {
+                    _barSetupLogic.AddBarSetup(slot.Position, slot.Ingredient.IngredientId, id);
+                }
+
+                _navigationService.NavigateTo<EventListViewModel>();
             }
-
-            // copy to resources and use relative path
-            var finalImagePath = CopyEventImageToResources();
-
-            var id = _eventLogic.AddEvent(EventName, finalImagePath, null);
-
-            foreach (var slot in RackItems.Where(r => r.Ingredient != null))
+            catch (Exception ex)
             {
-                _barSetupLogic.AddBarSetup(slot.Position, slot.Ingredient.IngredientId, id);
+                MessageBox.Show(ex.Message, "Fejl", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-
-            _navigationService.NavigateTo<EventListViewModel>();
         }
 
         private string CopyEventImageToResources()
