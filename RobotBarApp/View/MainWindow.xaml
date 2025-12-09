@@ -6,6 +6,7 @@
         xmlns:vm="clr-namespace:RobotBarApp.ViewModels"
         xmlns:view="clr-namespace:RobotBarApp.View"
         xmlns:viewModel="clr-namespace:RobotBarApp.ViewModels"
+        xmlns:global="clr-namespace:"
         mc:Ignorable="d"
         Title="Robert's robotbar"
         WindowState="Maximized"
@@ -22,7 +23,7 @@
                           Opacity="0.4" />
 
         <!-- ViewModel -> View templates -->
-        <DataTemplate DataType="{x:Type vm:EventListViewModel}">
+        <DataTemplate DataType="{x:Type global:EventListViewModel}">
             <view:EventListView />
         </DataTemplate>
 
