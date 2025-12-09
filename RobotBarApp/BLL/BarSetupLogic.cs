@@ -64,16 +64,18 @@ public class BarSetupLogic : IBarSetupLogic
             throw new ArgumentException("No bar setup found for the given event and position.");
         }
     }
-    
-    public IEnumerable<BarSetup> GetBarSetupsForEvent(Guid eventId)
+
+    public IEnumerable<BarSetup> GetBarSetupForEvent(Guid eventId)
     {
         if (eventId == Guid.Empty)
         {
             throw new ArgumentException("Event ID cannot be empty.");
         }
 
-        return _barSetupRepository.GetAllBarSetupsForEventById(eventId);
+        return _barSetupRepository.GetBarSetupForEvent(eventId);
     }
+
+ 
 
     
     

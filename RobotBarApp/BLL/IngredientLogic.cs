@@ -169,19 +169,19 @@ public class IngredientLogic : IIngredientLogic
         
     }
 
-    public IEnumerable<Ingredient> GetAlcohol()
+    public IEnumerable<Ingredient> GetAlcohol(Guid eventId)
     {
-        return _ingredientRepository.GetIngredientByType("Alkohol");
+        return _ingredientRepository.GetIngredientByType("Alkohol",eventId);
     }
 
-    public IEnumerable<Ingredient> GetSyrups()
+    public IEnumerable<Ingredient> GetSyrups(Guid eventId)
     {
-        return _ingredientRepository.GetIngredientByType("Syrup");
+        return _ingredientRepository.GetIngredientByType("Syrup",eventId);
     }
 
-    public IEnumerable<Ingredient> GetSoda()
+    public IEnumerable<Ingredient> GetSoda(Guid eventId)
     {
-        return _ingredientRepository.GetIngredientByType("Soda");
+        return _ingredientRepository.GetIngredientByType("Soda", eventId);
     }
     public IEnumerable<Ingredient> GetIngredientsWithScripts(List<Guid> ingredientIds)
     {

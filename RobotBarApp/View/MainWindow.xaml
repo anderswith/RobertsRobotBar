@@ -6,6 +6,7 @@
         xmlns:vm="clr-namespace:RobotBarApp.ViewModels"
         xmlns:view="clr-namespace:RobotBarApp.View"
         xmlns:viewModel="clr-namespace:RobotBarApp.ViewModels"
+        xmlns:global="clr-namespace:"
         mc:Ignorable="d"
         Title="Robert's robotbar"
         WindowState="Maximized"
@@ -22,7 +23,7 @@
                           Opacity="0.4" />
 
         <!-- ViewModel -> View templates -->
-        <DataTemplate DataType="{x:Type vm:EventListViewModel}">
+        <DataTemplate DataType="{x:Type global:EventListViewModel}">
             <view:EventListView />
         </DataTemplate>
 
@@ -48,6 +49,10 @@
 
         <DataTemplate DataType="{x:Type vm:TilfoejEventViewModel}">
             <view:TilfoejEventView />
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type vm:EventViewModel}">
+            <view:EventView />
         </DataTemplate>
 
     </Window.Resources>
@@ -157,16 +162,6 @@
                             Height="35"
                             Margin="0,0,0,10"
                             Command="{Binding NavigateTilfoejIngrediensCommand}"/>
-
-                    <Button Content="Tilføj Drink"
-                            Height="35"
-                            Margin="0,0,0,10"
-                            Command="{Binding NavigateTilfoejDrinkCommand}"/>
-
-                    <Button Content="Tilføj Menu"
-                            Height="35"
-                            Margin="0,0,0,10"
-                            Command="{Binding NavigateTilfoejMenuCommand}"/>
 
                     <Button Content="Tilføj Event"
                             Height="35"

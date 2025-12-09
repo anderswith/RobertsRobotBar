@@ -6,6 +6,6 @@ public interface IBarSetupLogic
 { 
     void AddBarSetup(int positionNumber, Guid ingredientId, Guid eventId);
     void DeleteBarSetup(Guid eventId, int positionNumber);
-    IEnumerable<BarSetup> GetBarSetupsForEvent(Guid eventId);
+    IEnumerable<BarSetup> GetBarSetupForEvent(Guid eventId);
 
 }

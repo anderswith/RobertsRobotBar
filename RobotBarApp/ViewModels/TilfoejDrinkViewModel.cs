@@ -11,18 +11,22 @@ namespace RobotBarApp.ViewModels
 {
     public class TilfoejDrinkViewModel : ViewModelBase
     {
+       
         private readonly IIngredientLogic _ingredientLogic;
         private readonly IDrinkLogic _drinkLogic;
         private readonly INavigationService _navigation;
+        private readonly Guid _eventId;
 
         public TilfoejDrinkViewModel(
             IIngredientLogic ingredientLogic,
             IDrinkLogic drinkLogic,
-            INavigationService navigation)
+            INavigationService navigation,
+            Guid eventId)
         {
             _ingredientLogic = ingredientLogic;
             _drinkLogic = drinkLogic;
             _navigation = navigation;
+            _eventId = eventId;
 
             ChooseImageCommand = new RelayCommand(_ => ChooseImage());
             SaveCommand = new RelayCommand(_ => Save());
@@ -77,9 +81,9 @@ namespace RobotBarApp.ViewModels
             SyrupOptions.Clear();
             SodaOptions.Clear();
 
-            foreach (var i in _ingredientLogic.GetAlcohol()) AlcoholOptions.Add(i);
-            foreach (var i in _ingredientLogic.GetSyrups()) SyrupOptions.Add(i);
-            foreach (var i in _ingredientLogic.GetSoda()) SodaOptions.Add(i);
+            foreach (var i in _ingredientLogic.GetAlcohol(_eventId)) AlcoholOptions.Add(i);
+            foreach (var i in _ingredientLogic.GetSyrups(_eventId)) SyrupOptions.Add(i);
+            foreach (var i in _ingredientLogic.GetSoda(_eventId)) SodaOptions.Add(i);
         }
 
         public Ingredient? SelectedAlcohol1 { get; set; }
@@ -178,7 +182,7 @@ namespace RobotBarApp.ViewModels
 
             System.Windows.MessageBox.Show("Drinken blev tilføjet.");
 
-            _navigation.NavigateTo<TilfoejDrinkViewModel>();
+            _navigation.NavigateTo<EventViewModel>(_eventId);
         }
     }
 }

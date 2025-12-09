@@ -1,0 +1,84 @@
+<UserControl x:Class="RobotBarApp.View.EventView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:conv="clr-namespace:RobotBarApp.Converters"
+             mc:Ignorable="d"
+             Background="#FFE5E5E5">
+
+    <UserControl.Resources>
+        <conv:PathToImageConverter x:Key="PathToImageConverter" />
+    </UserControl.Resources>
+
+    <Grid Margin="40">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+
+        <!-- EVENT NAME -->
+        <TextBlock Text="{Binding CurrentEvent.Name}"
+                   FontSize="40"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"/>
+
+
+        <!-- RACK -->
+        <ItemsControl Grid.Row="1"
+                      Margin="0,40,0,0"
+                      ItemsSource="{Binding Rack}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="8" Rows="3"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+
+                    <StackPanel>
+                        <Image Source="{Binding Ingredient.Image, Converter={StaticResource PathToImageConverter}}"
+                               Height="70" Width="70"
+                               Stretch="Uniform"/>
+
+                        <Rectangle Width="50"
+                                   Height="5"
+                                   Fill="Black"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+
+        <!-- BOTTOM BUTTONS -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,40,0,0"
+                   >
+
+            <Button Content="Back"
+                    Width="200" Height="70"
+                    Margin="10,0"
+                    Command="{Binding BackCommand}"/>
+
+            <Button Content="Launch Event"
+                    Width="200" Height="70"
+                    Margin="10,0"
+                    Command="{Binding LaunchCommand}"/>
+
+            <Button Content="Tilføj Drink"
+                    Width="200" Height="70"
+                    Margin="10,0"
+                    Command="{Binding NavigateTilfoejDrinkCommand}"/>
+
+        </StackPanel>
+
+    </Grid>
+</UserControl>

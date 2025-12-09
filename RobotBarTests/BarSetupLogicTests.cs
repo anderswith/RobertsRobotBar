@@ -142,7 +142,7 @@ namespace UnitTests
         public void GetBarSetupsForEvent_ShouldThrow_WhenEventIdEmpty()
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _barSetupLogic.GetBarSetupsForEvent(Guid.Empty));
+                _barSetupLogic.GetBarSetupForEvent(Guid.Empty));
 
             Assert.That(ex.Message, Is.EqualTo("Event ID cannot be empty."));
         }
@@ -154,15 +154,15 @@ namespace UnitTests
             var setups = new List<BarSetup>();
 
             _barSetupRepositoryMock
-                .Setup(r => r.GetAllBarSetupsForEventById(eventId))
+                .Setup(r => r.GetBarSetupForEvent(eventId))
                 .Returns(setups);
 
-            var result = _barSetupLogic.GetBarSetupsForEvent(eventId);
+            var result = _barSetupLogic.GetBarSetupForEvent(eventId);
 
             Assert.That(result, Is.EqualTo(setups));
 
             _barSetupRepositoryMock.Verify(
-                r => r.GetAllBarSetupsForEventById(eventId),
+                r => r.GetBarSetupForEvent(eventId),
                 Times.Once);
         }
     }
