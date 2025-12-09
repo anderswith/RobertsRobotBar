@@ -50,6 +50,10 @@
         <DataTemplate DataType="{x:Type vm:TilfoejEventViewModel}">
             <view:TilfoejEventView />
         </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type vm:EventViewModel}">
+            <view:EventView />
+        </DataTemplate>
 
     </Window.Resources>
 
@@ -158,16 +162,6 @@
                             Height="35"
                             Margin="0,0,0,10"
                             Command="{Binding NavigateTilfoejIngrediensCommand}"/>
-
-                    <Button Content="Tilføj Drink"
-                            Height="35"
-                            Margin="0,0,0,10"
-                            Command="{Binding NavigateTilfoejDrinkCommand}"/>
-
-                    <Button Content="Tilføj Menu"
-                            Height="35"
-                            Margin="0,0,0,10"
-                            Command="{Binding NavigateTilfoejMenuCommand}"/>
 
                     <Button Content="Tilføj Event"
                             Height="35"

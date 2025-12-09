@@ -28,7 +28,7 @@ public class EventListViewModel : ViewModelBase
         {
             if (evt is Event e)
             {
-                MessageBox.Show($"You clicked {e.Name}");
+                _navigation.NavigateTo<EventViewModel>(e.EventId);
             }
         });
     }

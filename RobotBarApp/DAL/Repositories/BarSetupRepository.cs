@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using RobotBarApp.BE;
 using RobotBarApp.DAL.Repositories.Interfaces;
 
@@ -39,5 +40,12 @@ public class BarSetupRepository : IBarSetupRepository
     {
         return _context.BarSetups
             .FirstOrDefault(b => b.EventId == eventId && b.PositionNumber == positionNumber);
+    }
+    public IEnumerable<BarSetup> GetBarSetupForEvent(Guid eventId)
+    {
+        return _context.BarSetups
+            .Where(x => x.EventId == eventId)
+            .Include(x => x.Ingredient) 
+            .ToList();
     }
 }

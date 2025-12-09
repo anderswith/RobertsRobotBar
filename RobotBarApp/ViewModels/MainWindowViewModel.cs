@@ -42,14 +42,6 @@ namespace RobotBarApp.ViewModels
             NavigateTilfoejIngrediensCommand = new RelayCommand(_ =>
                 _navigationService.NavigateTo<TilfoejIngrediensViewModel>());
 
-            // Tilføj Drink
-            NavigateTilfoejDrinkCommand = new RelayCommand(_ =>
-                _navigationService.NavigateTo<TilfoejDrinkViewModel>());
-
-            // Tilføj Menu
-            NavigateTilfoejMenuCommand = new RelayCommand(_ =>
-                _navigationService.NavigateTo<TilfoejMenuViewModel>());
-
             // Tilføj Event
             NavigateTilfoejEventCommand = new RelayCommand(_ =>
                 _navigationService.NavigateTo<TilfoejEventViewModel>());

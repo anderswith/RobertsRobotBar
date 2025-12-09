@@ -37,10 +37,12 @@ public class IngredientRepository : IIngredientRepository
         _context.SaveChanges();
     }
 
-    public IEnumerable<Ingredient> GetIngredientByType(string type)
+    public IEnumerable<Ingredient> GetIngredientByType(string type, Guid eventId)
     {
-        return _context.Ingredients.
-            Where(i => i.Type == type)
+        return _context.Ingredients
+            .Include(i => i.BarSetups)     
+            .Where(i => i.Type == type &&
+                        i.BarSetups.Any(bs => bs.EventId == eventId))
             .ToList();
     }
     

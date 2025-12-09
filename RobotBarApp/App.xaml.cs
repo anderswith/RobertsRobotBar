@@ -61,6 +61,7 @@ public partial class App : Application
                 services.AddTransient<TilfoejEventViewModel>();
                 services.AddTransient<TilfoejIngrediensViewModel>();
                 services.AddTransient<TilfoejMenuViewModel>();
+                services.AddTransient<EventViewModel>();
                 
                 // Views
                 services.AddTransient<EventListView>();
@@ -73,6 +74,7 @@ public partial class App : Application
                 services.AddTransient<TilfoejEventView>();
                 services.AddTransient<TilfoejIngrediensView>();
                 services.AddTransient<TilfoejMenuView>();
+                services.AddTransient<EventView>();
                 
                 services.AddSingleton<INavigationService, NavigationService>();
                 

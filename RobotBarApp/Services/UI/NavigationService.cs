@@ -20,10 +20,18 @@ namespace RobotBarApp.Services
 
         public void NavigateTo<TViewModel>() where TViewModel : ViewModelBase
         {
-            // Resolve ViewModel via DI
             CurrentViewModel = _provider.GetRequiredService<TViewModel>();
+            OnViewModelChanged?.Invoke();
+        }
 
-            // Fire event so MainWindowViewModel updates UI
+        // NEW overload
+        public void NavigateTo<TViewModel>(object parameter) where TViewModel : ViewModelBase
+        {
+            CurrentViewModel = (ViewModelBase)ActivatorUtilities.CreateInstance(
+                _provider,
+                typeof(TViewModel),
+                parameter);
+
             OnViewModelChanged?.Invoke();
         }
     }
