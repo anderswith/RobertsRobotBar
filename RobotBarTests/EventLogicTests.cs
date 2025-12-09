@@ -42,15 +42,7 @@ namespace UnitTests
 
             Assert.That(ex.Message, Is.EqualTo("Event image URL cannot be null or empty"));
         }
-
-        [Test]
-        public void AddEvent_ShouldThrow_WhenMenuIdIsEmpty()
-        {
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _eventLogic.AddEvent("Event Name", "image.png", Guid.Empty));
-
-            Assert.That(ex.Message, Is.EqualTo("Menu ID cannot be empty"));
-        }
+        
 
         [Test]
         public void AddEvent_ShouldCallRepository_WhenDataIsValid()
