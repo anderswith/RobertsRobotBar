@@ -148,34 +148,25 @@ namespace RobotBarApp.ViewModels
 
         private string CopyEventImageToResources()
         {
-            var destinationFolder = GetEventPicsDirectory();
+            var projectRoot = Directory.GetParent(AppContext.BaseDirectory)
+                .Parent.Parent.Parent.FullName;
+
+            var destinationFolder = Path.Combine(projectRoot, "Resources", "EventPics");
             Directory.CreateDirectory(destinationFolder);
 
-            var extension = Path.GetExtension(ImagePath);   // <-– you used ImagePreview earlier, fixed
-            var safeName = new string((EventName ?? "event").Select(ch =>
-                Path.GetInvalidFileNameChars().Contains(ch) ? '_' : ch).ToArray());
-
-            if (string.IsNullOrWhiteSpace(safeName))
-                safeName = "event";
+            var extension = Path.GetExtension(ImagePath);
+            var safeName = new string((EventName ?? "event")
+                .Select(ch => Path.GetInvalidFileNameChars().Contains(ch) ? '_' : ch).ToArray());
 
             var fileName = $"{safeName}_{DateTime.UtcNow:yyyyMMddHHmmssfff}{extension}";
             var destinationPath = Path.Combine(destinationFolder, fileName);
-            
 
             File.Copy(ImagePath, destinationPath, overwrite: true);
 
+            // store project-local relative path
             return Path.Combine("Resources", "EventPics", fileName).Replace("\\", "/");
         }
 
-        private string GetEventPicsDirectory()
-        {
-            var projectRoot = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
-
-            var eventPicsPath = Path.Combine(projectRoot, "Resources", "EventPics");
-            Directory.CreateDirectory(eventPicsPath);
-
-            return eventPicsPath;
-        }
     }
 
 
