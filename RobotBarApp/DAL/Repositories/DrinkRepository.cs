@@ -56,6 +56,12 @@ public class DrinkRepository : IDrinkRepository
             .Include(d => d.DrinkScripts)
             .FirstOrDefault(d => d.DrinkId == drinkId);
     }
-    
-    
+
+    public IEnumerable<Drink> GetAllDrinksWithContent()
+    {
+        return _context.Drinks
+            .Include(d => d.DrinkContents)
+            .ToList();
+    }
+
 }

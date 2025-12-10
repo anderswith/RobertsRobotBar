@@ -8,6 +8,6 @@ public class Menu
     public Guid MenuId { get; set; }
     public string Name { get; set; }
     
-    public ICollection<MenuContent> MenuContents { get; set; }
+    public ICollection<MenuContent> MenuContents { get; set; } = new List<MenuContent>();
     public ICollection<Event>? Events { get; set; }
 }
