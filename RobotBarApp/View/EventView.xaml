@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="clr-namespace:RobotBarApp.Converters"
+             xmlns:global="clr-namespace:"
              mc:Ignorable="d"
              Background="#FFE5E5E5">
 

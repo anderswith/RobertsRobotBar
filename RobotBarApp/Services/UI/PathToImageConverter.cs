@@ -10,20 +10,18 @@ namespace RobotBarApp.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var relativePath = value as string;
+            var relative = value as string;
+            if (string.IsNullOrWhiteSpace(relative)) return null;
 
-            if (string.IsNullOrWhiteSpace(relativePath))
-                return null;
+            var projectRoot = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
 
-            // Combine with base directory
-            var fullPath = Path.Combine(AppContext.BaseDirectory, relativePath);
+            var full = Path.Combine(projectRoot, relative);
 
-            if (!File.Exists(fullPath))
-                return null;
+            if (!File.Exists(full)) return null;
 
             try
             {
-                return new BitmapImage(new Uri(fullPath, UriKind.Absolute));
+                return new BitmapImage(new Uri(full, UriKind.Absolute));
             }
             catch
             {
