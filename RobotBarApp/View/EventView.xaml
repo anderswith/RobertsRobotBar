@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="clr-namespace:RobotBarApp.Converters"
-             xmlns:global="clr-namespace:"
+             xmlns:behaviors="clr-namespace:RobotBarApp.Behaviors"
              mc:Ignorable="d"
              Background="#FFE5E5E5">
 
@@ -13,25 +13,65 @@
     </UserControl.Resources>
 
     <Grid Margin="40">
-
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-
-        <!-- EVENT NAME -->
+        <!-- EVENT TITLE -->
         <TextBlock Text="{Binding CurrentEvent.Name}"
                    FontSize="40"
                    FontWeight="Bold"
-                   HorizontalAlignment="Center"/>
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,20"/>
 
+        <!-- DRINK SELECTION PANEL -->
+        <Grid Grid.Row="1" Margin="0,20,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <!-- RACK -->
-        <ItemsControl Grid.Row="1"
-                      Margin="0,40,0,0"
-                      ItemsSource="{Binding Rack}">
+            <!-- AVAILABLE DRINKS -->
+            <Border Background="White" Padding="10" CornerRadius="10" BorderBrush="#CCC" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Available Drinks" FontSize="20" Margin="0,0,0,10"/>
+                    <ListBox ItemsSource="{Binding AvailableDrinks}"
+                             SelectionMode="Extended"
+                             DisplayMemberPath="Name"
+                             behaviors:SelectedItemsBehavior.BindableSelectedItems="{Binding SelectedAvailable}"
+                             Height="250"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ADD / REMOVE BUTTONS -->
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" >
+                <Button Content="→ Add →"
+                        Width="70"
+                        Command="{Binding AddToMenuCommand}"/>
+                <Button Content="← Remove ←"
+                        Width="70"
+                        Command="{Binding RemoveFromMenuCommand}"/>
+            </StackPanel>
+
+            <!-- MENU DRINKS -->
+            <Border Grid.Column="2" Background="White" Padding="10" CornerRadius="10" BorderBrush="#CCC" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Menu Drinks" FontSize="20" Margin="0,0,0,10"/>
+                    <ListBox ItemsSource="{Binding MenuDrinks}"
+                             SelectionMode="Extended"
+                             DisplayMemberPath="Name"
+                             behaviors:SelectedItemsBehavior.BindableSelectedItems="{Binding SelectedMenu}"
+                             Height="250"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- RACK DISPLAY -->
+        <ItemsControl Grid.Row="2" Margin="0,20,0,20" ItemsSource="{Binding Rack}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Columns="8" Rows="3"/>
@@ -40,46 +80,35 @@
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-
                     <StackPanel>
                         <Image Source="{Binding Ingredient.Image, Converter={StaticResource PathToImageConverter}}"
                                Height="70" Width="70"
                                Stretch="Uniform"/>
-
-                        <Rectangle Width="50"
-                                   Height="5"
-                                   Fill="Black"
-                                   Margin="0,4,0,0"/>
+                        <Rectangle Width="50" Height="5" Fill="Black" Margin="0,4,0,0"/>
                     </StackPanel>
-
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-
         <!-- BOTTOM BUTTONS -->
-        <StackPanel Grid.Row="2"
+        <StackPanel Grid.Row="3"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
-                    Margin="0,40,0,0"
-                   >
+                    Margin="0,20,0,0">
 
             <Button Content="Back"
                     Width="200" Height="70"
-                    Margin="10,0"
                     Command="{Binding BackCommand}"/>
 
             <Button Content="Launch Event"
                     Width="200" Height="70"
-                    Margin="10,0"
                     Command="{Binding LaunchCommand}"/>
 
             <Button Content="Tilføj Drink"
                     Width="200" Height="70"
-                    Margin="10,0"
                     Command="{Binding NavigateTilfoejDrinkCommand}"/>
-
         </StackPanel>
 
     </Grid>
+
 </UserControl>

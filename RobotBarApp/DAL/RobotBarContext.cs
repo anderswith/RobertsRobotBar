@@ -80,6 +80,12 @@ public class RobotBarContext : DbContext
             .HasForeignKey(e => e.MenuId)
             .OnDelete(DeleteBehavior.SetNull);
         
+        modelBuilder.Entity<Menu>()
+            .HasMany(m => m.MenuContents)
+            .WithOne(mc => mc.Menu)
+            .HasForeignKey(mc => mc.MenuId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         modelBuilder.Entity<Event>().Ignore("MenuId1");
     }
     

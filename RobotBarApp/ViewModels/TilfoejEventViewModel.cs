@@ -131,7 +131,7 @@ namespace RobotBarApp.ViewModels
             {
                 var finalImagePath = CopyEventImageToResources();
 
-                var id = _eventLogic.AddEvent(EventName, finalImagePath, null);
+                var id = _eventLogic.AddEvent(EventName, finalImagePath);
 
                 foreach (var slot in RackItems.Where(r => r.Ingredient != null))
                 {

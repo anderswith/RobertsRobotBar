@@ -12,4 +12,6 @@ public interface IDrinkRepository
     void UpdateDrink(Drink drink);
     IEnumerable<Drink> GetDrinksByIds(IEnumerable<Guid> drinkIds);
     Drink? GetDrinkWithScripts(Guid drinkId);
+    IEnumerable<Drink> GetAllDrinksWithContent();
+
 }

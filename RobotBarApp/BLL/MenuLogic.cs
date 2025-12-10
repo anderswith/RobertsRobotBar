@@ -17,40 +17,34 @@ public class MenuLogic : IMenuLogic
         _eventRepository = eventRepository;
     }
     
-   public void AddMenuWithDrinks(string name, List<Guid> drinkIds)
+    public void AddDrinksToMenu(List<Guid> drinkIds, Guid eventId)
     {
-        if (string.IsNullOrEmpty(name))
-        {
-            throw new ArgumentException("Menu name cannot be null or empty.");
-        }
-        var drinks = _drinkRepository.GetDrinksByIds(drinkIds).ToList();
-        if (drinkIds == null || !drinkIds.Any())
-        {
-            throw new InvalidOperationException("No valid drinks found for the provided IDs.");
-        }
+        Console.WriteLine("Adding drinks to menu for event: " + eventId);
 
-        var menu = new Menu
+        if (drinkIds == null || drinkIds.Count == 0)
         {
-            MenuId = Guid.NewGuid(),
-            Name = name,
-            MenuContents = new List<MenuContent>(),
-        };
-        
-        foreach (var drink in drinks)
+            throw new ArgumentException("Drink IDs cannot be null or empty.");
+        }
+            
+        Console.WriteLine($"Drink ID to add: {string.Join(", ", drinkIds)}");
+        // 1. Resolve menuId from the event
+        var menu = _menuRepository.GetMenuWithContentByEventId(eventId);
+        var menuId = menu.MenuId;
+        Console.WriteLine("Resolved menu ID: " + menuId);
+        if (menuId == null || menuId == Guid.Empty)
         {
-            var content = new MenuContent
-            {
-                MenuContentId = Guid.NewGuid(),
-                Menu = menu,
-                Drink = drink
-                
-            };
-            menu.MenuContents.Add(content);
+            throw new KeyNotFoundException("Menu not found for the event.");
         }
         
-        _menuRepository.AddMenu(menu);
+        // 2. Let repository do the insert
+        _menuRepository.AddDrinksToMenu(menuId, drinkIds);
+
+        Console.WriteLine("Added " + drinkIds.Count + " drinks to menu.");
     }
-   public IEnumerable<Menu> GetAllMenus()
+
+    
+
+    public IEnumerable<Menu> GetAllMenus()
     {
         return _menuRepository.GetAllMenus();
     }
@@ -110,34 +104,51 @@ public class MenuLogic : IMenuLogic
         
         _menuRepository.UpdateMenu(existingMenu);
     }
-    
-    public Menu GetMenuForEvent(Guid eventId)
+    public IEnumerable<Drink> GetDrinksForMenu(Guid eventId)
     {
-        if (eventId == Guid.Empty)
-        {
-            throw new ArgumentException("Event ID cannot be empty.");
-        }
-
-        var ev = _eventRepository.GetEventById(eventId);
-        if (ev == null)
-        {
-            throw new KeyNotFoundException("Event not found.");
-        }
-        
-        if (ev.MenuId == null)
-        {
-            throw new InvalidOperationException("Event has no menu assigned.");
-        }
-
-        var menu = _menuRepository.GetMenuWithDrinksAndIngredients(ev.MenuId.Value);
+        // 1. Load Menu + MenuContents (child)
+        var menu = _menuRepository.GetMenuWithContentByEventId(eventId);
 
         if (menu == null)
         {
-            throw new KeyNotFoundException("Menu not found.");
+            throw new KeyNotFoundException("Menu not found for this event.");
+        }
+        
+        // 2. Extract DrinkIds from MenuContents
+        var drinkIds = menu.MenuContents
+            .Select(mc => mc.DrinkId)
+            .ToList();
+
+        if (!drinkIds.Any())
+            return Enumerable.Empty<Drink>();
+
+        // 3. Query drinks using DrinkRepository
+        return _drinkRepository.GetDrinksByIds(drinkIds);
+    }
+    
+    public void RemoveDrinkFromMenu(Guid eventId, Guid drinkId)
+    {
+        // 1. Load menu with children
+        var menu = _menuRepository.GetMenuWithContentByEventId(eventId);
+        if (menu == null)
+        {
+            throw new KeyNotFoundException("Menu not found for this event.");
         }
 
-        return menu;
+        // 2. Find matching MenuContent item
+        var entry = menu.MenuContents
+            .FirstOrDefault(mc => mc.DrinkId == drinkId);
+
+        if (entry == null)
+            throw new KeyNotFoundException("Drink is not on the menu.");
+
+        // 3. Remove it from the child list
+        menu.MenuContents.Remove(entry);
+
+        // 4. Save changes
+        _menuRepository.UpdateMenu(menu);
     }
+
 
  
   

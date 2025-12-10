@@ -51,6 +51,7 @@ public partial class App : Application
                 services.AddScoped<IRobotLogic, RobotLogic>();
                 services.AddScoped<IIngredientUseCountLogic, IngredientUseCountLogic>();
                 services.AddScoped<IDrinkUseCountLogic, DrinkUseCountLogic>();
+                services.AddScoped<IDrinkAvailabilityService, DrinkAvailabilityService>();
                 
                 // ViewModels
                 services.AddTransient<EventListViewModel>();
