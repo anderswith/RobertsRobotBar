@@ -1,4 +1,5 @@
 using RobotBarApp.BLL.Interfaces;
+using RobotBarApp.Services.Application.Interfaces;
 using RobotBarApp.Services.Robot.Interfaces;
 
 namespace RobotBarApp.BLL;
@@ -10,15 +11,21 @@ public class RobotLogic : IRobotLogic
     private readonly IDrinkLogic _drinkLogic;
     private readonly IDrinkUseCountLogic _drinkUseCountLogic;
     private readonly IIngredientUseCountLogic _ingredientUseCountLogic;
+    private readonly IEventSessionService _eventSession;
     
-    public RobotLogic(IRobotScriptRunner scriptRunner, IIngredientLogic ingredientLogic, IDrinkLogic drinkLogic,
-        IIngredientUseCountLogic ingredientUseCountLogic, IDrinkUseCountLogic drinkUseCountLogic)
+    public RobotLogic(IRobotScriptRunner scriptRunner, 
+        IIngredientLogic ingredientLogic, 
+        IDrinkLogic drinkLogic,
+        IIngredientUseCountLogic ingredientUseCountLogic, 
+        IDrinkUseCountLogic drinkUseCountLogic, 
+        IEventSessionService eventSessionService)
     {
         _scriptRunner = scriptRunner;
         _ingredientLogic = ingredientLogic;
         _drinkLogic = drinkLogic;
         _ingredientUseCountLogic = ingredientUseCountLogic;
         _drinkUseCountLogic = drinkUseCountLogic;
+        _eventSession = eventSessionService;
     }
     
     public void RunRobotScripts(IEnumerable<string> scripts)
@@ -38,9 +45,11 @@ public class RobotLogic : IRobotLogic
         {
             throw new ArgumentException("No ingredients found with the provided IDs.");
         }
+
+        var eventId = _eventSession.CurrentEventId!.Value;
         foreach(var ingredientId in ingredientIds)
         {
-            _ingredientUseCountLogic.AddIngredientUseCount(ingredientId);
+            _ingredientUseCountLogic.AddIngredientUseCount(ingredientId, eventId);
         }
 
         var scripts = new List<string>();
@@ -58,6 +67,7 @@ public class RobotLogic : IRobotLogic
 
     public void RunDrinkScripts(Guid drinkId)
     {
+        var eventId = _eventSession.CurrentEventId!.Value;
         if(drinkId == Guid.Empty)
         {
             throw new ArgumentException("Drink ID cannot be empty.");
@@ -68,7 +78,7 @@ public class RobotLogic : IRobotLogic
         {
             throw new ArgumentException("Drink not found.");
         }
-        _drinkUseCountLogic.AddDrinkUseCount(drinkId);
+        _drinkUseCountLogic.AddDrinkUseCount(drinkId, eventId);
         
         var ingredientIds = drink.DrinkContents
             .Select(dc => dc.IngredientId)
@@ -76,7 +86,7 @@ public class RobotLogic : IRobotLogic
 
         foreach (var ingredientId in ingredientIds)
         {
-            _ingredientUseCountLogic.AddIngredientUseCount(ingredientId);
+            _ingredientUseCountLogic.AddIngredientUseCount(ingredientId, eventId);
         }
 
         var scripts = new List<string>();

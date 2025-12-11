@@ -28,7 +28,7 @@ namespace UnitTests
         public void AddEvent_ShouldThrow_WhenNameIsNullOrEmpty(string? invalidName)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _eventLogic.AddEvent(invalidName!, "image.png", Guid.NewGuid()));
+                _eventLogic.AddEvent(invalidName!, "image.png"));
 
             Assert.That(ex.Message, Is.EqualTo("Event name cannot be null or empty"));
         }
@@ -38,7 +38,7 @@ namespace UnitTests
         public void AddEvent_ShouldThrow_WhenImageIsNullOrEmpty(string? invalidImage)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _eventLogic.AddEvent("Event Name", invalidImage!, Guid.NewGuid()));
+                _eventLogic.AddEvent("Event Name", invalidImage!));
 
             Assert.That(ex.Message, Is.EqualTo("Event image URL cannot be null or empty"));
         }
@@ -47,15 +47,12 @@ namespace UnitTests
         [Test]
         public void AddEvent_ShouldCallRepository_WhenDataIsValid()
         {
-            var menuId = Guid.NewGuid();
-
-            _eventLogic.AddEvent("New Event", "image.png", menuId);
+            _eventLogic.AddEvent("New Event", "image.png");
 
             _eventRepositoryMock.Verify(r =>
                 r.AddEvent(It.Is<Event>(e =>
                     e.Name == "New Event" &&
-                    e.Image == "image.png" &&
-                    e.MenuId == menuId
+                    e.Image == "image.png"
                 )), Times.Once);
         }
 

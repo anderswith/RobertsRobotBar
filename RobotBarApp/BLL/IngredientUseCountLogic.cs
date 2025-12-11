@@ -12,7 +12,7 @@ public class IngredientUseCountLogic : IIngredientUseCountLogic
         _ingredientUseCountRepository = ingredientUseCountRepository;
     }
     
-    public void AddIngredientUseCount(Guid ingredientId)
+    public void AddIngredientUseCount(Guid ingredientId, Guid eventId)
     {
         if (Guid.Empty == ingredientId)
         {
@@ -23,6 +23,7 @@ public class IngredientUseCountLogic : IIngredientUseCountLogic
             UseCountId = Guid.NewGuid(),
             TimeStamp = DateTime.Now,
             IngredientId = ingredientId,
+            EventId = eventId
         };
         
         _ingredientUseCountRepository.AddIngredientUseCount(ingredientUseCount);
