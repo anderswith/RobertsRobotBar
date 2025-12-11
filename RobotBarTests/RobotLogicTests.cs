@@ -1,14 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
+using RobotBarApp.BE;
 using RobotBarApp.BLL;
 using RobotBarApp.BLL.Interfaces;
-using RobotBarApp.BE;
+using RobotBarApp.Services.Application.Interfaces;
 using RobotBarApp.Services.Robot.Interfaces;
 
-namespace UnitTests
+namespace RobotBarApp.Tests.BLL
 {
     [TestFixture]
     public class RobotLogicTests
@@ -16,10 +14,11 @@ namespace UnitTests
         private Mock<IRobotScriptRunner> _scriptRunnerMock;
         private Mock<IIngredientLogic> _ingredientLogicMock;
         private Mock<IDrinkLogic> _drinkLogicMock;
-        private Mock<IDrinkUseCountLogic> _drinkUseCountLogicMock;
-        private Mock<IIngredientUseCountLogic> _ingredientUseCountLogicMock;
+        private Mock<IIngredientUseCountLogic> _ingredientUseMock;
+        private Mock<IDrinkUseCountLogic> _drinkUseMock;
+        private Mock<IEventSessionService> _sessionMock;
 
-        private RobotLogic _robotLogic;
+        private RobotLogic _logic;
 
         [SetUp]
         public void Setup()
@@ -27,145 +26,139 @@ namespace UnitTests
             _scriptRunnerMock = new Mock<IRobotScriptRunner>();
             _ingredientLogicMock = new Mock<IIngredientLogic>();
             _drinkLogicMock = new Mock<IDrinkLogic>();
-            _drinkUseCountLogicMock = new Mock<IDrinkUseCountLogic>();
-            _ingredientUseCountLogicMock = new Mock<IIngredientUseCountLogic>();
+            _ingredientUseMock = new Mock<IIngredientUseCountLogic>();
+            _drinkUseMock = new Mock<IDrinkUseCountLogic>();
+            _sessionMock = new Mock<IEventSessionService>();
 
-            _robotLogic = new RobotLogic(
+            _sessionMock.Setup(s => s.CurrentEventId).Returns(Guid.NewGuid());
+            _sessionMock.Setup(s => s.HasActiveEvent).Returns(true);
+
+            _logic = new RobotLogic(
                 _scriptRunnerMock.Object,
                 _ingredientLogicMock.Object,
                 _drinkLogicMock.Object,
-                _ingredientUseCountLogicMock.Object,
-                _drinkUseCountLogicMock.Object
-            );
-        }
-        
-        // RunIngredientScript tests
-
-        [Test]
-        public void RunIngredientScript_Throws_WhenIdsNullOrEmpty()
-        {
-            Assert.Throws<ArgumentException>(() =>
-                _robotLogic.RunIngredientScript(null));
-
-            Assert.Throws<ArgumentException>(() =>
-                _robotLogic.RunIngredientScript(new List<Guid>()));
+                _ingredientUseMock.Object,
+                _drinkUseMock.Object,
+                _sessionMock.Object);
         }
 
-        [Test]
-        public void RunIngredientScript_Throws_WhenIngredientsNotFound()
-        {
-            var ids = new List<Guid> { Guid.NewGuid() };
+        // ------------------------------------------------------------
+        // RunRobotScripts
+        // ------------------------------------------------------------
 
+        [Test]
+        public void RunRobotScripts_QueuesScripts()
+        {
+            var scripts = new List<string> { "move", "place" };
+
+            _logic.RunRobotScripts(scripts);
+
+            _scriptRunnerMock.Verify(r => r.QueueScripts(
+                It.Is<IEnumerable<string>>(l => l.SequenceEqual(scripts))
+            ), Times.Once);
+        }
+
+        // ------------------------------------------------------------
+        // RunIngredientScript
+        // ------------------------------------------------------------
+
+        [Test]
+        public void RunIngredientScript_Throws_WhenIngredientIdsNull()
+        {
+            Assert.Throws<ArgumentException>(() => _logic.RunIngredientScript(null));
+        }
+
+        [Test]
+        public void RunIngredientScript_Throws_WhenIngredientIdsEmpty()
+        {
+            Assert.Throws<ArgumentException>(() => _logic.RunIngredientScript(new List<Guid>()));
+        }
+
+        [Test]
+        public void RunIngredientScript_Throws_WhenNoIngredientScriptsFound()
+        {
             _ingredientLogicMock
-                .Setup(m => m.GetIngredientsWithScripts(ids))
-                .Returns(new List<Ingredient>()); // empty list
+                .Setup(l => l.GetIngredientsWithScripts(It.IsAny<List<Guid>>()))
+                .Returns(new List<Ingredient>());
 
             Assert.Throws<ArgumentException>(() =>
-                _robotLogic.RunIngredientScript(ids));
+                _logic.RunIngredientScript(new List<Guid> { Guid.NewGuid() }));
         }
 
         [Test]
-        public void RunIngredientScript_AddsUseCount_ForEachIngredient()
+        public void RunIngredientScript_AddsUseCounts_AndQueuesScripts()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-            var ids = new List<Guid> { id1, id2 };
+            var eventId = Guid.NewGuid();
+            _sessionMock.Setup(s => s.CurrentEventId).Returns(eventId);
 
-            var ingredient = new Ingredient
+            var ing1 = Guid.NewGuid();
+            var ing2 = Guid.NewGuid();
+
+            var ingredients = new List<Ingredient>
             {
-                IngredientId = id1,
-                IngredientScripts = new List<IngredientScript>()
-            };
-
-            _ingredientLogicMock
-                .Setup(m => m.GetIngredientsWithScripts(ids))
-                .Returns(new List<Ingredient>
+                new Ingredient
                 {
-                    new Ingredient { IngredientId = id1, IngredientScripts = new List<IngredientScript>() },
-                    new Ingredient { IngredientId = id2, IngredientScripts = new List<IngredientScript>() }
-                });
-
-            _robotLogic.RunIngredientScript(ids);
-
-            _ingredientUseCountLogicMock.Verify(m => m.AddIngredientUseCount(id1), Times.Once);
-            _ingredientUseCountLogicMock.Verify(m => m.AddIngredientUseCount(id2), Times.Once);
-        }
-
-        [Test]
-        public void RunIngredientScript_QueuesScriptsInCorrectOrder()
-        {
-            var ingredientId = Guid.NewGuid();
-            var ids = new List<Guid> { ingredientId };
-
-            var ingredient = new Ingredient
-            {
-                IngredientId = ingredientId,
-                IngredientScripts = new List<IngredientScript>
+                    IngredientId = ing1,
+                    IngredientScripts = new List<IngredientScript>
+                    {
+                        new IngredientScript { Number = 1, UrScript = "A1" },
+                        new IngredientScript { Number = 2, UrScript = "A2" }
+                    }
+                },
+                new Ingredient
                 {
-                    new IngredientScript { Number = 3, UrScript = "third" },
-                    new IngredientScript { Number = 1, UrScript = "first" },
-                    new IngredientScript { Number = 2, UrScript = "second" }
+                    IngredientId = ing2,
+                    IngredientScripts = new List<IngredientScript>
+                    {
+                        new IngredientScript { Number = 1, UrScript = "B1" }
+                    }
                 }
             };
 
             _ingredientLogicMock
-                .Setup(m => m.GetIngredientsWithScripts(ids))
-                .Returns(new List<Ingredient> { ingredient });
+                .Setup(l => l.GetIngredientsWithScripts(It.IsAny<List<Guid>>()))
+                .Returns(ingredients);
 
-            _robotLogic.RunIngredientScript(ids);
+            _logic.RunIngredientScript(new List<Guid> { ing1, ing2 });
 
-            _scriptRunnerMock.Verify(s =>
-                s.QueueScripts(It.Is<IEnumerable<string>>(list =>
-                    list.SequenceEqual(new[] { "first", "second", "third" })
-                )), Times.Once);
+            // Verify usecounts
+            _ingredientUseMock.Verify(u => u.AddIngredientUseCount(ing1, eventId), Times.Once);
+            _ingredientUseMock.Verify(u => u.AddIngredientUseCount(ing2, eventId), Times.Once);
+
+            // Expected ordered scripts
+            var expectedScripts = new[] { "A1", "A2", "B1" };
+
+            _scriptRunnerMock.Verify(r => r.QueueScripts(
+                It.Is<IEnumerable<string>>(l => l.SequenceEqual(expectedScripts))
+            ), Times.Once);
         }
 
-        // RunDrinkScripts tests
+        // ------------------------------------------------------------
+        // RunDrinkScripts
+        // ------------------------------------------------------------
 
         [Test]
         public void RunDrinkScripts_Throws_WhenDrinkIdEmpty()
         {
-            Assert.Throws<ArgumentException>(() =>
-                _robotLogic.RunDrinkScripts(Guid.Empty));
+            Assert.Throws<ArgumentException>(() => _logic.RunDrinkScripts(Guid.Empty));
         }
 
         [Test]
         public void RunDrinkScripts_Throws_WhenDrinkNotFound()
         {
-            var id = Guid.NewGuid();
-
             _drinkLogicMock
-                .Setup(m => m.GetDrinksWithScripts(id))
+                .Setup(l => l.GetDrinksWithScripts(It.IsAny<Guid>()))
                 .Returns((Drink)null);
 
-            Assert.Throws<ArgumentException>(() =>
-                _robotLogic.RunDrinkScripts(id));
+            Assert.Throws<ArgumentException>(() => _logic.RunDrinkScripts(Guid.NewGuid()));
         }
 
         [Test]
-        public void RunDrinkScripts_AddsDrinkUseCount()
+        public void RunDrinkScripts_AddsUseCounts_AndQueuesScripts()
         {
-            var drinkId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
+            _sessionMock.Setup(s => s.CurrentEventId).Returns(eventId);
 
-            var drink = new Drink
-            {
-                DrinkId = drinkId,
-                DrinkContents = new List<DrinkContent>(),
-                DrinkScripts = new List<DrinkScript>()
-            };
-
-            _drinkLogicMock
-                .Setup(m => m.GetDrinksWithScripts(drinkId))
-                .Returns(drink);
-
-            _robotLogic.RunDrinkScripts(drinkId);
-
-            _drinkUseCountLogicMock.Verify(m => m.AddDrinkUseCount(drinkId), Times.Once);
-        }
-
-        [Test]
-        public void RunDrinkScripts_AddsIngredientUseCount_ForEachIngredient()
-        {
             var drinkId = Guid.NewGuid();
             var ing1 = Guid.NewGuid();
             var ing2 = Guid.NewGuid();
@@ -178,46 +171,32 @@ namespace UnitTests
                     new DrinkContent { IngredientId = ing1 },
                     new DrinkContent { IngredientId = ing2 }
                 },
-                DrinkScripts = new List<DrinkScript>()
-            };
-
-            _drinkLogicMock
-                .Setup(m => m.GetDrinksWithScripts(drinkId))
-                .Returns(drink);
-
-            _robotLogic.RunDrinkScripts(drinkId);
-
-            _ingredientUseCountLogicMock.Verify(m => m.AddIngredientUseCount(ing1), Times.Once);
-            _ingredientUseCountLogicMock.Verify(m => m.AddIngredientUseCount(ing2), Times.Once);
-        }
-
-        [Test]
-        public void RunDrinkScripts_QueuesScriptsInCorrectOrder()
-        {
-            var drinkId = Guid.NewGuid();
-
-            var drink = new Drink
-            {
-                DrinkId = drinkId,
-                DrinkContents = new List<DrinkContent>(),
                 DrinkScripts = new List<DrinkScript>
                 {
-                    new DrinkScript { Number = 5, UrScript = "fifth" },
-                    new DrinkScript { Number = 1, UrScript = "first" },
-                    new DrinkScript { Number = 3, UrScript = "third" }
+                    new DrinkScript { Number = 1, UrScript = "S1" },
+                    new DrinkScript { Number = 2, UrScript = "S2" }
                 }
             };
 
             _drinkLogicMock
-                .Setup(m => m.GetDrinksWithScripts(drinkId))
+                .Setup(l => l.GetDrinksWithScripts(drinkId))
                 .Returns(drink);
 
-            _robotLogic.RunDrinkScripts(drinkId);
+            _logic.RunDrinkScripts(drinkId);
 
-            _scriptRunnerMock.Verify(s =>
-                s.QueueScripts(It.Is<IEnumerable<string>>(list =>
-                    list.SequenceEqual(new[] { "first", "third", "fifth" })
-                )), Times.Once);
+            // Verify drink usecount
+            _drinkUseMock.Verify(u => u.AddDrinkUseCount(drinkId, eventId), Times.Once);
+
+            // Verify ingredient usecounts
+            _ingredientUseMock.Verify(u => u.AddIngredientUseCount(ing1, eventId), Times.Once);
+            _ingredientUseMock.Verify(u => u.AddIngredientUseCount(ing2, eventId), Times.Once);
+
+            // Expected ordered scripts
+            var expectedScripts = new[] { "S1", "S2" };
+
+            _scriptRunnerMock.Verify(r => r.QueueScripts(
+                It.Is<IEnumerable<string>>(l => l.SequenceEqual(expectedScripts))
+            ), Times.Once);
         }
     }
 }
