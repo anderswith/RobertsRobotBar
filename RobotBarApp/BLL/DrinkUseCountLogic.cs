@@ -11,13 +11,15 @@ public class DrinkUseCountLogic : IDrinkUseCountLogic
     {
         _drinkUseCountRepository = drinkUseCountRepository;
     }
-    public void AddDrinkUseCount(Guid drinkId)
+    public void AddDrinkUseCount(Guid drinkId, Guid eventId)
+    
     {
         var drinkUseCount = new DrinkUseCount
         {
             UseCountId = Guid.NewGuid(),
             TimeStamp = DateTime.Now,
-            DrinkId = drinkId
+            DrinkId = drinkId,
+            EventId = eventId
         };
         _drinkUseCountRepository.AddDrinkUseCount(drinkUseCount);
     }

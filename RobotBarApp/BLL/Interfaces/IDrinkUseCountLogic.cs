@@ -5,7 +5,7 @@ namespace RobotBarApp.BLL.Interfaces;
 public interface IDrinkUseCountLogic
 {
 
-    void AddDrinkUseCount(Guid drinkId);
+    void AddDrinkUseCount(Guid drinkId, Guid eventId);
     IEnumerable<DrinkUseCount> GetAllDrinkUseCounts();
 
     IEnumerable<(string DrinkName, int TotalUseCount)> GetAllDrinkUseCountByTimeFrame(Guid eventId,

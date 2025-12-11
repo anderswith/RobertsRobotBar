@@ -26,27 +26,27 @@ public class IngredientUseCountRepository : IIngredientUseCountRepository
     public (List<Ingredient> Ingredients, List<IngredientUseCount> IngredientUses)
         GetIngredientUseCountForEvent(Guid eventId)
     {
-        // 1) Get all ingredient IDs that are part of the event setup
-        var ingredientIds = _context.BarSetups
-            .Where(e => e.EventId == eventId)
-            .Select(e => e.IngredientId)
+        // 1) Fetch all ingredient use counts for this event
+        var uses = _context.IngredientUseCounts
+            .Where(u => u.EventId == eventId)
+            .ToList();
+
+        if (!uses.Any())
+            return (new(), new());
+
+        // 2) Extract the ingredient IDs
+        var ingredientIds = uses
+            .Select(u => u.IngredientId)
             .Distinct()
             .ToList();
 
-        if (!ingredientIds.Any())
-            return (new(), new());
-
-        // 2) Load ingredients
+        // 3) Load ingredients matching those IDs
         var ingredients = _context.Ingredients
             .Where(i => ingredientIds.Contains(i.IngredientId))
             .ToList();
 
-        // 3) Load all use counts for these ingredients
-        var uses = _context.IngredientUseCounts
-            .Where(u => ingredientIds.Contains(u.IngredientId))
-            .ToList();
-
         return (ingredients, uses);
     }
+
 
 }
