@@ -8,6 +8,8 @@ public class IngredientUseCount
     public Guid UseCountId { get; set; }
     public DateTime TimeStamp { get; set; }
     public Guid IngredientId { get; set; }
-    
+    public Guid EventId { get; set; }
+        
+    public Event Event { get; set; }
     public Ingredient Ingredient { get; set; }
 }

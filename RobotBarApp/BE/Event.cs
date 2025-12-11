@@ -14,4 +14,6 @@ public class Event
     public Menu? Menu { get; set; }
     public ICollection<BarSetup> BarSetups { get; set; }
     public ICollection<Log> Logs { get; set; }
+    public ICollection<DrinkUseCount> DrinkUseCounts { get; set; }
+    public ICollection<IngredientUseCount> IngredientUseCounts { get; set; }
 }

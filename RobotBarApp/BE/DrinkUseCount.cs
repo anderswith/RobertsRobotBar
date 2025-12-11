@@ -8,6 +8,8 @@ public class DrinkUseCount
     public Guid UseCountId { get; set; }
     public DateTime TimeStamp { get; set; }
     public Guid DrinkId { get; set; }
+    public Guid EventId { get; set; }
     
+    public Event Event { get; set; }
     public Drink drink { get; set; }
 }
