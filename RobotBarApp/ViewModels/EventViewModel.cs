@@ -5,6 +5,7 @@ using System.Windows.Input;
 using RobotBarApp.BE;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.Services.Interfaces;
+using RobotBarApp.View; // <-- add this
 
 namespace RobotBarApp.ViewModels
 {
@@ -132,7 +133,14 @@ namespace RobotBarApp.ViewModels
 
         private void Launch()
         {
-            // robot triggering later
+            // Open the customer-facing full-screen window
+            var kundeStartViewModel = new KundeStartViewModel();
+            var kundeStartWindow = new KundeStartView
+            {
+                DataContext = kundeStartViewModel
+            };
+
+            kundeStartWindow.Show();
         }
     }
 }
