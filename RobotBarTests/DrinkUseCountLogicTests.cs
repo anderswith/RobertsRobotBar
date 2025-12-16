@@ -26,22 +26,31 @@ namespace UnitTests
         [Test]
         public void AddDrinkUseCount_CreatesCorrectEntity_AndCallsRepository()
         {
+            // Arrange
             Guid drinkId = Guid.NewGuid();
+            Guid eventId = Guid.NewGuid();
+
             DrinkUseCount? captured = null;
 
             _repoMock
                 .Setup(r => r.AddDrinkUseCount(It.IsAny<DrinkUseCount>()))
                 .Callback<DrinkUseCount>(duc => captured = duc);
 
-            _logic.AddDrinkUseCount(drinkId);
+            var logic = new DrinkUseCountLogic(_repoMock.Object);
 
+            // Act
+            logic.AddDrinkUseCount(drinkId, eventId);
+
+            // Assert
             _repoMock.Verify(r => r.AddDrinkUseCount(It.IsAny<DrinkUseCount>()), Times.Once);
 
             Assert.That(captured, Is.Not.Null);
             Assert.That(captured!.DrinkId, Is.EqualTo(drinkId));
+            Assert.That(captured.EventId, Is.EqualTo(eventId));        // NEW ASSERT
             Assert.That(captured.UseCountId, Is.Not.EqualTo(Guid.Empty));
             Assert.That(captured.TimeStamp, Is.Not.EqualTo(default(DateTime)));
         }
+
 
         // GetAllDrinkUseCounts
         [Test]

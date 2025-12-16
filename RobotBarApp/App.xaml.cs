@@ -7,8 +7,9 @@ using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.DAL;
 using RobotBarApp.DAL.Repositories;
 using RobotBarApp.DAL.Repositories.Interfaces;
-using RobotBarApp.Helper;
 using RobotBarApp.Services;
+using RobotBarApp.Services.Application;
+using RobotBarApp.Services.Application.Interfaces;
 using RobotBarApp.Services.Interfaces;
 using RobotBarApp.Services.Robot.Interfaces;
 using RobotBarApp.View;
@@ -77,6 +78,8 @@ public partial class App : Application
                 services.AddTransient<TilfoejMenuView>();
                 services.AddTransient<EventView>();
                 
+                //services
+                services.AddSingleton<IEventSessionService, EventSessionService>();
                 services.AddSingleton<INavigationService, NavigationService>();
                 
                 services.AddSingleton<IRobotDashboardStreamReader>(sp =>

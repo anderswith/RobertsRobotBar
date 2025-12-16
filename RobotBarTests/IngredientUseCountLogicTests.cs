@@ -26,26 +26,36 @@ namespace UnitTests
         [Test]
         public void AddIngredientUseCount_Throws_WhenIngredientIdIsEmpty()
         {
+            var ingredientId = Guid.Empty;
+            var eventSessionId = Guid.NewGuid();
             Assert.Throws<ArgumentException>(() =>
-                _logic.AddIngredientUseCount(Guid.Empty));
+                _logic.AddIngredientUseCount(ingredientId, eventSessionId));
         }
 
         [Test]
         public void AddIngredientUseCount_CreatesCorrectEntity_AndCallsRepository()
         {
+            // Arrange
             Guid ingredientId = Guid.NewGuid();
+            Guid eventId = Guid.NewGuid();
+
             IngredientUseCount? captured = null;
 
             _repoMock
                 .Setup(r => r.AddIngredientUseCount(It.IsAny<IngredientUseCount>()))
                 .Callback<IngredientUseCount>(iuc => captured = iuc);
 
-            _logic.AddIngredientUseCount(ingredientId);
+            var logic = new IngredientUseCountLogic(_repoMock.Object);
 
+            // Act
+            logic.AddIngredientUseCount(ingredientId, eventId);
+
+            // Assert
             _repoMock.Verify(r => r.AddIngredientUseCount(It.IsAny<IngredientUseCount>()), Times.Once);
 
             Assert.That(captured, Is.Not.Null);
             Assert.That(captured!.IngredientId, Is.EqualTo(ingredientId));
+            Assert.That(captured.EventId, Is.EqualTo(eventId));          // NEW ASSERT
             Assert.That(captured.UseCountId, Is.Not.EqualTo(Guid.Empty));
             Assert.That(captured.TimeStamp, Is.Not.EqualTo(default(DateTime)));
         }

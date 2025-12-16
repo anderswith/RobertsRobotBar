@@ -27,29 +27,19 @@ public class DrinkUseCountRepository : IDrinkUseCountRepository
     public (List<Drink> Drinks, List<DrinkUseCount> DrinkUses)
         GetAllDrinksUseCountForEvent(Guid eventId)
     {
-        // 1) Find menu-id
-        var menuId = _context.Events
-            .Where(e => e.EventId == eventId)
-            .Select(e => e.MenuId)
-            .FirstOrDefault();
+        // 1) Fetch all usecounts for this event
+        var drinkUses = _context.DrinkUseCounts
+            .Where(duc => duc.EventId == eventId)
+            .ToList();
 
-        if (menuId == Guid.Empty)
+        if (!drinkUses.Any())
             return (new(), new());
 
-        // 2) Find alle drinks i menuen
-        var drinkIds = _context.MenuContents
-            .Where(mc => mc.MenuId == menuId)
-            .Select(mc => mc.DrinkId)
-            .ToList();
+        // 2) Fetch drinks that match those usecounts
+        var drinkIds = drinkUses.Select(uc => uc.DrinkId).Distinct().ToList();
 
-        // 3) Hent drinks
         var drinks = _context.Drinks
             .Where(d => drinkIds.Contains(d.DrinkId))
-            .ToList();
-
-        // 4) Hent ALLE DrinkUseCounts for disse drinks
-        var drinkUses = _context.DrinkUseCounts
-            .Where(duc => drinkIds.Contains(duc.DrinkId))
             .ToList();
 
         return (drinks, drinkUses);
