@@ -4,8 +4,8 @@ using System.Linq;
 using System.Windows.Input;
 using RobotBarApp.BE;
 using RobotBarApp.BLL.Interfaces;
-using RobotBarApp.Services.Application.Interfaces;
 using RobotBarApp.Services.Interfaces;
+using RobotBarApp.View; // <-- add this
 
 namespace RobotBarApp.ViewModels
 {
@@ -16,7 +16,6 @@ namespace RobotBarApp.ViewModels
         private readonly INavigationService _navigation;
         private readonly IDrinkAvailabilityService _drinkAvailabilityService;
         private readonly IMenuLogic _menuLogic;
-        private readonly IEventSessionService _eventSession;
 
         public Guid EventId { get; }
         public Event CurrentEvent { get; private set; }
@@ -45,8 +44,7 @@ namespace RobotBarApp.ViewModels
             IBarSetupLogic barSetupLogic,
             IMenuLogic menuLogic,
             IDrinkAvailabilityService drinkAvailabilityService,
-            INavigationService navigation,
-            IEventSessionService eventSession)
+            INavigationService navigation)
         {
             EventId = eventId;
             _eventLogic = eventLogic;
@@ -54,7 +52,6 @@ namespace RobotBarApp.ViewModels
             _menuLogic = menuLogic;
             _navigation = navigation;
             _drinkAvailabilityService = drinkAvailabilityService;
-            _eventSession = eventSession;
 
             LoadEvent();
             LoadRack();
@@ -136,7 +133,14 @@ namespace RobotBarApp.ViewModels
 
         private void Launch()
         {
-            _eventSession.StartEvent(EventId);
+            // Open the customer-facing full-screen window
+            var kundeStartViewModel = new KundeStartViewModel();
+            var kundeStartWindow = new KundeStartView
+            {
+                DataContext = kundeStartViewModel
+            };
+
+            kundeStartWindow.Show();
         }
     }
 }
