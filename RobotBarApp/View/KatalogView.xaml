@@ -11,17 +11,17 @@
 
     <UserControl.Resources>
 
-        <!-- Pill style for the four filter buttons -->
+        <!-- Filter toggle button style -->
         <Style x:Key="FilterToggleButtonStyle" TargetType="ToggleButton">
-            <Setter Property="Margin" Value="5,0,0,0" />
-            <Setter Property="Padding" Value="25,8" />
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Background" Value="#FFB0B0B0" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="BorderBrush" Value="#FF888888" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="5,0,0,0"/>
+            <Setter Property="Padding" Value="25,8"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="#FFB0B0B0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FF888888"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ToggleButton">
@@ -30,53 +30,51 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}">
                             <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Margin="5,2"/>
+                                              VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="Background" Value="#FF5C87B2"/> <!-- blue -->
+                    <Setter Property="Background" Value="#FF5C87B2"/>
                     <Setter Property="BorderBrush" Value="#FF3C6182"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <!-- Simple style for the search TextBox without conflicting Text triggers -->
+        <!-- Search TextBox style -->
         <Style x:Key="SearchTextBoxStyle" TargetType="TextBox">
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Foreground" Value="#FF555555" />
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#FF555555"/>
         </Style>
 
-        <!-- DataTemplate for each card using the separate UserControl -->
+        <!-- Card template -->
         <DataTemplate x:Key="KatalogItemTemplate">
-            <view:KatalogItemView />
+            <view:KatalogItemView/>
         </DataTemplate>
 
     </UserControl.Resources>
 
     <Grid Margin="20">
-
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>  <!-- search + filters -->
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="10"/>
-            <RowDefinition Height="*"/>     <!-- items -->
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Top row: search + filter buttons -->
+        <!-- Top: search + filters -->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>  <!-- search -->
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="20"/>
-                <ColumnDefinition Width="Auto"/>  <!-- filters -->
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Search box -->
+            <!-- Search -->
             <Border Grid.Column="0"
                     Width="330"
                     Height="45"
@@ -91,50 +89,49 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Simple magnifying glass icon -->
                     <TextBlock Grid.Column="0"
                                VerticalAlignment="Center"
                                FontSize="18"
                                Foreground="#FF808080"
                                Text="🔍"/>
+
                     <TextBox Grid.Column="2"
                              Style="{StaticResource SearchTextBoxStyle}"
-                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                             Text="{Binding SearchText,
+                                            Mode=TwoWay,
+                                            UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
             </Border>
 
-            <!-- Filter buttons -->
+            <!-- Filters -->
             <StackPanel Grid.Column="2"
                         Orientation="Horizontal"
                         VerticalAlignment="Center">
 
-                <ToggleButton Content="Ingredienser"
-                              Style="{StaticResource FilterToggleButtonStyle}"
-                              IsChecked="{Binding IsIngredientsFilterSelected, Mode=TwoWay}"
-                              Command="{Binding FilterCommand}"
-                              CommandParameter="Ingredients"/>
+                <RadioButton Content="Ingredients"
+                             Style="{StaticResource FilterToggleButtonStyle}"
+                             GroupName="CatalogFilter"
+                             IsChecked="{Binding IsIngredientsSelected, Mode=TwoWay}"
+                             Command="{Binding FilterCommand}"
+                             CommandParameter="Ingredients"/>
 
-                <ToggleButton Content="Drinks"
-                              Style="{StaticResource FilterToggleButtonStyle}"
-                              IsChecked="{Binding IsDrinksFilterSelected, Mode=TwoWay}"
-                              Command="{Binding FilterCommand}"
-                              CommandParameter="Drinks"/>
+                <RadioButton Content="Drinks"
+                             Style="{StaticResource FilterToggleButtonStyle}"
+                             GroupName="CatalogFilter"
+                             IsChecked="{Binding IsDrinksSelected, Mode=TwoWay}"
+                             Command="{Binding FilterCommand}"
+                             CommandParameter="Drinks"/>
 
-                <ToggleButton Content="Menuer"
-                              Style="{StaticResource FilterToggleButtonStyle}"
-                              IsChecked="{Binding IsMenusFilterSelected, Mode=TwoWay}"
-                              Command="{Binding FilterCommand}"
-                              CommandParameter="Menus"/>
-
-                <ToggleButton Content="Events"
-                              Style="{StaticResource FilterToggleButtonStyle}"
-                              IsChecked="{Binding IsEventsFilterSelected, Mode=TwoWay}"
-                              Command="{Binding FilterCommand}"
-                              CommandParameter="Events"/>
+                <RadioButton Content="Events"
+                             Style="{StaticResource FilterToggleButtonStyle}"
+                             GroupName="CatalogFilter"
+                             IsChecked="{Binding IsEventsSelected, Mode=TwoWay}"
+                             Command="{Binding FilterCommand}"
+                             CommandParameter="Events"/>
             </StackPanel>
         </Grid>
 
-        <!-- Item list -->
+        <!-- Items -->
         <ScrollViewer Grid.Row="2"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
@@ -142,10 +139,9 @@
                           ItemTemplate="{StaticResource KatalogItemTemplate}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <!-- Wrap items like your screenshot -->
                         <WrapPanel IsItemsHost="True"
-                                   Margin="10"
-                                   Orientation="Horizontal" />
+                                   Orientation="Horizontal"
+                                   Margin="10"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
