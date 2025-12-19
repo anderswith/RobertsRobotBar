@@ -14,11 +14,12 @@
             Background="#FFE5E5E5"
             BorderBrush="#FFC0C0C0"
             BorderThickness="1">
+
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>   <!-- header -->
-                <RowDefinition Height="*"/>    <!-- image -->
-                <RowDefinition Height="45"/>   <!-- footer buttons -->
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="45"/>
             </Grid.RowDefinitions>
 
             <!-- Header -->
@@ -26,21 +27,21 @@
                     CornerRadius="18,18,0,0"
                     Background="#FFC2D7E8">
                 <TextBlock Text="{Binding Name}"
-                           Margin="10,5,10,0"
+                           Margin="10,0"
                            VerticalAlignment="Center"
                            FontSize="16"
                            FontWeight="SemiBold"
-                           TextTrimming="CharacterEllipsis" />
+                           TextTrimming="CharacterEllipsis"/>
             </Border>
 
             <!-- Image -->
             <Border Grid.Row="1"
                     Background="White"
-                    Margin="10,5,10,5">
-                <Image Source="{Binding ImageSource}"
+                    Margin="10,5">
+                <Image Source="{Binding Image}"
                        Stretch="Uniform"
                        HorizontalAlignment="Center"
-                       VerticalAlignment="Center" />
+                       VerticalAlignment="Center"/>
             </Border>
 
             <!-- Footer -->
@@ -50,22 +51,27 @@
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center">
+
                     <Button Content="Rediger"
                             Margin="0,0,5,0"
                             Padding="6,2"
                             Background="Transparent"
                             BorderThickness="0"
-                            Command="{Binding EditCommand}" />
+                            Command="{Binding EditCommand}"/>
+
                     <TextBlock Text="|"
                                VerticalAlignment="Center"
-                               Margin="0,0,5,0" />
+                               Margin="0,0,5,0"/>
+
                     <Button Content="Slet"
                             Padding="6,2"
                             Background="Transparent"
                             BorderThickness="0"
-                            Command="{Binding DeleteCommand}" />
+                            Command="{Binding DeleteCommand}"/>
+
                 </StackPanel>
             </Border>
         </Grid>
+
     </Border>
 </UserControl>
