@@ -8,7 +8,7 @@ public interface IIngredientLogic
     IEnumerable<Ingredient> GetAllIngredients();
     Ingredient? GetIngredientById(Guid ingredientId);
     void DeleteIngredient(Guid ingredientId);
-    void UpdateIngredient(Guid ingredientId, string name, string type, string image, double size, string dose, List<string> scriptNames);
+    void UpdateIngredient(Guid ingredientId, string name, string type, string image, double size, string dose, int positionNumber, List<string> scriptNames);
     IEnumerable<Ingredient> GetAlcohol(Guid eventId);
     IEnumerable<Ingredient> GetSyrups(Guid eventId);
     IEnumerable<Ingredient> GetSoda(Guid eventId);

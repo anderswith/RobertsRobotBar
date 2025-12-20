@@ -9,5 +9,5 @@ public interface IEventRepository
     Event? GetEventById(Guid eventId);
     void DeleteEvent(Event evt);
     void UpdateEvent(Event evt);
-    
+    Guid GetEventIdByDrinkId(Guid drinkId);
 }

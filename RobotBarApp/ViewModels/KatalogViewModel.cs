@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using RobotBarApp.BLL.Interfaces;
+using RobotBarApp.Services.Interfaces;
 
 namespace RobotBarApp.ViewModels;
 
@@ -15,8 +16,8 @@ public class KatalogViewModel : ViewModelBase
     private readonly IDrinkLogic _drinkLogic;
     private readonly IIngredientLogic _ingredientLogic;
     private readonly IEventLogic _eventLogic;
-    
-    
+    private readonly Guid? _ingredientId;
+    private readonly INavigationService _navigationService;
     
     // Master list (never filtered)
     private readonly List<KatalogItemViewModel> _allItems = new();
@@ -38,11 +39,13 @@ public class KatalogViewModel : ViewModelBase
     public KatalogViewModel(
         IDrinkLogic drinkLogic,
         IIngredientLogic ingredientLogic,
-        IEventLogic eventLogic)
+        IEventLogic eventLogic,
+        INavigationService navigation)
     {
         _drinkLogic = drinkLogic;
         _ingredientLogic = ingredientLogic;
         _eventLogic = eventLogic;
+        _navigationService = navigation;
 
         FilterCommand = new RelayCommand(ChangeFilter);
 
@@ -208,7 +211,20 @@ public class KatalogViewModel : ViewModelBase
 
     private void EditItem(Guid id, KatalogItemType type)
     {
-        // Implement later
+        switch (type)
+        {
+            case KatalogItemType.Ingredient:
+                _navigationService.NavigateTo<TilfoejIngrediensViewModel>(id);
+                break;
+
+            case KatalogItemType.Drink:
+               // _navigationService.NavigateTo<EditDrinkViewModel>(id);
+                break;
+
+            case KatalogItemType.Event:
+               // _navigationService.NavigateTo<EditEventViewModel>(id);
+                break;
+        }
     }
 
     public string SearchText
@@ -262,13 +278,22 @@ public class KatalogViewModel : ViewModelBase
 
     private ImageSource LoadImage(string path)
     {
-        Uri uri = Path.IsPathRooted(path)
-            ? new Uri(path, UriKind.Absolute)
-            : new Uri(path, UriKind.Relative);
+        if (string.IsNullOrWhiteSpace(path))
+            return null;
+
+        string absolutePath = Path.IsPathRooted(path)
+            ? path
+            : Path.Combine(
+                Directory.GetParent(AppContext.BaseDirectory)!.Parent!.Parent!.Parent!.FullName,
+                path.Replace("/", Path.DirectorySeparatorChar.ToString())
+            );
+
+        if (!File.Exists(absolutePath))
+            return null;
 
         var image = new BitmapImage();
         image.BeginInit();
-        image.UriSource = uri;
+        image.UriSource = new Uri(absolutePath, UriKind.Absolute);
         image.CacheOption = BitmapCacheOption.OnLoad;
         image.EndInit();
         image.Freeze();

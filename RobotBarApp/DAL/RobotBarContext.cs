@@ -74,11 +74,6 @@ public class RobotBarContext : DbContext
             .HasForeignKey(ds => ds.DrinkId)
             .OnDelete(DeleteBehavior.Cascade);
         
-        modelBuilder.Entity<Event>()
-            .HasOne(e => e.Menu)
-            .WithMany(m => m.Events)
-            .HasForeignKey(e => e.MenuId)
-            .OnDelete(DeleteBehavior.SetNull);
         
         modelBuilder.Entity<Menu>()
             .HasMany(m => m.MenuContents)

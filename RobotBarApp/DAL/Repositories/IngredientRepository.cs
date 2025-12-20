@@ -24,7 +24,10 @@ public class IngredientRepository : IIngredientRepository
     }
     public Ingredient? GetIngredientById(Guid ingredientId)
     {
-        return _context.Ingredients.FirstOrDefault(i => i.IngredientId == ingredientId);
+        return _context.Ingredients
+            .Include(i => i.IngredientPositions)
+            .Include(i => i.IngredientScripts)
+            .FirstOrDefault(i => i.IngredientId == ingredientId);
     }
     public void DeleteIngredient(Ingredient ingredient)
     {
@@ -34,6 +37,12 @@ public class IngredientRepository : IIngredientRepository
     public void UpdateIngredient(Ingredient ingredient)
     {
         _context.Ingredients.Update(ingredient);
+        _context.SaveChanges();
+    }
+
+    
+    public void Save()
+    {
         _context.SaveChanges();
     }
 
