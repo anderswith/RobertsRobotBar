@@ -10,4 +10,5 @@ public interface IEventLogic
     void DeleteEvent(Guid eventId);
     void UpdateEvent(Guid eventId, string name, string image, Guid menuId);
     
+    Guid GetEventIdForDrink(Guid drinkId);
 }

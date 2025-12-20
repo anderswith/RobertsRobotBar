@@ -37,6 +37,14 @@ public class EventRepository : IEventRepository
         _context.Events.Update(evt);
         _context.SaveChanges();
     }
+    public Guid GetEventIdByDrinkId(Guid drinkId)
+    {
+        return _context.MenuContents
+            .Where(mc => mc.DrinkId == drinkId)
+            .Select(mc => mc.Menu.Event.EventId)
+            .Single();
+
+    }
     
     
     

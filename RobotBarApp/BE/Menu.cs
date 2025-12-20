@@ -9,5 +9,5 @@ public class Menu
     public string Name { get; set; }
     
     public ICollection<MenuContent> MenuContents { get; set; } = new List<MenuContent>();
-    public ICollection<Event>? Events { get; set; }
+    public Event Event { get; set; }
 }

@@ -13,11 +13,8 @@ public class IngredientLogic : IIngredientLogic
     }
     public void AddIngredient(string name, string type, string image, double size, string dose, int positionNumber, List<string> scriptNames)
     {
-        if(positionNumber <= 0)
-        {
-            throw new ArgumentException("Ingredient position number cannot be negative.");
-        }
-        IngredientValidation(name, type, image, size, dose, scriptNames);
+        
+        IngredientValidation(name, type, image, size, dose, positionNumber, scriptNames);
         dose = dose?.ToLowerInvariant();
         Ingredient ingredient = new Ingredient
         {
@@ -52,8 +49,12 @@ public class IngredientLogic : IIngredientLogic
         _ingredientRepository.AddIngredient(ingredient);
     }
 
-    private static void IngredientValidation(string name, string type, string image, double size, string dose, List<string> scriptNames)
+    private static void IngredientValidation(string name, string type, string image, double size, string dose, int positionNumber, List<string> scriptNames)
     {
+        if(positionNumber <= 0)
+        {
+            throw new ArgumentException("Ingredient position number cannot be negative.");
+        }
         if(string.IsNullOrEmpty(name))
         {
             throw new ArgumentException("Ingredient name cannot be null or empty.");
@@ -120,13 +121,13 @@ public class IngredientLogic : IIngredientLogic
         _ingredientRepository.DeleteIngredient(ingredient);
         
     }
-    public void UpdateIngredient(Guid ingredientId, string name, string type, string image, double size, string dose, List<string> scriptNames)
+    public void UpdateIngredient(Guid ingredientId, string name, string type, string image, double size, string dose, int positionNumber, List<string> scriptNames)
     {
         if(Guid.Empty == ingredientId)
         {
             throw new ArgumentException("Ingredient ID cannot be empty.");
         }
-        IngredientValidation(name, type, image, size, dose, scriptNames);
+        IngredientValidation(name, type, image, size, dose, positionNumber, scriptNames);
        
         dose = dose?.ToLowerInvariant();
         var existingIngredient = _ingredientRepository.GetIngredientById(ingredientId);
@@ -140,30 +141,44 @@ public class IngredientLogic : IIngredientLogic
         existingIngredient.Image = image;
         existingIngredient.Size = size;
         existingIngredient.Dose = dose;
-    
-        var currentScripts = existingIngredient.IngredientScripts?.ToList() ?? new List<IngredientScript>();
+        
+        // Position
+        var position = existingIngredient.IngredientPositions.FirstOrDefault();
 
-        // Remove old scripts not in the new list
-        var toRemove = currentScripts.Where(s => !scriptNames.Contains(s.UrScript)).ToList();
-        foreach (var script in toRemove)
+        if (position == null)
         {
-            existingIngredient.IngredientScripts.Remove(script);
+            existingIngredient.IngredientPositions.Add(new IngredientPosition
+            {
+                IngredientPositionId = Guid.NewGuid(),
+                IngredientId = existingIngredient.IngredientId,
+                Position = positionNumber
+            });
+        }
+        else
+        {
+            position.Position = positionNumber;
         }
         
-        // Add new scripts that didn’t exist before
-        var toAdd = scriptNames.Where(s => !currentScripts.Select(c => c.UrScript).Contains(s)).ToList();
+        
+        
+        // Scripts
+        var script = existingIngredient.IngredientScripts.FirstOrDefault();
 
-        int nextNumber = currentScripts.Count > 0 ? currentScripts.Max(s => s.Number) + 1 : 1;
-        foreach (var scriptName in toAdd)
+        if (script == null)
         {
             existingIngredient.IngredientScripts.Add(new IngredientScript
             {
                 ScriptId = Guid.NewGuid(),
-                UrScript = scriptName,
-                Number = nextNumber++,
-                IngredientId = existingIngredient.IngredientId
+                IngredientId = existingIngredient.IngredientId,
+                UrScript = scriptNames.First(),
+                Number = 1
             });
         }
+        else
+        {
+            script.UrScript = scriptNames.First();
+        }
+
         
         _ingredientRepository.UpdateIngredient(existingIngredient);
         

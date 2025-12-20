@@ -16,7 +16,9 @@ namespace RobotBarApp.ViewModels
         private readonly INavigationService _navigation;
         private readonly IIngredientLogic _ingredientLogic;
         private readonly IRobotLogic _robotLogic;
-
+        
+        private readonly Guid? _ingredientId;
+        public bool IsEditMode => _ingredientId.HasValue;
 
 
         private string _ingredientName = "";
@@ -75,12 +77,15 @@ namespace RobotBarApp.ViewModels
         public TilfoejIngrediensViewModel(
             INavigationService navigation,
             IIngredientLogic ingredientLogic,
-            IRobotLogic robotLogic
+            IRobotLogic robotLogic,
+            Guid? ingredientId = null
             )
         {
             _navigation = navigation;
             _ingredientLogic = ingredientLogic;
             _robotLogic = robotLogic;
+            _ingredientId = ingredientId;
+            
 
             //  Position numbers 1 to 24 
             for (int i = 1; i <= 24; i++)
@@ -93,6 +98,34 @@ namespace RobotBarApp.ViewModels
             CancelCommand = new RelayCommand(_ => Cancel());
             SaveCommand = new RelayCommand(_ => Save());
             RunTestScriptCommand = new RelayCommand(_ => RunTestScripts());
+            if (IsEditMode)
+            {
+                LoadIngredient();
+            }
+        }
+        private void LoadIngredient()
+        {
+            var ingredient = _ingredientLogic.GetIngredientById(_ingredientId!.Value);
+
+            IngredientName = ingredient.Name;
+            SizeCl = ingredient.Size.ToString();
+            ImagePreview = ingredient.Image;
+
+            IsAlkohol = ingredient.Type == "Alkohol";
+            IsMock    = ingredient.Type == "Mock";
+            IsSyrup   = ingredient.Type == "Syrup";
+            IsSoda    = ingredient.Type == "Soda";
+
+            IsSingleDose = ingredient.Dose == "Single";
+            IsDoubleDose = ingredient.Dose == "Double";
+
+            SelectedHolder = ingredient.IngredientPositions
+                .Select(p => p.Position)
+                .FirstOrDefault();
+
+            ScriptText = ingredient.IngredientScripts
+                .OrderBy(s => s.Number)
+                .FirstOrDefault()?.UrScript ?? "";
         }
 
         public void RunTestScripts()
@@ -131,56 +164,72 @@ namespace RobotBarApp.ViewModels
 
         private void Save()
         {
-            
-
             if (!double.TryParse(SizeCl, out double sizeParsed))
             {
-                System.Windows.MessageBox.Show("Size (cl) has to be a valid number.");
+                MessageBox.Show("Size (cl) has to be a valid number.");
                 return;
             }
 
-            string type = "Ukendt";
-            if (IsAlkohol) type = "Alkohol";
-            else if (IsMock) type = "Mock";
-            else if (IsSyrup) type = "Syrup";
-            else if (IsSoda) type = "Soda";
-
+            string type =
+                IsAlkohol ? "Alkohol" :
+                IsMock    ? "Mock" :
+                IsSyrup   ? "Syrup" :
+                IsSoda    ? "Soda" :
+                "Ukendt";
 
             string dose = IsSingleDose ? "Single" : "Double";
 
-
-            List<string> scripts = new();
-            if (!ScriptText.Contains(".urp"))
-            {
-                MessageBox.Show("Script name has to end with .urp");
-            }
+            var scripts = new List<string>();
             if (!string.IsNullOrWhiteSpace(ScriptText))
                 scripts.Add(ScriptText);
-            
 
-            
             try
             {
-                var storedImagePath = CopyImageToResources();
+                var imagePath = IsEditMode
+                    ? ImagePreview
+                    : CopyImageToResources();
 
-                _ingredientLogic.AddIngredient(
-                    name: IngredientName,
-                    type: type,
-                    image: storedImagePath,
-                    size: sizeParsed,
-                    dose: dose,
-                    positionNumber: SelectedHolder,
-                    scriptNames: scripts
-                );
+                if (IsEditMode)
+                {
+                    _ingredientLogic.UpdateIngredient(
+                        ingredientId: _ingredientId!.Value,
+                        name: IngredientName,
+                        type: type,
+                        image: imagePath,
+                        size: sizeParsed,
+                        dose: dose,
+                        positionNumber: SelectedHolder,
+                        scriptNames: scripts
+                    );
+                }
+                else
+                {
+                    _ingredientLogic.AddIngredient(
+                        name: IngredientName,
+                        type: type,
+                        image: imagePath,
+                        size: sizeParsed,
+                        dose: dose,
+                        positionNumber: SelectedHolder,
+                        scriptNames: scripts
+                    );
+                }
 
-                MessageBox.Show("Ingrediens tilføjet!");
-                _navigation.NavigateTo<TilfoejIngrediensViewModel>();
+                MessageBox.Show(IsEditMode ? "Ingrediens opdateret!" : "Ingrediens tilføjet!");
+
+                if (IsEditMode)
+                {
+                    _navigation.NavigateTo<KatalogViewModel>();
+                }
+                else
+                {
+                    _navigation.NavigateTo<TilfoejIngrediensViewModel>();
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Fejl", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(ex.Message);
             }
-            
         }
 
         private string CopyImageToResources()

@@ -12,4 +12,5 @@ public interface IIngredientRepository
     IEnumerable<Ingredient> GetIngredientByType(string type, Guid eventId);
     IEnumerable<Ingredient> GetIngredientsWithScripts(List<Guid> ingredientIds);
     IEnumerable<Ingredient> GetIngredientsForPositions();
+
 }

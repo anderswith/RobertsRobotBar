@@ -101,4 +101,16 @@ public class EventLogic : IEventLogic
 
         _eventRepository.UpdateEvent(evt);
     }
+    
+    public Guid GetEventIdForDrink(Guid drinkId)
+    {
+        var eventId = _eventRepository.GetEventIdByDrinkId(drinkId);
+
+        if (eventId == Guid.Empty)
+        {
+            throw new InvalidOperationException($"No event found for drink {drinkId}");
+        }
+        
+        return eventId;
+    }
 }
