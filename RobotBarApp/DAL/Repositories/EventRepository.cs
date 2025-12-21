@@ -41,9 +41,13 @@ public class EventRepository : IEventRepository
     {
         return _context.MenuContents
             .Where(mc => mc.DrinkId == drinkId)
-            .Select(mc => mc.Menu.Event.EventId)
-            .Single();
-
+            .Join(
+                _context.Events,
+                mc => mc.MenuId,
+                e  => e.MenuId,
+                (mc, e) => e.EventId
+            )
+            .FirstOrDefault();
     }
     
     

@@ -42,10 +42,7 @@
         <DataTemplate DataType="{x:Type vm:TilfoejDrinkViewModel}">
             <view:TilfoejDrinkView />
         </DataTemplate>
-
-        <DataTemplate DataType="{x:Type vm:TilfoejMenuViewModel}">
-            <view:TilfoejMenuView />
-        </DataTemplate>
+        
 
         <DataTemplate DataType="{x:Type vm:TilfoejEventViewModel}">
             <view:TilfoejEventView />

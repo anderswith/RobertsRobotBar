@@ -62,7 +62,6 @@ public partial class App : Application
                 services.AddTransient<TilfoejDrinkViewModel>();
                 services.AddTransient<TilfoejEventViewModel>();
                 services.AddTransient<TilfoejIngrediensViewModel>();
-                services.AddTransient<TilfoejMenuViewModel>();
                 services.AddTransient<EventViewModel>();
                 
                 // Views
@@ -75,7 +74,6 @@ public partial class App : Application
                 services.AddTransient<TilfoejDrinkView>();
                 services.AddTransient<TilfoejEventView>();
                 services.AddTransient<TilfoejIngrediensView>();
-                services.AddTransient<TilfoejMenuView>();
                 services.AddTransient<EventView>();
                 
                 //services

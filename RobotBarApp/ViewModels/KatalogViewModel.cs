@@ -218,7 +218,7 @@ public class KatalogViewModel : ViewModelBase
                 break;
 
             case KatalogItemType.Drink:
-               // _navigationService.NavigateTo<EditDrinkViewModel>(id);
+                _navigationService.NavigateTo<TilfoejDrinkViewModel>(id);
                 break;
 
             case KatalogItemType.Event:

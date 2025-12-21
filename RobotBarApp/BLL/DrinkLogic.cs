@@ -113,97 +113,97 @@ public class DrinkLogic : IDrinkLogic
     }
     
 
-    public void UpdateDrink(Guid drinkId, string name, string image, bool isMocktail, List<Guid> ingredientIds, List<string> scriptNames)
+    public void UpdateDrink(
+        Guid drinkId,
+        string name,
+        string image,
+        bool isMocktail,
+        List<Guid> ingredientIds,
+        List<string> scriptNames)
     {
         DrinkValidation(name, image, isMocktail, ingredientIds, scriptNames);
-        
-        var existingDrink = _drinkRepository.GetDrinkById(drinkId);
 
-        if (existingDrink == null)
-        {
-            throw new KeyNotFoundException($"Drink not found.");
-        }
+        var existingDrink = _drinkRepository.GetDrinkById(drinkId)
+                            ?? throw new KeyNotFoundException("Drink not found.");
 
-        
         existingDrink.Name = name;
         existingDrink.Image = image;
         existingDrink.IsMocktail = isMocktail;
 
-    // Update Ingredients (DrinkContents)
+        var desiredIngredientIds = ingredientIds.Distinct().ToHashSet();
 
-    var currentIngredientIds = existingDrink.DrinkContents
-        .Select(dc => dc.IngredientId)
-        .ToList();
-
-    // Remove old ingredients not in the new list
-    var toRemoveIngredients = existingDrink.DrinkContents
-        .Where(dc => !ingredientIds.Contains(dc.IngredientId))
-        .ToList();
-
-    foreach (var dc in toRemoveIngredients)
-        existingDrink.DrinkContents.Remove(dc);
-
-    // Add new ingredients
-    var toAddIngredients = ingredientIds
-        .Where(id => !currentIngredientIds.Contains(id))
-        .ToList();
-
-    foreach (var id in toAddIngredients)
-    {
-        existingDrink.DrinkContents.Add(new DrinkContent
+        // Remove missing
+        foreach (var content in existingDrink.DrinkContents.ToList())
         {
-            DrinkContentId = Guid.NewGuid(),
-            DrinkId = existingDrink.DrinkId,
-            IngredientId = id
-        });
-    }
+            if (!desiredIngredientIds.Contains(content.IngredientId))
+            {
+                _drinkRepository.RemoveDrinkContent(content);
+                existingDrink.DrinkContents.Remove(content);
+            }
+        }
 
+        // Add new
+        var existingIds = existingDrink.DrinkContents
+            .Select(dc => dc.IngredientId)
+            .ToHashSet();
 
-    // Update Scripts (DrinkScripts)
-    
-    var currentScriptNames = existingDrink.DrinkScripts
-        .Select(s => s.UrScript)
-        .ToList();
-
-    // Remove scripts that no longer exist
-    var toRemoveScripts = existingDrink.DrinkScripts
-        .Where(s => !scriptNames.Contains(s.UrScript))
-        .ToList();
-
-    foreach (var script in toRemoveScripts)
-    {
-        existingDrink.DrinkScripts.Remove(script);
-    }
-    
-    // Add new scripts
-    var toAddScripts = scriptNames
-        .Where(name => !currentScriptNames.Contains(name))
-        .ToList();
-
-    int nextNumber = 1;
-
-    if (existingDrink.DrinkScripts.Any())
-    {
-        int highestNumber = existingDrink.DrinkScripts.Max(script => script.Number);
-        nextNumber = highestNumber + 1;
-    }
-
-    foreach (var scriptName in toAddScripts)
-    {
-        existingDrink.DrinkScripts.Add(new DrinkScript
+        foreach (var ingredientId in desiredIngredientIds)
         {
-            ScriptId = Guid.NewGuid(),
-            UrScript = scriptName,
-            Number = nextNumber++,
-            DrinkId = existingDrink.DrinkId
-        });
-    }
-        
+            if (!existingIds.Contains(ingredientId))
+            {
+                existingDrink.DrinkContents.Add(new DrinkContent
+                {
+                    DrinkId = existingDrink.DrinkId,
+                    IngredientId = ingredientId
+                });
+            }
+        }
+
+        // Script  
+        var existingScript = existingDrink.DrinkScripts.FirstOrDefault();
+        var newScript = scriptNames.FirstOrDefault();
+
+        if (string.IsNullOrWhiteSpace(newScript))
+        {
+            if (existingScript != null)
+                existingDrink.DrinkScripts.Remove(existingScript);
+        }
+        else if (existingScript == null)
+        {
+            existingDrink.DrinkScripts.Add(new DrinkScript
+            {
+                ScriptId = Guid.NewGuid(),
+                DrinkId = existingDrink.DrinkId,
+                UrScript = newScript,
+                Number = 1
+            });
+        }
+        else
+        {
+            existingScript.UrScript = newScript;
+        }
+
         _drinkRepository.UpdateDrink(existingDrink);
     }
 
     public Drink? GetDrinksWithScripts(Guid drinkId)
     {
         return _drinkRepository.GetDrinkWithScripts(drinkId);
+    }
+    
+    public IEnumerable<Ingredient> GetAvailableIngredientsForDrink(Guid drinkId)
+    {
+        if(drinkId == Guid.Empty)
+        {
+            throw new ArgumentException("Invalid drink ID.");
+        }
+        return _drinkRepository.GetAvailableIngredientsForDrink(drinkId);
+    }
+    public bool Exists(Guid drinkId)
+    {
+        if (drinkId == Guid.Empty)
+            return false;
+
+        return _drinkRepository.Exists(drinkId);
     }
 }
