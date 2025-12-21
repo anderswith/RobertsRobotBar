@@ -1,6 +1,7 @@
 using RobotBarApp.BE;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.DAL.Repositories.Interfaces;
+using RobotBarApp.Services.Application.Interfaces;
 
 namespace RobotBarApp.BLL;
 
@@ -9,12 +10,14 @@ public class MenuLogic : IMenuLogic
     private readonly IMenuRepository _menuRepository;
     private readonly IDrinkRepository _drinkRepository;
     private readonly IEventRepository _eventRepository;
+    private readonly IEventSessionService _eventSessionService;
     
-    public MenuLogic(IMenuRepository menuRepository, IDrinkRepository drinkRepository, IEventRepository eventRepository)
+    public MenuLogic(IMenuRepository menuRepository, IDrinkRepository drinkRepository, IEventRepository eventRepository, IEventSessionService eventSessionService)
     {
         _menuRepository = menuRepository;
         _drinkRepository = drinkRepository;
         _eventRepository = eventRepository;
+        _eventSessionService = eventSessionService;
     }
     
     public void AddDrinksToMenu(List<Guid> drinkIds, Guid eventId)
@@ -147,6 +150,23 @@ public class MenuLogic : IMenuLogic
 
         // 4. Save changes
         _menuRepository.UpdateMenu(menu);
+    }
+
+    public IEnumerable<Drink> GetMenuWithDrinksAndIngredients()
+    {
+        if (!_eventSessionService.HasActiveEvent)
+            throw new InvalidOperationException("No active event");
+
+        var eventId = _eventSessionService.CurrentEventId.Value;
+        var menu = _menuRepository.GetMenuWithDrinksAndIngredientsByEventId(eventId);
+        if (menu == null)
+        {
+            throw new KeyNotFoundException("Menu not found for active event");
+        }
+
+        return menu.MenuContents
+            .Select(mc => mc.Drink)
+            .ToList();
     }
 
 

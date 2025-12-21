@@ -12,4 +12,5 @@ public interface IMenuLogic
     IEnumerable<Drink> GetDrinksForMenu(Guid eventId);
     void RemoveDrinkFromMenu(Guid eventId, Guid drinkId);
 
+    IEnumerable<Drink> GetMenuWithDrinksAndIngredients();
 }

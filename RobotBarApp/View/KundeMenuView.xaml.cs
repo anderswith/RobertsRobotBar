@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.ViewModels;
 
 namespace RobotBarApp.View
@@ -6,9 +7,11 @@ namespace RobotBarApp.View
     public partial class KundeMenuView : Window
     {
         private const double ScrollStep = 380; // roughly 1 card + margin
+        private readonly IMenuLogic _menuLogic;
 
-        public KundeMenuView()
+        public KundeMenuView(IMenuLogic menuLogic)
         {
+            _menuLogic = menuLogic;
             InitializeComponent();
             // DataContext = new KundeMenuViewModel(); // recommended
         }
@@ -19,7 +22,7 @@ namespace RobotBarApp.View
             var startView = new KundeStartView
             {
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                DataContext = new KundeStartViewModel()
+                DataContext = new KundeStartViewModel(_menuLogic)
             };
 
             startView.Show();
