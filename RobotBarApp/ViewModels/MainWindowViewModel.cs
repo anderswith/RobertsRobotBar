@@ -14,8 +14,6 @@ namespace RobotBarApp.ViewModels
         public ICommand NavigateStatistikCommand { get; }
         public ICommand NavigateKatalogCommand { get; }
         public ICommand NavigateTilfoejIngrediensCommand { get; }
-        public ICommand NavigateTilfoejDrinkCommand { get; }
-        public ICommand NavigateTilfoejMenuCommand { get; }
         public ICommand NavigateTilfoejEventCommand { get; }
 
         public MainWindowViewModel(INavigationService navigationService)
@@ -44,7 +42,7 @@ namespace RobotBarApp.ViewModels
 
             // Tilføj Event
             NavigateTilfoejEventCommand = new RelayCommand(_ =>
-                _navigationService.NavigateTo<TilfoejEventViewModel>());
+                _navigationService.NavigateTo<TilfoejEventViewModel>(Guid.NewGuid()));
 
             // Set default view
             _navigationService.NavigateTo<EventListViewModel>();

@@ -222,7 +222,7 @@ public class KatalogViewModel : ViewModelBase
                 break;
 
             case KatalogItemType.Event:
-               // _navigationService.NavigateTo<EditEventViewModel>(id);
+                _navigationService.NavigateTo<TilfoejEventViewModel>(id);
                 break;
         }
     }
