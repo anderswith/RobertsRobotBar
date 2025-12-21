@@ -16,18 +16,24 @@ namespace RobotBarApp.ViewModels
         private readonly IIngredientLogic _ingredientLogic;
         private readonly IEventLogic _eventLogic;
         private readonly IBarSetupLogic _barSetupLogic;
-
+        
+        private readonly Guid? _eventId;
+        public bool IsEditMode => _eventId.HasValue;
         public TilfoejEventViewModel(
             INavigationService navigationService,
             IIngredientLogic ingredientLogic,
             IEventLogic eventLogic,
-            IBarSetupLogic barSetupLogic)
+            IBarSetupLogic barSetupLogic,
+            Guid contextId)
         {
+            
             _navigationService = navigationService;
             _ingredientLogic = ingredientLogic;
             _eventLogic = eventLogic;
             _barSetupLogic = barSetupLogic;
-
+            
+            
+            
             Step = 1;
 
             Ingredients = new ObservableCollection<Ingredient>(_ingredientLogic.GetIngredientsForPositions());
@@ -40,7 +46,21 @@ namespace RobotBarApp.ViewModels
             AddIngredientCommand = new RelayCommand(AddIngredient);
             SaveCommand = new RelayCommand(SaveEvent);
             NextCommand = new RelayCommand(_ => GoNextStep());
-            CancelCommand = new RelayCommand(_ => _navigationService.NavigateTo<EventListViewModel>());
+            CancelCommand = new RelayCommand(_ => NavigateAfterClose());
+            
+            var ev = _eventLogic.GetEventById(contextId);
+            if (ev != null)
+            {
+                // EDIT
+                _eventId = contextId;
+                LoadEvent(ev);
+            }
+            else
+            {
+                // CREATE
+                _eventId = null;
+            }
+
         }
         private void GoNextStep()
         {
@@ -123,27 +143,102 @@ namespace RobotBarApp.ViewModels
             if (dialog.ShowDialog() == true)
                 ImagePath = dialog.FileName;
         });
+        
+        private void LoadEvent(Event ev)
+        {
+
+
+            EventName = ev.Name;
+            ImagePath = ev.Image;
+
+            foreach (var bs in _barSetupLogic.GetBarSetupForEvent(_eventId.Value))
+            {
+                var slot = RackItems.FirstOrDefault(r => r.Position == bs.PositionNumber);
+                if (slot != null)
+                    slot.Ingredient = bs.Ingredient;
+            }
+        }
 
         // SAVE
         private void SaveEvent(object _)
         {
             try
             {
-                var finalImagePath = CopyEventImageToResources();
+                var finalImagePath = ImagePath;
 
-                var id = _eventLogic.AddEvent(EventName, finalImagePath);
+                if (!ImagePath.StartsWith("Resources/"))
+                    finalImagePath = CopyEventImageToResources();
 
-                foreach (var slot in RackItems.Where(r => r.Ingredient != null))
+                if (!IsEditMode)
                 {
-                    _barSetupLogic.AddBarSetup(slot.Position, slot.Ingredient.IngredientId, id);
+                    // CREATE
+                    var newEventId = _eventLogic.AddEvent(EventName, finalImagePath);
+
+                    foreach (var slot in RackItems.Where(r => r.Ingredient != null))
+                    {
+                        _barSetupLogic.AddBarSetup(
+                            slot.Position,
+                            slot.Ingredient.IngredientId,
+                            newEventId);
+                    }
+                }
+                else
+                {
+                    // UPDATE EVENT CORE DATA
+                    var ev = _eventLogic.GetEventById(_eventId!.Value)
+                             ?? throw new Exception("Event not found");
+
+                    _eventLogic.UpdateEvent(
+                        _eventId.Value,
+                        EventName,
+                        finalImagePath,
+                        ev.MenuId!.Value
+                    );
+
+                    // EXISTING bar setup from DB
+                    var existingSetups = _barSetupLogic
+                        .GetBarSetupForEvent(_eventId.Value)
+                        .ToDictionary(bs => bs.PositionNumber);
+
+                    // LOOP ALL RACK POSITIONS (1–24)
+                    foreach (var slot in RackItems)
+                    {
+                        var hasDbSetup = existingSetups.TryGetValue(slot.Position, out var dbSetup);
+
+                        if (slot.Ingredient == null)
+                        {
+                            // UI removed ingredient → delete if existed
+                            if (hasDbSetup)
+                            {
+                                _barSetupLogic.DeleteBarSetup(_eventId.Value, slot.Position);
+                            }
+                        }
+                        else
+                        {
+                            // UI has ingredient → add or update
+                            _barSetupLogic.AddBarSetup(
+                                slot.Position,
+                                slot.Ingredient.IngredientId,
+                                _eventId.Value
+                            );
+                        }
+                    }
                 }
 
-                _navigationService.NavigateTo<EventListViewModel>();
+                NavigateAfterClose();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Fejl", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        }
+        
+        private void NavigateAfterClose()
+        {
+            if (IsEditMode)
+                _navigationService.NavigateTo<KatalogViewModel>();
+            else
+                _navigationService.NavigateTo<EventListViewModel>();
         }
 
         private string CopyEventImageToResources()
