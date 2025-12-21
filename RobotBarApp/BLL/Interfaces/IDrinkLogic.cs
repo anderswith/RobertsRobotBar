@@ -13,5 +13,7 @@ public interface IDrinkLogic
     void UpdateDrink(Guid drinkId, string name, string image, bool isMocktail, List<Guid> ingredientIds,
         List<string> scriptNames);
     Drink? GetDrinksWithScripts(Guid drinkId);
+    IEnumerable<Ingredient> GetAvailableIngredientsForDrink(Guid drinkId);
 
+    bool Exists(Guid drinkId);
 }

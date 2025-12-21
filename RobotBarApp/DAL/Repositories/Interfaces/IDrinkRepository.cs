@@ -13,5 +13,8 @@ public interface IDrinkRepository
     IEnumerable<Drink> GetDrinksByIds(IEnumerable<Guid> drinkIds);
     Drink? GetDrinkWithScripts(Guid drinkId);
     IEnumerable<Drink> GetAllDrinksWithContent();
+    IEnumerable<Ingredient> GetAvailableIngredientsForDrink(Guid drinkId);
+    bool Exists(Guid drinkId);
+    void RemoveDrinkContent(DrinkContent content);
 
 }

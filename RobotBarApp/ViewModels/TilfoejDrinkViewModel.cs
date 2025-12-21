@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
 using RobotBarApp.BE;
@@ -15,29 +16,123 @@ namespace RobotBarApp.ViewModels
         private readonly IIngredientLogic _ingredientLogic;
         private readonly IDrinkLogic _drinkLogic;
         private readonly INavigationService _navigation;
+        private readonly IEventLogic _eventLogic;
         private readonly Guid _eventId;
-
+        
+        private readonly Guid? _drinkId;
+        public bool IsEditMode => _drinkId.HasValue;
         public TilfoejDrinkViewModel(
             IIngredientLogic ingredientLogic,
             IDrinkLogic drinkLogic,
             INavigationService navigation,
-            Guid eventId)
+            IEventLogic eventLogic,
+            Guid contextId)
+            
         {
             _ingredientLogic = ingredientLogic;
             _drinkLogic = drinkLogic;
             _navigation = navigation;
-            _eventId = eventId;
+            _eventLogic = eventLogic;
+            
+            if (_drinkLogic.Exists(contextId))
+            {
+                // EDIT MODE
+                _drinkId = contextId;
+                _eventId = _eventLogic.GetEventIdForDrink(contextId);
+
+                if (_eventId == Guid.Empty)
+                {
+                    
+                    MessageBox.Show(
+                        "Denne drink er ikke tilknyttet et event.\n\n" +
+                        "Tilføj drinken til en menu, før du redigerer ingredienserne.",
+                        "Kan ikke redigere drink"
+                        );
+                    
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        _navigation.NavigateTo<KatalogViewModel>();
+                    }));
+                }
+            }
+            else
+            {
+                // CREATE MODE
+                _drinkId = null;
+                _eventId = contextId;
+            }
 
             ChooseImageCommand = new RelayCommand(_ => ChooseImage());
             SaveCommand = new RelayCommand(_ => Save());
             CancelCommand = new RelayCommand(_ => Cancel());
             GuideCommand = new RelayCommand(_ => ShowGuide());
-
+            
             LoadIngredientLists();
+            if (IsEditMode)
+            {
+                LoadDrinkForEdit();
+            }
+            
+        }
+        
+        private void LoadDrinkForEdit()
+        {
+            if (!IsEditMode)
+                return;
+
+            var drink = _drinkLogic.GetDrinkById(_drinkId!.Value);
+            if (drink == null)
+                throw new KeyNotFoundException("Drink not found.");
+
+            // Basic fields
+            DrinkName   = drink.Name;
+            ImagePreview = drink.Image;
+            IsMocktail  = drink.IsMocktail;
+            
+            ScriptText = drink.DrinkScripts?
+                             .OrderBy(s => s.Number)
+                             .FirstOrDefault()
+                             ?.UrScript
+                         ?? "";
+
+            // Ingredients already in the drink
+            var drinkIngredients = drink.DrinkContents
+                .Select(dc => dc.Ingredient)
+                .ToList();
+
+            // Alcohol slots
+            SelectedAlcohol1 = drinkIngredients.ElementAtOrDefault(0);
+            SelectedAlcohol2 = drinkIngredients.ElementAtOrDefault(1);
+            SelectedAlcohol3 = drinkIngredients.ElementAtOrDefault(2);
+            SelectedAlcohol4 = drinkIngredients.ElementAtOrDefault(3);
+
+            // Syrups
+            SelectedSyrup1 = drinkIngredients
+                .FirstOrDefault(i => i.Type == "Syrup");
+            SelectedSyrup2 = drinkIngredients
+                .Skip(1)
+                .FirstOrDefault(i => i.Type == "Syrup");
+            SelectedSyrup3 = drinkIngredients
+                .Skip(2)
+                .FirstOrDefault(i => i.Type == "Syrup");
+
+            // Sodas
+            SelectedSoda1 = drinkIngredients
+                .FirstOrDefault(i => i.Type == "Soda");
+            SelectedSoda2 = drinkIngredients
+                .Skip(1)
+                .FirstOrDefault(i => i.Type == "Soda");
         }
         private void Cancel()
         {
-            _navigation.NavigateTo<MainWindowViewModel>(); 
+            if (IsEditMode)
+            {
+                _navigation.NavigateTo<KatalogViewModel>();
+            }
+            else
+            {
+                _navigation.NavigateTo<EventViewModel>(_eventId);
+            }
         }
         
 
@@ -86,11 +181,33 @@ namespace RobotBarApp.ViewModels
             foreach (var i in _ingredientLogic.GetSoda(_eventId)) SodaOptions.Add(i);
         }
 
-        public Ingredient? SelectedAlcohol1 { get; set; }
-        public Ingredient? SelectedAlcohol2 { get; set; }
-        public Ingredient? SelectedAlcohol3 { get; set; }
-        public Ingredient? SelectedAlcohol4 { get; set; }
+        private Ingredient? _selectedAlcohol1;
+        public Ingredient? SelectedAlcohol1
+        {
+            get => _selectedAlcohol1;
+            set => SetProperty(ref _selectedAlcohol1, value);
+        }
 
+        private Ingredient? _selectedAlcohol2;
+        public Ingredient? SelectedAlcohol2
+        {
+            get => _selectedAlcohol2;
+            set => SetProperty(ref _selectedAlcohol2, value);
+        }
+
+        private Ingredient? _selectedAlcohol3;
+        public Ingredient? SelectedAlcohol3
+        {
+            get => _selectedAlcohol3;
+            set => SetProperty(ref _selectedAlcohol3, value);
+        }
+
+        private Ingredient? _selectedAlcohol4;
+        public Ingredient? SelectedAlcohol4
+        {
+            get => _selectedAlcohol4;
+            set => SetProperty(ref _selectedAlcohol4, value);
+        }
         public int AlcoholAmount1 { get; set; }
         public int AlcoholAmount2 { get; set; }
         public int AlcoholAmount3 { get; set; }
@@ -109,13 +226,41 @@ namespace RobotBarApp.ViewModels
         public ICommand DecreaseAlcoholAmount4Command => new RelayCommand(_ => { if (AlcoholAmount4 > 0) AlcoholAmount4--; });
         
 
-        public Ingredient? SelectedSyrup1 { get; set; }
-        public Ingredient? SelectedSyrup2 { get; set; }
-        public Ingredient? SelectedSyrup3 { get; set; }
+        private Ingredient? _selectedSyrup1;
+        public Ingredient? SelectedSyrup1
+        {
+            get => _selectedSyrup1;
+            set => SetProperty(ref _selectedSyrup1, value);
+        }
+
+        private Ingredient? _selectedSyrup2;
+        public Ingredient? SelectedSyrup2
+        {
+            get => _selectedSyrup2;
+            set => SetProperty(ref _selectedSyrup2, value);
+        }
+
+        private Ingredient? _selectedSyrup3;
+        public Ingredient? SelectedSyrup3
+        {
+            get => _selectedSyrup3;
+            set => SetProperty(ref _selectedSyrup3, value);
+        }
         
 
-        public Ingredient? SelectedSoda1 { get; set; }
-        public Ingredient? SelectedSoda2 { get; set; }
+        private Ingredient? _selectedSoda1;
+        public Ingredient? SelectedSoda1
+        {
+            get => _selectedSoda1;
+            set => SetProperty(ref _selectedSoda1, value);
+        }
+
+        private Ingredient? _selectedSoda2;
+        public Ingredient? SelectedSoda2
+        {
+            get => _selectedSoda2;
+            set => SetProperty(ref _selectedSoda2, value);
+        }
         
 
         public ICommand ChooseImageCommand { get; }
@@ -141,48 +286,65 @@ namespace RobotBarApp.ViewModels
 
         private void Save()
         {
-            Console.WriteLine("SAVE() CALLED!");
-            if (string.IsNullOrWhiteSpace(DrinkName))
+            try
             {
-                System.Windows.MessageBox.Show("Drinken skal have et navn.");
-                return;
+                // Build ingredient list from slots
+                var ingredientIds = new List<Guid>();
+
+                void AddIfSelected(Ingredient? ingredient)
+                {
+                    if (ingredient != null)
+                        ingredientIds.Add(ingredient.IngredientId);
+                }
+
+                AddIfSelected(SelectedAlcohol1);
+                AddIfSelected(SelectedAlcohol2);
+                AddIfSelected(SelectedAlcohol3);
+                AddIfSelected(SelectedAlcohol4);
+
+                AddIfSelected(SelectedSyrup1);
+                AddIfSelected(SelectedSyrup2);
+                AddIfSelected(SelectedSyrup3);
+
+                AddIfSelected(SelectedSoda1);
+                AddIfSelected(SelectedSoda2);
+
+                ingredientIds = ingredientIds.Distinct().ToList();
+                var scripts = string.IsNullOrWhiteSpace(ScriptText)
+                    ? new List<string>()
+                    : new List<string> { ScriptText };
+                if (IsEditMode)
+                {
+                    _drinkLogic.UpdateDrink(
+                        drinkId: _drinkId!.Value,
+                        name: DrinkName,
+                        image: ImagePreview ?? "",
+                        isMocktail: IsMocktail,
+                        ingredientIds: ingredientIds,
+                        scriptNames: scripts
+                    );
+
+                    // ✅ Edit → back to catalog
+                    _navigation.NavigateTo<KatalogViewModel>();
+                }
+                else
+                {
+                    _drinkLogic.AddDrink(
+                        name: DrinkName,
+                        image: ImagePreview ?? "",
+                        isMocktail: IsMocktail,
+                        ingredientIds: ingredientIds,
+                        scriptNames: scripts
+                    );
+
+                    // ✅ Create → back to event
+                    _navigation.NavigateTo<EventViewModel>(_eventId);
+                }
             }
-
-            var ingredientIds = new List<Guid>();
-            var scriptNames = new List<string>();
-            
-            if (!string.IsNullOrWhiteSpace(ScriptText))
-                scriptNames.Add(ScriptText);
-
-            void AddIngredient(Ingredient? ing)
+            catch (Exception ex)
             {
-                if (ing != null)
-                    ingredientIds.Add(ing.IngredientId);
+                System.Windows.MessageBox.Show(ex.Message, "Error");
             }
-
-            AddIngredient(SelectedAlcohol1);
-            AddIngredient(SelectedAlcohol2);
-            AddIngredient(SelectedAlcohol3);
-            AddIngredient(SelectedAlcohol4);
-
-            AddIngredient(SelectedSyrup1);
-            AddIngredient(SelectedSyrup2);
-            AddIngredient(SelectedSyrup3);
-
-            AddIngredient(SelectedSoda1);
-            AddIngredient(SelectedSoda2);
-
-            _drinkLogic.AddDrink(
-                DrinkName,
-                ImagePreview ?? "",
-                IsMocktail,
-                ingredientIds,
-                scriptNames
-            );
-
-            System.Windows.MessageBox.Show("Drinken blev tilføjet.");
-
-            _navigation.NavigateTo<EventViewModel>(_eventId);
         }
     }
 }

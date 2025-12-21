@@ -10,5 +10,6 @@ public interface IBarSetupRepository
     void deleteBarSetup(BarSetup barSetup);
     BarSetup? GetBarSetupEventAndPosition(Guid eventId, int positionNumber);
     IEnumerable<BarSetup> GetBarSetupForEvent(Guid eventId);
+    
 
 }
