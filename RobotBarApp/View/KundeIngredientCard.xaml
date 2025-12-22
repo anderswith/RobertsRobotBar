@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="RobotBarApp.View.KundeIngredientCard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:RobotBarApp.Converters"
+             x:Name="Root">
+
+    <UserControl.Resources>
+        <converters:PathToImageConverter x:Key="PathToImageConverter"/>
+    </UserControl.Resources>
+
+    <Button Background="Transparent"
+            BorderThickness="0"
+            Padding="0"
+            Cursor="Hand"
+            Click="Button_Click">
+        <Border CornerRadius="16"
+                Background="#2F4A3B"
+                BorderBrush="#2F4A3B"
+                BorderThickness="0">
+            <Grid Margin="18">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Image Grid.Row="0"
+                       Source="{Binding ImagePath, ElementName=Root, Converter={StaticResource PathToImageConverter}}"
+                       Stretch="Uniform"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+
+                <TextBlock Grid.Row="1"
+                           Text="{Binding Title, ElementName=Root}"
+                           Foreground="White"
+                           FontSize="24"
+                           HorizontalAlignment="Center"
+                           Margin="0,14,0,4"/>
+            </Grid>
+        </Border>
+    </Button>
+</UserControl>

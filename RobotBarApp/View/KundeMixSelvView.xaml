@@ -1,0 +1,150 @@
+﻿<UserControl x:Class="RobotBarApp.View.KundeMixSelvView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:view="clr-namespace:RobotBarApp.View"
+             Background="#F2EEE6">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="IngredientCardTemplate">
+            <view:KundeIngredientCard
+                Width="240"
+                Height="460"
+                Margin="18,0"
+                Title="{Binding Name}"
+                ImagePath="{Binding ImagePath}"
+                Click="IngredientCard_Click"/>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Grid Grid.Row="0" Margin="28,18,28,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Back -->
+            <Button Grid.Column="0"
+                    Width="160"
+                    Height="60"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Click="Back_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Resources/Icons/ArrowGreenLeft.png"
+                           Height="28"
+                           Margin="0,0,10,0"/>
+                    <TextBlock Text="Tilbage"
+                               FontSize="26"
+                               Foreground="#2F4A3B"/>
+                </StackPanel>
+            </Button>
+
+            <!-- Logo -->
+            <Image Grid.Column="1"
+                   Source="/Resources/Icons/Roberts_robotbar_logo.png"
+                   Height="70"
+                   HorizontalAlignment="Center"/>
+        </Grid>
+
+        <!-- BODY -->
+        <Grid Grid.Row="1" Margin="40,20,40,40">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="520"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Glass area -->
+            <Image Grid.Column="0"
+                   Source="/Resources/Kundeview/Glass.png"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Left"/>
+
+            <!-- Category selector -->
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Center"
+                        Width="360">
+
+                <TextBlock Text="Byg din drink:"
+                           FontSize="40"
+                           Foreground="#2F4A3B"
+                           HorizontalAlignment="Center"
+                           Margin="0,20,0,30"/>
+
+                <Button Content="Alkohol" Height="86" FontSize="30" Margin="0,0,0,26" Click="Category_Click" Tag="Alkohol"/>
+                <Button Content="Mockohol" Height="86" FontSize="30" Margin="0,0,0,26" Click="Category_Click" Tag="Mockohol"/>
+                <Button Content="Sirup" Height="86" FontSize="30" Margin="0,0,0,26" Click="Category_Click" Tag="Sirup"/>
+                <Button Content="Sodavand" Height="86" FontSize="30" Margin="0,0,0,26" Click="Category_Click" Tag="Sodavand"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- OVERLAY -->
+        <Grid x:Name="Overlay"
+              Background="#99000000"
+              Visibility="Collapsed">
+
+            <Border Width="1500"
+                    Height="720"
+                    Background="White"
+                    CornerRadius="6"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+
+                <Grid Margin="30">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock x:Name="OverlayTitle"
+                               FontSize="44"
+                               Foreground="#2F4A3B"
+                               HorizontalAlignment="Center"
+                               Margin="0,10,0,30"/>
+
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0"
+                                Width="90"
+                                Click="OverlayScrollLeft_Click">
+                            <Image Source="/Resources/Icons/ArrowGreenLeft.png"/>
+                        </Button>
+
+                        <ScrollViewer x:Name="OverlayScroll"
+                                      Grid.Column="1"
+                                      HorizontalScrollBarVisibility="Hidden"
+                                      PanningMode="HorizontalOnly">
+                            <ItemsControl x:Name="OverlayItems">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <Button Grid.Column="2"
+                                Width="90"
+                                Click="OverlayScrollRight_Click">
+                            <Image Source="/Resources/Icons/ArrowGreenRight.png"/>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

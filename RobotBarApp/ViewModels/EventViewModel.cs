@@ -138,7 +138,7 @@ namespace RobotBarApp.ViewModels
         private void Launch()
         {
             // Open the customer-facing full-screen window
-            var kundeStartViewModel = new KundeStartViewModel(_menuLogic);
+            var kundeStartViewModel = new KundeStartViewModel();
             var kundeStartWindow = new KundeStartView
             {
                 DataContext = kundeStartViewModel
