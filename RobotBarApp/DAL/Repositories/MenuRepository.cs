@@ -103,5 +103,18 @@ public class MenuRepository : IMenuRepository
         _context.SaveChanges();
     }
     
+    public Menu? GetMenuWithDrinksAndIngredientsByEventId(Guid eventId)
+    {
+        return _context.Menus
+            .Where(m => m.Event.EventId == eventId)
+            .Include(m => m.MenuContents)
+            .ThenInclude(mc => mc.Drink)
+            .ThenInclude(d => d.DrinkContents)
+            .ThenInclude(dc => dc.Ingredient)
+            .FirstOrDefault();
+        
+        
+    }
+    
     
 }

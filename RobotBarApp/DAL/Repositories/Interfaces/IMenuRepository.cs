@@ -14,4 +14,5 @@ public interface IMenuRepository
     Menu GetMenuByEventId(Guid eventId);
     Menu GetMenuWithContentByEventId(Guid eventId);
     void AddDrinksToMenu(Guid menuId, IEnumerable<Guid> drinkIds);
+    Menu? GetMenuWithDrinksAndIngredientsByEventId(Guid eventId);
 }
