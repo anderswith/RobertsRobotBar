@@ -79,5 +79,10 @@ namespace RobotBarApp.View
             _menuTransform.BeginAnimation(TranslateTransform.XProperty, slideAnim);
             MenuOverlay.BeginAnimation(OpacityProperty, overlayAnim);
         }
+        
+        private void MenuOption_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleMenu(false);
+        }
     }
 }
