@@ -8,64 +8,72 @@
         Topmost="True"
         Background="Black">
     <Grid>
-        <!-- Background image -->
-        <Image Source="/RobotBarApp;component/Resources/Kundeview/Kunde_view.png"
-               Stretch="UniformToFill"
-               RenderOptions.BitmapScalingMode="HighQuality" />
+        <!-- This hosts sub-views (Menu/MixSelv). When null, we show the start background + buttons. -->
+        <ContentControl x:Name="HostContent" />
 
-        <!-- Clickable halves -->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <!-- START SCREEN (only visible when HostContent is empty) -->
+        <Grid x:Name="StartRoot">
+            <!-- Background image -->
+            <Image Source="/RobotBarApp;component/Resources/Kundeview/Kunde_view.png"
+                   Stretch="UniformToFill"
+                   RenderOptions.BitmapScalingMode="HighQuality" />
 
-            <!-- LEFT: MENU -->
-            <Button Grid.Column="0"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Cursor="Hand"
-                    Command="{Binding OpenMenuCommand}">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Grid Background="Transparent">
-                            <!-- Hover / pressed feedback (subtle overlay) -->
-                            <Border x:Name="Overlay" Background="Transparent"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Overlay" Property="Background" Value="#22000000"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Overlay" Property="Background" Value="#33000000"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+            <!-- Clickable halves -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- RIGHT: MIX SELV -->
-            <Button Grid.Column="1"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Cursor="Hand"
-                    Command="{Binding OpenMixSelvCommand}">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Grid Background="Transparent">
-                            <Border x:Name="Overlay" Background="Transparent"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Overlay" Property="Background" Value="#22000000"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Overlay" Property="Background" Value="#33000000"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+                <!-- LEFT: MENU -->
+                <Button Grid.Column="0"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Command="{Binding OpenMenuCommand}"
+                        Click="Menu_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid Background="Transparent">
+                                <!-- Hover / pressed feedback (subtle overlay) -->
+                                <Border x:Name="Overlay" Background="Transparent"/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Overlay" Property="Background" Value="#22000000"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Overlay" Property="Background" Value="#33000000"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <!-- RIGHT: MIX SELV -->
+                <Button Grid.Column="1"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Command="{Binding OpenMixSelvCommand}"
+                        Click="MixSelv_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid Background="Transparent">
+                                <Border x:Name="Overlay" Background="Transparent"/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Overlay" Property="Background" Value="#22000000"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Overlay" Property="Background" Value="#33000000"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

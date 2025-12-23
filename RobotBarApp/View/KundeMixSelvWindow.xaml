@@ -1,0 +1,14 @@
+﻿<Window x:Class="RobotBarApp.View.KundeMixSelvWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:view="clr-namespace:RobotBarApp.View"
+        Title="Mix Selv"
+        WindowState="Maximized"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="#F2EEE6"
+        Topmost="True">
+
+    <view:KundeMixSelvView/>
+</Window>
+
