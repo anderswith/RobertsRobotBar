@@ -1,24 +1,25 @@
 using RobotBarApp.BE;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.DAL.Repositories.Interfaces;
+using RobotBarApp.Services.Application.Interfaces;
 
 namespace RobotBarApp.BLL;
 
 public class LogLogic : ILogLogic
 {
     private readonly ILogRepository _logRepository;
+    private readonly IEventSessionService _eventSessionService;
 
-    public LogLogic(ILogRepository logRepository)
+    public LogLogic(ILogRepository logRepository, IEventSessionService eventSessionService)
     {
         _logRepository = logRepository;
+        _eventSessionService = eventSessionService;
     }
     
-    public void AddEventLog(Guid eventId, string logMsg, string type)
+    public void AddEventLog(string logMsg, string type)
     {
-        if(Guid.Empty == eventId)
-        {
-            throw new ArgumentException("Event ID must be specified");
-        }
+        var eventId = _eventSessionService.CurrentEventId;
+        
         if (string.IsNullOrEmpty(logMsg))
         {
             throw new ArgumentException("Log message cannot be null or empty");

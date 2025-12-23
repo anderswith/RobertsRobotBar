@@ -35,7 +35,6 @@ public class KundeValgtDrinkViewModel : ViewModelBase
     
     private void Bestil()
     {
-        MessageBox.Show($"Din drink er bestilt! Vent venligst mens robotten mixer din drink.{SelectedDrink.Name}::{SelectedDrink.DrinkId}");
-        _robotLogic.RunDrinkScripts(SelectedDrink.DrinkId);
+       _robotLogic.RunDrinkScripts(SelectedDrink.DrinkId);
     }
 }

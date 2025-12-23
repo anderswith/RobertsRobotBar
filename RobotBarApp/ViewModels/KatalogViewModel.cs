@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -191,6 +192,15 @@ public class KatalogViewModel : ViewModelBase
 
     private void DeleteItem(Guid id, KatalogItemType type)
     {
+        var result = MessageBox.Show(
+            "Er du sikker på, at du vil slette denne?",
+            "Bekræft sletning",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (result != MessageBoxResult.Yes)
+            return;
+        
         switch (type)
         {
             case KatalogItemType.Drink:

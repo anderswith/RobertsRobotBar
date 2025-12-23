@@ -83,19 +83,18 @@ public class RobotLogic : IRobotLogic
         var ingredientIds = drink.DrinkContents
             .Select(dc => dc.IngredientId)
             .ToList();
-
-        foreach (var ingredientId in ingredientIds)
+       foreach (var ingredientId in ingredientIds)
         {
             _ingredientUseCountLogic.AddIngredientUseCount(ingredientId, eventId);
         }
-
         var scripts = new List<string>();
 
         foreach (var script in drink.DrinkScripts.OrderBy(s => s.Number))
         {
-            scripts.Add(script.UrScript);
+            
+            var scriptName = script.UrScript.Trim(); ;
+            scripts.Add(scriptName);
         }
-
         _scriptRunner.QueueScripts(scripts);
     }
 }

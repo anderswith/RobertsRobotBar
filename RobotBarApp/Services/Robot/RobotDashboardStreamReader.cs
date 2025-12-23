@@ -102,7 +102,7 @@ public class RobotDashboardStreamReader : IRobotDashboardStreamReader
             trimmed.Contains("fault", StringComparison.OrdinalIgnoreCase) ||
             trimmed.Contains("emergency", StringComparison.OrdinalIgnoreCase))
         {
-            _log.AddLog($"Error: {trimmed}", "RobotError");
+            _log.AddEventLog($"Error: {trimmed}", "RobotError");
             OnRobotError?.Invoke(trimmed);
         }
 
