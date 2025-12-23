@@ -12,6 +12,8 @@
             BorderThickness="0"
             Padding="0"
             Cursor="Hand"
+            Command="{Binding Command, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            CommandParameter="{Binding CommandParameter, RelativeSource={RelativeSource AncestorType=UserControl}}"
             Click="Button_Click">
         <Border CornerRadius="16"
                 Background="#2F4A3B"
