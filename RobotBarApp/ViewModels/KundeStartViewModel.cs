@@ -1,39 +1,46 @@
 ﻿using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Microsoft.Extensions.DependencyInjection;
 using RobotBarApp.BLL.Interfaces;
+using RobotBarApp.Services.Interfaces;
 using RobotBarApp.View;
 
 namespace RobotBarApp.ViewModels;
 
-public class KundeStartViewModel
+public class KundeStartViewModel : ViewModelBase
 {
     public ICommand OpenMenuCommand { get; }
     public ICommand OpenMixSelvCommand { get; }
     private readonly IMenuLogic _menuLogic;
+    private readonly IServiceProvider _provider;
 
-    public KundeStartViewModel(IMenuLogic menuLogic)
+    public KundeStartViewModel(
+        IMenuLogic menuLogic,
+        IServiceProvider provider)
     {
         _menuLogic = menuLogic;
+        _provider = provider;
+
         OpenMenuCommand = new RelayCommand(_ => OpenMenu());
         OpenMixSelvCommand = new RelayCommand(_ => OpenMixSelv());
     }
 
     private void OpenMenu()
     {
-        var vm = new KundeMenuViewModel(_menuLogic);
+        var menuWindow =
+            ActivatorUtilities.CreateInstance<KundeMenuView>(_provider);
 
-        var menuWindow = new KundeMenuView(_menuLogic)
-        {
-            DataContext = vm,
-            WindowStartupLocation = WindowStartupLocation.CenterScreen
-        };
+        menuWindow.DataContext =
+            ActivatorUtilities.CreateInstance<KundeMenuViewModel>(_provider);
 
-        // Show the menu window and bring it to front
+        menuWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        menuWindow.WindowState = WindowState.Maximized;
+        menuWindow.WindowStyle = WindowStyle.None;
+
         menuWindow.Show();
         menuWindow.Activate();
 
-        // Close the start window if it is open
         CloseKundeStartWindow();
     }
 
