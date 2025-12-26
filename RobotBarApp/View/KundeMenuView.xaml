@@ -24,12 +24,12 @@
             </Grid.ColumnDefinitions>
 
             <!-- Back button (image-only) -->
-            <Button Grid.Column="0"
-                    Width="160" Height="60"
+            <Button Command="{Binding BackCommand}"
+                    Width="160"
+                    Height="60"
                     Background="Transparent"
                     BorderThickness="0"
-                    Cursor="Hand"
-                    Click="Back_Click">
+                    Cursor="Hand">
                 <Image Source="/Resources/Icons/ArrowWhiteLeft.png"
                        Stretch="Uniform"
                        RenderOptions.BitmapScalingMode="HighQuality"/>
@@ -88,8 +88,9 @@
                                     Margin="24,0"
                                     Title="{Binding Name}"
                                     ImageSource="{Binding ImagePath}"
-                                    IngredientsText="{Binding IngredientsText}" 
-                                    Click="DrinkCard_Click"/>
+                                    IngredientsText="{Binding IngredientsText}"
+                                    Command="{Binding DataContext.SelectDrinkCommand,
+                                  RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

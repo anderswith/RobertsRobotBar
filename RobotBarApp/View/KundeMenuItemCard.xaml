@@ -13,7 +13,8 @@
             BorderThickness="0"
             Padding="0"
             Cursor="Hand"
-            Click="Button_Click">
+            Command="{Binding Command, ElementName=Root}"
+            CommandParameter="{Binding}">
         <Border CornerRadius="18"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"

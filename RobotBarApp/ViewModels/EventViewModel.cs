@@ -1,7 +1,9 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
+using Microsoft.Extensions.DependencyInjection;
 using RobotBarApp.BE;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.Services.Application.Interfaces;
@@ -18,6 +20,7 @@ namespace RobotBarApp.ViewModels
         private readonly IDrinkAvailabilityService _drinkAvailabilityService;
         private readonly IMenuLogic _menuLogic;
         private readonly IEventSessionService _eventSessionService;
+        private readonly IServiceProvider _provider;
 
         public Guid EventId { get; }
         public Event CurrentEvent { get; private set; }
@@ -47,7 +50,8 @@ namespace RobotBarApp.ViewModels
             IMenuLogic menuLogic,
             IDrinkAvailabilityService drinkAvailabilityService,
             INavigationService navigation,
-            IEventSessionService eventSessionService)
+            IEventSessionService eventSessionService,
+            IServiceProvider provider)
         {
             EventId = eventId;
             _eventLogic = eventLogic;
@@ -56,6 +60,7 @@ namespace RobotBarApp.ViewModels
             _navigation = navigation;
             _drinkAvailabilityService = drinkAvailabilityService;
             _eventSessionService = eventSessionService;
+            _provider = provider;
 
             LoadEvent();
             LoadRack();
@@ -137,15 +142,18 @@ namespace RobotBarApp.ViewModels
 
         private void Launch()
         {
-            // Open the customer-facing full-screen window
-            var kundeStartViewModel = new KundeStartViewModel();
-            var kundeStartWindow = new KundeStartView
-            {
-                DataContext = kundeStartViewModel
-            };
             _eventSessionService.StartEvent(EventId);
+            var vm = ActivatorUtilities.CreateInstance<KundeStartViewModel>(_provider);
 
-            kundeStartWindow.Show();
+            var startWindow = ActivatorUtilities.CreateInstance<KundeStartView>(_provider);
+            startWindow.DataContext = vm;
+            startWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            startWindow.WindowState = WindowState.Maximized;
+            startWindow.WindowStyle = WindowStyle.None;
+
+            startWindow.Show();
+            startWindow.Activate();
+
         }
     }
 }

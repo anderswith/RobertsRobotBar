@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace RobotBarApp.View
@@ -28,5 +29,17 @@ namespace RobotBarApp.View
         public event RoutedEventHandler Click;
 
         private void Button_Click(object sender, RoutedEventArgs e) => Click?.Invoke(this, e);
+        
+        public static readonly DependencyProperty CommandProperty =
+            DependencyProperty.Register(
+                nameof(Command),
+                typeof(ICommand),
+                typeof(KundeMenuItemCard));
+
+        public ICommand Command
+        {
+            get => (ICommand)GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
+        }
     }
 }

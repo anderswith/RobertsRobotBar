@@ -10,5 +10,5 @@ public interface ILogLogic
     IEnumerable<Log> GetLogsInTimeFrame(Guid eventId, DateTime start, DateTime end);
     IEnumerable<Log> GetLogsByTypeInTimeFrame(Guid eventId, string type, DateTime start, DateTime end);
     IEnumerable<Log> GetLogsForEvent(Guid eventId);
-    void AddEventLog(Guid eventId, string logMsg, string type);
+    void AddEventLog(string logMsg, string type);
 }

@@ -12,21 +12,7 @@ namespace RobotBarApp.View
             InitializeComponent();
         }
 
-        private void Menu_Click(object sender, RoutedEventArgs e)
-        {
-            var menuLogic = ResolveMenuLogic();
-            if (menuLogic == null)
-                return;
 
-            var menuView = new KundeMenuView(menuLogic)
-            {
-                DataContext = new KundeMenuViewModel(menuLogic)
-            };
-
-            menuView.BackRequested += (_, _) => ShowStartScreen();
-
-            ShowChild(menuView);
-        }
 
         private void MixSelv_Click(object sender, RoutedEventArgs e)
         {

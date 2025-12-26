@@ -18,37 +18,45 @@
                    Stretch="UniformToFill"
                    RenderOptions.BitmapScalingMode="HighQuality" />
 
-            <!-- Clickable halves -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+        <!-- Clickable halves -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-                <!-- LEFT: MENU -->
-                <Button Grid.Column="0"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Cursor="Hand"
-                        Command="{Binding OpenMenuCommand}"
-                        Click="Menu_Click">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Grid Background="Transparent">
-                                <!-- Hover / pressed feedback (subtle overlay) -->
-                                <Border x:Name="Overlay" Background="Transparent"/>
-                            </Grid>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Overlay" Property="Background" Value="#22000000"/>
-                                </Trigger>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="Overlay" Property="Background" Value="#33000000"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+            <!-- LEFT: MENU -->
+            <Button Grid.Column="0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Command="{Binding OpenMenuCommand}">
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Grid Background="Transparent">
+                            <!-- ACTUAL clickable content -->
+                            <ContentPresenter />
+
+                            <!-- Hover / pressed overlay -->
+                            <Border x:Name="Overlay" Background="Transparent"/>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Overlay"
+                                        Property="Background"
+                                        Value="#22000000"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Overlay"
+                                        Property="Background"
+                                        Value="#33000000"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
 
                 <!-- RIGHT: MIX SELV -->
                 <Button Grid.Column="1"

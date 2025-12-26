@@ -1,28 +1,39 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows;
 using RobotBarApp.BLL.Interfaces;
+using RobotBarApp.Services.Interfaces;
 using RobotBarApp.ViewModels;
 
 namespace RobotBarApp.View
 {
-    public partial class KundeMenuView : UserControl
+    public partial class KundeMenuView : Window
     {
         private const double ScrollStep = 380; // roughly 1 card + margin
         private readonly IMenuLogic _menuLogic;
+        private readonly INavigationService _navigation;
 
-        public event EventHandler? BackRequested;
-
-        public KundeMenuView(IMenuLogic menuLogic)
+        public KundeMenuView(IMenuLogic menuLogic, INavigationService navigation)
         {
+            _navigation = navigation;
             _menuLogic = menuLogic;
             InitializeComponent();
+            // DataContext = new KundeMenuViewModel(); // recommended
         }
 
-        private void Back_Click(object sender, RoutedEventArgs e)
+       /* private void Back_Click(object sender, RoutedEventArgs e)
         {
-            BackRequested?.Invoke(this, EventArgs.Empty);
-        }
+            // Re-open a fresh KundeStartView when going back
+            var startView = new KundeStartView
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                DataContext = new KundeStartViewModel(_menuLogic, _navigation)
+            };
+
+            startView.Show();
+            startView.Activate();
+
+            // Close this menu window
+            Close();
+        }*/
 
         private void ScrollLeft_Click(object sender, RoutedEventArgs e)
             => DrinksScroll.ScrollToHorizontalOffset(DrinksScroll.HorizontalOffset - ScrollStep);
