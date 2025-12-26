@@ -3,9 +3,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using LiveCharts;
+using LiveCharts.Wpf;
 using RobotBarApp.BE;
 using RobotBarApp.BLL.Interfaces;
-using OxyPlot;
+
 
 namespace RobotBarApp.ViewModels
 {
@@ -26,14 +28,36 @@ namespace RobotBarApp.ViewModels
             _drinkLogic = drinkLogic;
             _ingredientLogic = ingredientLogic;
             _logLogic = logLogic;
+            
+            DrinkPieSeries = new SeriesCollection();
+            IngredientBarSeries = new SeriesCollection();
+            XAxes = new AxesCollection
+            {
+                new Axis
+                {
+                    Labels = Array.Empty<string>()
+                }
+            };
 
-            LoadEvents();
+            YAxes = new AxesCollection
+            {
+                new Axis
+                {
+                    Title = "Uses",
+                    MinValue = 0
+                }
+            };
+
+            
 
             RefreshStatisticsCommand = new RelayCommand(_ => RefreshStatistics());
 
             TimeOptions = new ObservableCollection<TimeSpan>(
                 Enumerable.Range(0, 24).Select(h => new TimeSpan(h, 0, 0)));
+            
+            LoadEvents();
         }
+    
 
         public ObservableCollection<Event> Events { get; } = new();
 
@@ -78,12 +102,16 @@ namespace RobotBarApp.ViewModels
             }
         }
 
+        public SeriesCollection DrinkPieSeries { get; }
+        public SeriesCollection IngredientBarSeries { get; }
+
+        public AxesCollection XAxes { get; }
+        public AxesCollection YAxes { get; }
         public ObservableCollection<(string Name, int Count)> DrinkStats { get; } = new();
         public ObservableCollection<(string Name, int Count)> IngredientStats { get; } = new();
         public ObservableCollection<Log> Logs { get; } = new();
 
-        public PlotModel DrinkPieChart { get; set; }
-        public PlotModel IngredientBarChart { get; set; }
+        
 
         public ICommand RefreshStatisticsCommand { get; }
 
@@ -92,6 +120,7 @@ namespace RobotBarApp.ViewModels
             Events.Clear();
             foreach (var ev in _eventLogic.GetAllEvents())
                 Events.Add(ev);
+            
         }
 
         private void RefreshStatistics()
@@ -143,6 +172,8 @@ namespace RobotBarApp.ViewModels
 
                 foreach (var log in logs)
                     Logs.Add(log);
+                
+                BuildCharts();
 
                 bool hasAnyData =
                     DrinkStats.Any() ||
@@ -179,5 +210,37 @@ namespace RobotBarApp.ViewModels
                     MessageBoxImage.Error);
             }
         }
+        private void BuildCharts()
+        {
+            // PIE — Drinks
+            DrinkPieSeries.Clear();
+
+            foreach (var d in DrinkStats)
+            {
+                DrinkPieSeries.Add(new PieSeries
+                {
+                    Title = d.Name,
+                    Values = new ChartValues<int> { d.Count },
+                    DataLabels = true
+                });
+            }
+
+            // COLUMN — Ingredients
+            IngredientBarSeries.Clear();
+
+            IngredientBarSeries.Add(new ColumnSeries
+            {
+                Title = "Ingredients",
+                Values = new ChartValues<int>(
+                    IngredientStats.Select(i => i.Count)),
+                DataLabels = true
+            });
+
+            // 🔑 SAFE axis label update (no crashes)
+            XAxes[0].Labels = IngredientStats
+                .Select(i => i.Name)
+                .ToArray();
+        }
+
     }
 }
