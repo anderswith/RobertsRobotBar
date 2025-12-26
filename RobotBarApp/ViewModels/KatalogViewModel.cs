@@ -158,34 +158,24 @@ public class KatalogViewModel : ViewModelBase
     {
         if (parameter is not string filter)
             return;
-        IsIngredientsSelected = false;
-        IsDrinksSelected = false;
-        IsEventsSelected = false;
 
-        KatalogItemType? selectedFilter = null;
-
-        switch (filter)
+        KatalogItemType? clickedFilter = filter switch
         {
-            case "Ingredients":
-                IsIngredientsSelected = true;
-                selectedFilter = KatalogItemType.Ingredient;
-                break;
+            "Ingredients" => KatalogItemType.Ingredient,
+            "Drinks"      => KatalogItemType.Drink,
+            "Events"      => KatalogItemType.Event,
+            _             => null
+        };
 
-            case "Drinks":
-                IsDrinksSelected = true;
-                selectedFilter = KatalogItemType.Drink;
-                break;
-
-            case "Events":
-                IsEventsSelected = true;
-                selectedFilter = KatalogItemType.Event;
-                break;
-        }
-
-        // Toggle off behavior:
-        _activeFilter = _activeFilter == selectedFilter
+        // Toggle behavior
+        _activeFilter = _activeFilter == clickedFilter
             ? null
-            : selectedFilter;
+            : clickedFilter;
+
+        // 🔑 Sync visual state with actual filter
+        IsIngredientsSelected = _activeFilter == KatalogItemType.Ingredient;
+        IsDrinksSelected      = _activeFilter == KatalogItemType.Drink;
+        IsEventsSelected      = _activeFilter == KatalogItemType.Event;
 
         ApplyFilter();
     }
