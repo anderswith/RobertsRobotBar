@@ -12,14 +12,12 @@ public class KundeStartViewModel : ViewModelBase
 {
     public ICommand OpenMenuCommand { get; }
     public ICommand OpenMixSelvCommand { get; }
-    private readonly IMenuLogic _menuLogic;
     private readonly IServiceProvider _provider;
 
     public KundeStartViewModel(
         IMenuLogic menuLogic,
         IServiceProvider provider)
     {
-        _menuLogic = menuLogic;
         _provider = provider;
 
         OpenMenuCommand = new RelayCommand(_ => OpenMenu());

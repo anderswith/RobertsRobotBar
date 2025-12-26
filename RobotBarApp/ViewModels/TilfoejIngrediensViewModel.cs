@@ -159,7 +159,7 @@ namespace RobotBarApp.ViewModels
 
         private void Cancel()
         {
-            _navigation.NavigateTo<MainWindowViewModel>(); 
+            _navigation.NavigateTo<EventListViewModel>(); 
         }
 
         private void Save()
