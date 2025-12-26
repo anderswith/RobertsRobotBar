@@ -1,3 +1,4 @@
+using System.Windows.Media;
 using RobotBarApp.BE;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.DAL.Repositories.Interfaces;
@@ -11,10 +12,10 @@ public class IngredientLogic : IIngredientLogic
     {
         _ingredientRepository = ingredientRepository;
     }
-    public void AddIngredient(string name, string type, string image, double size, string dose, int positionNumber, List<string> scriptNames)
+    public void AddIngredient(string name, string type, string image, string dose, string color, int positionNumber, List<string> scriptNames)
     {
         
-        IngredientValidation(name, type, image, size, dose, positionNumber, scriptNames);
+        IngredientValidation(name, type, image, dose, color, positionNumber, scriptNames);
         dose = dose?.ToLowerInvariant();
         Ingredient ingredient = new Ingredient
         {
@@ -22,8 +23,8 @@ public class IngredientLogic : IIngredientLogic
             Name = name,
             Type = type,
             Image = image,
-            Size = size,
             Dose = dose,
+            Color = color,
             IngredientPositions = new List<IngredientPosition>
             {
                 new IngredientPosition
@@ -49,7 +50,7 @@ public class IngredientLogic : IIngredientLogic
         _ingredientRepository.AddIngredient(ingredient);
     }
 
-    private static void IngredientValidation(string name, string type, string image, double size, string dose, int positionNumber, List<string> scriptNames)
+    private static void IngredientValidation(string name, string type, string image, string dose, string color, int positionNumber, List<string> scriptNames)
     {
         if(positionNumber <= 0)
         {
@@ -68,10 +69,12 @@ public class IngredientLogic : IIngredientLogic
         {
             throw new ArgumentException("Ingredient image cannot be null or empty.");
         }
-        if(size <= 0)
+
+        if (string.IsNullOrEmpty(color))
         {
-            throw new ArgumentException("Ingredient size cannot be negative.");
+            throw new AggregateException("Ingredient color cannot be null or empty.");
         }
+
         var normalizedDose = dose?.ToLowerInvariant();
         if(string.IsNullOrEmpty(normalizedDose) || normalizedDose !="single" && normalizedDose !="double")
         {
@@ -121,13 +124,13 @@ public class IngredientLogic : IIngredientLogic
         _ingredientRepository.DeleteIngredient(ingredient);
         
     }
-    public void UpdateIngredient(Guid ingredientId, string name, string type, string image, double size, string dose, int positionNumber, List<string> scriptNames)
+    public void UpdateIngredient(Guid ingredientId, string name, string type, string image, string dose, string color, int positionNumber, List<string> scriptNames)
     {
         if(Guid.Empty == ingredientId)
         {
             throw new ArgumentException("Ingredient ID cannot be empty.");
         }
-        IngredientValidation(name, type, image, size, dose, positionNumber, scriptNames);
+        IngredientValidation(name, type, image, dose, color, positionNumber, scriptNames);
        
         dose = dose?.ToLowerInvariant();
         var existingIngredient = _ingredientRepository.GetIngredientById(ingredientId);
@@ -139,8 +142,8 @@ public class IngredientLogic : IIngredientLogic
         existingIngredient.Name = name;
         existingIngredient.Type = type;
         existingIngredient.Image = image;
-        existingIngredient.Size = size;
         existingIngredient.Dose = dose;
+        existingIngredient.Color = color;
         
         // Position
         var position = existingIngredient.IngredientPositions.FirstOrDefault();

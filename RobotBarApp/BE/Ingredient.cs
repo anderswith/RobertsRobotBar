@@ -9,8 +9,8 @@ public class Ingredient
     public string Name { get; set; }
     public string Type { get; set; }
     public string Image { get; set; }
-    public double Size { get; set; }
     public string Dose { get; set; }
+    public string Color { get; set; }
 
     public ICollection<IngredientPosition> IngredientPositions { get; set; }
     public ICollection<DrinkContent> DrinkContents { get; set; }
