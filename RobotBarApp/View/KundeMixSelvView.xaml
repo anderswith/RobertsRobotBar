@@ -2,10 +2,13 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:view="clr-namespace:RobotBarApp.View"
-             Background="#F2EEE6"
-             Loaded="KundeMixSelvView_Loaded">
+             xmlns:converters="clr-namespace:RobotBarApp.Converters"
+             Background="#F2EEE6">
 
     <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <converters:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibility"/>
+
         <DataTemplate x:Key="IngredientCardTemplate">
             <view:KundeIngredientCard
                 Width="240"
@@ -13,7 +16,8 @@
                 Margin="18,0"
                 Title="{Binding Name}"
                 ImagePath="{Binding ImagePath}"
-                Click="IngredientCard_Click"/>
+                Command="{Binding DataContext.SelectIngredientCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                CommandParameter="{Binding}"/>
         </DataTemplate>
 
         <Style x:Key="QtyButtonStyle" TargetType="Button">
@@ -28,7 +32,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid x:Name="Root">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -49,7 +53,7 @@
                     Background="Transparent"
                     BorderThickness="0"
                     Cursor="Hand"
-                    Click="Back_Click">
+                    Command="{Binding BackCommand}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Resources/Icons/ArrowGreenLeft.png"
                            Height="28"
@@ -86,8 +90,7 @@
                     <Grid Width="520" Height="520">
 
                         <!-- Glass FIRST -->
-                        <Image x:Name="GlassImage"
-                               Panel.ZIndex="0"
+                        <Image Panel.ZIndex="0"
                                Source="/Resources/Kundeview/Glass.png"
                                Stretch="Fill"
                                RenderOptions.BitmapScalingMode="HighQuality"/>
@@ -95,19 +98,18 @@
                         <!-- Liquid AFTER glass (clip applied in code-behind) -->
                         <Grid x:Name="LiquidLayer"
                               Panel.ZIndex="10"
-                              Visibility="Collapsed">
+                              Visibility="{Binding SelectedIngredientName, Converter={StaticResource StringNotEmptyToVisibility}}">
                             <Grid.Clip>
                                 <!-- replaced at runtime -->
                                 <RectangleGeometry Rect="0,0,0,0"/>
                             </Grid.Clip>
 
                             <!-- Liquid disc -->
-                            <Ellipse x:Name="LiquidDisc"
-                                     Width="220"
-                                     Height="20"
+                            <Ellipse Width="{Binding LiquidDiscWidth}"
+                                     Height="{Binding LiquidDiscHeight}"
                                      HorizontalAlignment="Left"
                                      VerticalAlignment="Top"
-                                     Margin="150,425,0,0"
+                                     Margin="{Binding LiquidDiscMargin}"
                                      Opacity="0.95">
                                 <Ellipse.Fill>
                                     <RadialGradientBrush>
@@ -119,12 +121,11 @@
                             </Ellipse>
 
                             <!-- Highlight -->
-                            <Ellipse x:Name="LiquidHighlight"
-                                     Width="120"
-                                     Height="10"
+                            <Ellipse Width="{Binding LiquidHighlightWidth}"
+                                     Height="{Binding LiquidHighlightHeight}"
                                      HorizontalAlignment="Left"
                                      VerticalAlignment="Top"
-                                     Margin="190,432,0,0"
+                                     Margin="{Binding LiquidHighlightMargin}"
                                      Opacity="0.35">
                                 <Ellipse.Fill>
                                     <RadialGradientBrush>
@@ -141,7 +142,7 @@
                                    Width="240"
                                    Height="2"
                                    Fill="#2F4A3B"
-                                   Visibility="Collapsed"
+                                   Visibility="{Binding SelectedIngredientName, Converter={StaticResource StringNotEmptyToVisibility}}"
                                    HorizontalAlignment="Left"
                                    VerticalAlignment="Top"
                                    Margin="410,412,0,0"/>
@@ -156,16 +157,14 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel x:Name="SelectedIngredientPanel"
-                            Grid.Row="0"
+                <StackPanel Grid.Row="0"
                             Orientation="Horizontal"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left"
-                            Visibility="Collapsed"
+                            Visibility="{Binding SelectedIngredientName, Converter={StaticResource StringNotEmptyToVisibility}}"
                             Margin="0,0,0,26">
 
-                    <TextBlock x:Name="SelectedIngredientText"
-                               Text="Vodka (2cl)"
+                    <TextBlock Text="{Binding SelectedIngredientDisplayText}"
                                FontSize="28"
                                Foreground="#2F4A3B"
                                VerticalAlignment="Center"
@@ -173,16 +172,15 @@
 
                     <Button Style="{StaticResource QtyButtonStyle}"
                             Content="−"
-                            Click="Minus_Click"
+                            Command="{Binding DecreaseClCommand}"
                             Margin="0,0,10,0"/>
 
                     <Button Style="{StaticResource QtyButtonStyle}"
                             Content="+"
-                            Click="Plus_Click"/>
+                            Command="{Binding IncreaseClCommand}"/>
                 </StackPanel>
 
-                <Button x:Name="BestilButton"
-                        Grid.Row="1"
+                <Button Grid.Row="1"
                         Width="220"
                         Height="90"
                         HorizontalAlignment="Left"
@@ -190,8 +188,8 @@
                         Background="#F7F4EE"
                         BorderBrush="#2F4A3B"
                         BorderThickness="2"
-                        Visibility="Collapsed"
-                        Click="Bestil_Click">
+                        Visibility="{Binding SelectedIngredientName, Converter={StaticResource StringNotEmptyToVisibility}}"
+                        Command="{Binding BestilCommand}">
                     <Image Source="/Resources/Icons/Bestil.png"
                            Stretch="Uniform"
                            RenderOptions.BitmapScalingMode="HighQuality"/>
@@ -213,26 +211,25 @@
 
                 <Button Content="Alkohol" Height="86" FontSize="30" Margin="0,0,0,26"
                         Cursor="Hand" Background="#F7F4EE" BorderBrush="#2F4A3B" BorderThickness="2"
-                        Click="Category_Click" Tag="Alkohol"/>
+                        Command="{Binding SelectCategoryCommand}" CommandParameter="Alkohol"/>
 
                 <Button Content="Mockohol" Height="86" FontSize="30" Margin="0,0,0,26"
                         Cursor="Hand" Background="#F7F4EE" BorderBrush="#2F4A3B" BorderThickness="2"
-                        Click="Category_Click" Tag="Mockohol"/>
+                        Command="{Binding SelectCategoryCommand}" CommandParameter="Mockohol"/>
 
                 <Button Content="Sirup" Height="86" FontSize="30" Margin="0,0,0,26"
                         Cursor="Hand" Background="#F7F4EE" BorderBrush="#2F4A3B" BorderThickness="2"
-                        Click="Category_Click" Tag="Sirup"/>
+                        Command="{Binding SelectCategoryCommand}" CommandParameter="Sirup"/>
 
                 <Button Content="Sodavand" Height="86" FontSize="30" Margin="0,0,0,26"
                         Cursor="Hand" Background="#F7F4EE" BorderBrush="#2F4A3B" BorderThickness="2"
-                        Click="Category_Click" Tag="Sodavand"/>
+                        Command="{Binding SelectCategoryCommand}" CommandParameter="Sodavand"/>
             </StackPanel>
 
             <!-- OVERLAY -->
-            <Grid x:Name="Overlay"
-                  Grid.ColumnSpan="3"
+            <Grid Grid.ColumnSpan="3"
                   Background="#99000000"
-                  Visibility="Collapsed">
+                  Visibility="{Binding IsOverlayOpen, Converter={StaticResource BoolToVisibility}}">
 
                 <Border Width="1500"
                         Height="720"
@@ -247,12 +244,12 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock x:Name="OverlayTitle"
-                                   FontSize="44"
+                        <TextBlock FontSize="44"
                                    FontWeight="SemiBold"
                                    Foreground="#2F4A3B"
                                    HorizontalAlignment="Center"
-                                   Margin="0,10,0,30"/>
+                                   Margin="0,10,0,30"
+                                   Text="{Binding OverlayTitle}"/>
 
                         <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
@@ -279,7 +276,8 @@
                                           PanningMode="HorizontalOnly"
                                           IsManipulationEnabled="True"
                                           CanContentScroll="True">
-                                <ItemsControl x:Name="OverlayItems">
+                                <ItemsControl ItemsSource="{Binding OverlayIngredients}"
+                                              ItemTemplate="{StaticResource IngredientCardTemplate}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal"/>

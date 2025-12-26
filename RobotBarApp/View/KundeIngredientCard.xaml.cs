@@ -1,9 +1,9 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace RobotBarApp.View
 {
-    public partial class KundeIngredientCard : UserControl
+    public partial class KundeIngredientCard
     {
         public KundeIngredientCard()
         {
@@ -15,6 +15,12 @@ namespace RobotBarApp.View
 
         public static readonly DependencyProperty ImagePathProperty =
             DependencyProperty.Register(nameof(ImagePath), typeof(string), typeof(KundeIngredientCard), new PropertyMetadata(""));
+
+        public static readonly DependencyProperty CommandProperty =
+            DependencyProperty.Register(nameof(Command), typeof(ICommand), typeof(KundeIngredientCard), new PropertyMetadata(null));
+
+        public static readonly DependencyProperty CommandParameterProperty =
+            DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(KundeIngredientCard), new PropertyMetadata(null));
 
         public string Title
         {
@@ -28,9 +34,28 @@ namespace RobotBarApp.View
             set => SetValue(ImagePathProperty, value);
         }
 
-        public event RoutedEventHandler Click;
+        public ICommand? Command
+        {
+            get => (ICommand?)GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
+        }
+
+        public object? CommandParameter
+        {
+            get => GetValue(CommandParameterProperty);
+            set => SetValue(CommandParameterProperty, value);
+        }
+
+        public event RoutedEventHandler? Click;
 
         private void Button_Click(object sender, RoutedEventArgs e)
-            => Click?.Invoke(this, e);
+        {
+            // First: run bound MVVM command (if any)
+            if (Command?.CanExecute(CommandParameter) == true)
+                Command.Execute(CommandParameter);
+
+            // Also keep legacy Click event for other usages
+            Click?.Invoke(this, e);
+        }
     }
 }
