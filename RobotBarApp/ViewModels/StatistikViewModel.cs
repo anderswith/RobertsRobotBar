@@ -1,10 +1,13 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
+using LiveCharts;
+using LiveCharts.Wpf;
 using RobotBarApp.BE;
 using RobotBarApp.BLL.Interfaces;
-using OxyPlot;
+
 
 namespace RobotBarApp.ViewModels
 {
@@ -25,15 +28,36 @@ namespace RobotBarApp.ViewModels
             _drinkLogic = drinkLogic;
             _ingredientLogic = ingredientLogic;
             _logLogic = logLogic;
+            
+            DrinkPieSeries = new SeriesCollection();
+            IngredientBarSeries = new SeriesCollection();
+            XAxes = new AxesCollection
+            {
+                new Axis
+                {
+                    Labels = Array.Empty<string>()
+                }
+            };
 
-            LoadEvents();
+            YAxes = new AxesCollection
+            {
+                new Axis
+                {
+                    Title = "Uses",
+                    MinValue = 0
+                }
+            };
+
+            
 
             RefreshStatisticsCommand = new RelayCommand(_ => RefreshStatistics());
-            // hours 0-24
+
             TimeOptions = new ObservableCollection<TimeSpan>(
                 Enumerable.Range(0, 24).Select(h => new TimeSpan(h, 0, 0)));
+            
+            LoadEvents();
         }
-        
+    
 
         public ObservableCollection<Event> Events { get; } = new();
 
@@ -49,13 +73,13 @@ namespace RobotBarApp.ViewModels
             }
         }
 
-        public DateTime? StartDate { get; set; } 
-        public DateTime? EndDate { get; set; }    
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
-        public ObservableCollection<TimeSpan> TimeOptions { get; } 
+        public ObservableCollection<TimeSpan> TimeOptions { get; }
 
         private TimeSpan? _startTime;
-        public TimeSpan? StartTime  
+        public TimeSpan? StartTime
         {
             get => _startTime;
             set
@@ -67,7 +91,7 @@ namespace RobotBarApp.ViewModels
         }
 
         private TimeSpan? _endTime;
-        public TimeSpan? EndTime   
+        public TimeSpan? EndTime
         {
             get => _endTime;
             set
@@ -78,22 +102,25 @@ namespace RobotBarApp.ViewModels
             }
         }
 
+        public SeriesCollection DrinkPieSeries { get; }
+        public SeriesCollection IngredientBarSeries { get; }
+
+        public AxesCollection XAxes { get; }
+        public AxesCollection YAxes { get; }
         public ObservableCollection<(string Name, int Count)> DrinkStats { get; } = new();
         public ObservableCollection<(string Name, int Count)> IngredientStats { get; } = new();
         public ObservableCollection<Log> Logs { get; } = new();
 
-
-        public PlotModel DrinkPieChart { get; set; }
-        public PlotModel IngredientBarChart { get; set; }
+        
 
         public ICommand RefreshStatisticsCommand { get; }
-
 
         private void LoadEvents()
         {
             Events.Clear();
             foreach (var ev in _eventLogic.GetAllEvents())
                 Events.Add(ev);
+            
         }
 
         private void RefreshStatistics()
@@ -101,63 +128,119 @@ namespace RobotBarApp.ViewModels
             if (SelectedEvent == null)
                 return;
 
-            Guid eventId = SelectedEvent.EventId;
-            
-
-            bool hasStartDate = StartDate.HasValue;
-            bool hasEndDate = EndDate.HasValue;
-
-            DateTime start = DateTime.MinValue;
-            DateTime end = DateTime.MaxValue;
-
-
-            if (hasStartDate)
+            try
             {
-                var date = StartDate.Value.Date;
-                var time = StartTime ?? TimeSpan.Zero; 
-                start = date + time;
+                Guid eventId = SelectedEvent.EventId;
+
+                bool hasStartDate = StartDate.HasValue;
+                bool hasEndDate = EndDate.HasValue;
+                bool useTimeFrame = hasStartDate || hasEndDate;
+
+                DateTime start = DateTime.MinValue;
+                DateTime end = DateTime.MaxValue;
+
+                if (hasStartDate)
+                    start = StartDate.Value.Date + (StartTime ?? TimeSpan.Zero);
+
+                if (hasEndDate)
+                    end = EndDate.Value.Date + (EndTime ?? new TimeSpan(23, 59, 59));
+
+                if (useTimeFrame && start >= end)
+                    throw new ArgumentException("Start date/time must be before end date/time.");
+
+                DrinkStats.Clear();
+                IngredientStats.Clear();
+                Logs.Clear();
+
+                var drinkStats = useTimeFrame
+                    ? _drinkLogic.GetAllDrinkUseCountByTimeFrame(eventId, start, end)
+                    : _drinkLogic.GetAllDrinksUseCountForEvent(eventId);
+
+                foreach (var d in drinkStats)
+                    DrinkStats.Add((d.DrinkName, d.TotalUseCount));
+
+                var ingredientStats = useTimeFrame
+                    ? _ingredientLogic.GetIngredientUseCountByTimeFrame(eventId, start, end)
+                    : _ingredientLogic.GetAllIngredientsUseCountForEvent(eventId);
+
+                foreach (var i in ingredientStats)
+                    IngredientStats.Add((i.IngredientName, i.TotalUseCount));
+
+                var logs = useTimeFrame
+                    ? _logLogic.GetLogsInTimeFrame(eventId, start, end)
+                    : _logLogic.GetLogsForEvent(eventId);
+
+                foreach (var log in logs)
+                    Logs.Add(log);
+                
+                BuildCharts();
+
+                bool hasAnyData =
+                    DrinkStats.Any() ||
+                    IngredientStats.Any() ||
+                    Logs.Any();
+
+                if (!hasAnyData)
+                {
+                    string message = useTimeFrame
+                        ? "No statistics were found in the selected time frame."
+                        : "No statistics were found for the selected event.";
+
+                    MessageBox.Show(
+                        message,
+                        "No data",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
             }
-
-
-            if (hasEndDate)
+            catch (ArgumentException ex)
             {
-                var date = EndDate.Value.Date;
-                var time = EndTime ?? new TimeSpan(23, 59, 59);
-                end = date + time;
+                MessageBox.Show(
+                    ex.Message,
+                    "Invalid input",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
-
-
-            bool useTimeFrame = hasStartDate || hasEndDate;
-
-            if (useTimeFrame && start > end)
-                return;
-            
-            DrinkStats.Clear();
-            IngredientStats.Clear();
-            Logs.Clear();
-
-            var drinkStats = useTimeFrame
-                ? _drinkLogic.GetAllDrinkUseCountByTimeFrame(eventId, start, end)
-                : _drinkLogic.GetAllDrinksUseCountForEvent(eventId);
-
-            foreach (var d in drinkStats)
-                DrinkStats.Add((d.DrinkName, d.TotalUseCount));
-
-
-            var ingredientStats = useTimeFrame
-                ? _ingredientLogic.GetIngredientUseCountByTimeFrame(eventId, start, end)
-                : _ingredientLogic.GetAllIngredientsUseCountForEvent(eventId);
-
-            foreach (var i in ingredientStats)
-                IngredientStats.Add((i.IngredientName, i.TotalUseCount));
-            
-            var logs = useTimeFrame
-                ? _logLogic.GetLogsInTimeFrame(eventId, start, end)
-                : _logLogic.GetLogsForEvent(eventId);
-
-            foreach (var log in logs)
-                Logs.Add(log);
-            
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "An unexpected error occurred while loading statistics.\n\n" + ex.Message,
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
+        private void BuildCharts()
+        {
+            // PIE — Drinks
+            DrinkPieSeries.Clear();
+
+            foreach (var d in DrinkStats)
+            {
+                DrinkPieSeries.Add(new PieSeries
+                {
+                    Title = d.Name,
+                    Values = new ChartValues<int> { d.Count },
+                    DataLabels = true
+                });
+            }
+
+            // COLUMN — Ingredients
+            IngredientBarSeries.Clear();
+
+            IngredientBarSeries.Add(new ColumnSeries
+            {
+                Title = "Ingredients",
+                Values = new ChartValues<int>(
+                    IngredientStats.Select(i => i.Count)),
+                DataLabels = true
+            });
+
+            // 🔑 SAFE axis label update (no crashes)
+            XAxes[0].Labels = IngredientStats
+                .Select(i => i.Name)
+                .ToArray();
+        }
+
     }
 }

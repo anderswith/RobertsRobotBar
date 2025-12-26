@@ -76,7 +76,7 @@ public class DrinkUseCountLogic : IDrinkUseCountLogic
             .ToList();
 
         if (!filtered.Any())
-            throw new InvalidOperationException("No drink use counts found in the specified time frame.");
+            return Enumerable.Empty<(string, int)>();
 
         // Group and create statistics output
         var stats = filtered

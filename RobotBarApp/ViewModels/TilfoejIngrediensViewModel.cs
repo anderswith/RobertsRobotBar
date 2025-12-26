@@ -3,11 +3,9 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using RobotBarApp.Services.Interfaces;
 using RobotBarApp.BLL.Interfaces;
-using System.Collections.Generic;
-using RobotBarApp.BLL;
-using System;
 using System.IO;
 using System.Windows;
+
 
 namespace RobotBarApp.ViewModels
 {
@@ -28,11 +26,11 @@ namespace RobotBarApp.ViewModels
             set => SetProperty(ref _ingredientName, value);
         }
 
-        private string _sizeCl = "";
-        public string SizeCl
+        private string _color = "#FFFFFF";
+        public string Color
         {
-            get => _sizeCl;
-            set => SetProperty(ref _sizeCl, value);
+            get => _color;
+            set => SetProperty(ref _color, value);
         }
 
         private string _imagePreview;
@@ -92,7 +90,6 @@ namespace RobotBarApp.ViewModels
                 Holders.Add(i);
 
             SelectedHolder = Holders.FirstOrDefault();
-
             ChooseImageCommand = new RelayCommand(_ => ChooseImage());
             GuideCommand = new RelayCommand(_ => ShowGuide());
             CancelCommand = new RelayCommand(_ => Cancel());
@@ -108,8 +105,8 @@ namespace RobotBarApp.ViewModels
             var ingredient = _ingredientLogic.GetIngredientById(_ingredientId!.Value);
 
             IngredientName = ingredient.Name;
-            SizeCl = ingredient.Size.ToString();
             ImagePreview = ingredient.Image;
+            
 
             IsAlkohol = ingredient.Type == "Alkohol";
             IsMock    = ingredient.Type == "Mock";
@@ -127,6 +124,7 @@ namespace RobotBarApp.ViewModels
                 .OrderBy(s => s.Number)
                 .FirstOrDefault()?.UrScript ?? "";
         }
+        
 
         public void RunTestScripts()
         {
@@ -138,9 +136,6 @@ namespace RobotBarApp.ViewModels
 
             _robotLogic.RunRobotScripts(testScripts);
         }
-
-
-
         private void ChooseImage()
         {
             var dlg = new OpenFileDialog
@@ -159,17 +154,12 @@ namespace RobotBarApp.ViewModels
 
         private void Cancel()
         {
-            _navigation.NavigateTo<MainWindowViewModel>(); 
+            _navigation.NavigateTo<EventListViewModel>(); 
         }
 
         private void Save()
         {
-            if (!double.TryParse(SizeCl, out double sizeParsed))
-            {
-                MessageBox.Show("Size (cl) has to be a valid number.");
-                return;
-            }
-
+            
             string type =
                 IsAlkohol ? "Alkohol" :
                 IsMock    ? "Mock" :
@@ -196,8 +186,8 @@ namespace RobotBarApp.ViewModels
                         name: IngredientName,
                         type: type,
                         image: imagePath,
-                        size: sizeParsed,
                         dose: dose,
+                        color: Color,
                         positionNumber: SelectedHolder,
                         scriptNames: scripts
                     );
@@ -208,8 +198,8 @@ namespace RobotBarApp.ViewModels
                         name: IngredientName,
                         type: type,
                         image: imagePath,
-                        size: sizeParsed,
                         dose: dose,
+                        color: Color,
                         positionNumber: SelectedHolder,
                         scriptNames: scripts
                     );
@@ -252,7 +242,26 @@ namespace RobotBarApp.ViewModels
             return Path.Combine("Resources", "IngredientPics", fileName).Replace("\\", "/");
         }
 
-
+        public class ColorOption
+        {
+            public string Name { get; set; }   // "Red", "Blue", etc.
+            public string Hex { get; set; }    // "#FF0000"
+        }
+        public ObservableCollection<ColorOption> AvailableColors { get; } =
+            new()
+            {
+                new ColorOption { Name = "Red",     Hex = "#FF0000" },
+                new ColorOption { Name = "Green",   Hex = "#00FF00" },
+                new ColorOption { Name = "Blue",    Hex = "#0000FF" },
+                new ColorOption { Name = "Yellow",  Hex = "#FFFF00" },
+                new ColorOption { Name = "Purple",  Hex = "#FF00FF" },
+                new ColorOption { Name = "Cyan",    Hex = "#00FFFF" },
+                new ColorOption { Name = "Pink",    Hex = "#FF69B4" }, 
+                new ColorOption { Name = "Orange",  Hex = "#FFA500" },
+                new ColorOption { Name = "White",   Hex = "#FFFFFF" },
+                new ColorOption { Name = "Black",   Hex = "#000000" },
+                new ColorOption { Name = "Transparent", Hex = "#00FFFFFF" },
+            };
         
 
     }

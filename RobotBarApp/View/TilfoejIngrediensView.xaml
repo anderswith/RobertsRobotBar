@@ -74,20 +74,53 @@
                 <TextBlock Grid.Column="2"
                            VerticalAlignment="Center"
                            FontSize="18"
-                           Text="Størrelse:"/>
+                           Text="Farve:"/>
 
-                <!-- Størrelse textbox -->
-                <TextBox Grid.Column="4"
-                         Height="35"
-                         FontSize="16"
-                         Padding="6"
-                         Text="{Binding SizeCl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <!-- Farve textbox -->
+                <Grid Grid.Column="4"
+                      Width="140"
+                      Height="35"
+                      Margin="8,0,0,0">
 
-                <!-- cl -->
-                <TextBlock Grid.Column="6"
-                           VerticalAlignment="Center"
-                           FontSize="18"
-                           Text="cl" />
+                    <!-- Selected color preview (fills the box) -->
+                    <Border Background="{Binding Color}"
+                            BorderThickness="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            IsHitTestVisible="False"/>
+
+                    <!-- ComboBox on top (transparent when closed) -->
+                    <ComboBox ItemsSource="{Binding AvailableColors}"
+                              SelectedValuePath="Hex"
+                              SelectedValue="{Binding Color, Mode=TwoWay}"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              HorizontalContentAlignment="Stretch"
+                              VerticalContentAlignment="Stretch">
+
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="ComboBoxItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Padding" Value="0"/>
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Height="22"
+                                        Background="{Binding Hex}"
+                                        BorderBrush="Black"
+                                        BorderThickness="1"
+                                        Margin="2"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+
+                    </ComboBox>
+                </Grid>
+
+
+
+
 
                 <!-- Billed label -->
                 <TextBlock Grid.Column="8"
