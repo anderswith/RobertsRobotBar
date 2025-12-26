@@ -75,9 +75,20 @@ public class IngredientUseCountLogic : IIngredientUseCountLogic
         var (ingredients, uses) = _ingredientUseCountRepository
             .GetIngredientUseCountForEvent(eventId);
 
+        if (ingredients == null || uses == null)
+        {
+            return Enumerable.Empty<(string, int)>();
+        }
+            
+
         var filtered = uses
             .Where(u => u.TimeStamp >= start && u.TimeStamp <= end)
             .ToList();
+        if (!filtered.Any())
+        {
+            return Enumerable.Empty<(string, int)>();
+        }
+            
 
         return filtered
             .GroupBy(u => u.IngredientId)
