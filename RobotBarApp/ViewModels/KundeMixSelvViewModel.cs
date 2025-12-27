@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 
@@ -179,7 +178,6 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
 
     private void SelectIngredient(IngredientChoice choice)
     {
-        Debug.WriteLine($"[KundeMixSelv] SelectIngredient: {choice?.Name} (closing overlay)");
 
         SelectedIngredient = choice;
         SelectedCl = MinCl;

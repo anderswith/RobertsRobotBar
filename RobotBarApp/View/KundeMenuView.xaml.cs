@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Extensions.DependencyInjection;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.Services.Interfaces;
 using RobotBarApp.ViewModels;
@@ -20,21 +22,22 @@ namespace RobotBarApp.View
             // DataContext = new KundeMenuViewModel(); // recommended
         }
 
-       /* private void Back_Click(object sender, RoutedEventArgs e)
+        private void Back_Click(object sender, RoutedEventArgs e)
         {
-            // Re-open a fresh KundeStartView when going back
-            var startView = new KundeStartView
-            {
-                WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                DataContext = new KundeStartViewModel(_menuLogic, _navigation)
-            };
+            // Return to KundeStartView, similar to MixSelv's back behavior.
+            var startView = App.AppHost.Services.GetRequiredService<KundeStartView>();
+            startView.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            startView.WindowState = WindowState.Maximized;
+            startView.WindowStyle = WindowStyle.None;
+
+            // Ensure proper VM is used (DI).
+            startView.DataContext = App.AppHost.Services.GetRequiredService<ViewModels.KundeStartViewModel>();
 
             startView.Show();
             startView.Activate();
 
-            // Close this menu window
             Close();
-        }*/
+        }
 
         private void ScrollLeft_Click(object sender, RoutedEventArgs e)
             => DrinksScroll.ScrollToHorizontalOffset(DrinksScroll.HorizontalOffset - ScrollStep);

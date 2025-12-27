@@ -25,6 +25,7 @@
 
             <!-- Back button (image-only) -->
             <Button Command="{Binding BackCommand}"
+                    Click="Back_Click"
                     Width="160"
                     Height="60"
                     Background="Transparent"

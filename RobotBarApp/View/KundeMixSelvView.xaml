@@ -39,7 +39,7 @@
         </Grid.RowDefinitions>
 
         <!-- HEADER -->
-        <Grid Grid.Row="0" Margin="28,18,28,0">
+        <Grid Grid.Row="0" Margin="28,18,28,0" Panel.ZIndex="1000">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -53,7 +53,8 @@
                     Background="Transparent"
                     BorderThickness="0"
                     Cursor="Hand"
-                    Command="{Binding BackCommand}">
+                    Command="{Binding BackCommand}"
+                    Click="Back_Click">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Resources/Icons/ArrowGreenLeft.png"
                            Height="28"

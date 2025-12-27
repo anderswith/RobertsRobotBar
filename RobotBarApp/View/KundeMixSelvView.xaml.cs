@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using System.Windows.Media;
 using RobotBarApp.ViewModels;
 
@@ -61,5 +62,11 @@ namespace RobotBarApp.View
 
         private void OverlayScrollRight_Click(object sender, RoutedEventArgs e)
             => OverlayScroll.ScrollToHorizontalOffset(OverlayScroll.HorizontalOffset + 700);
+
+        private void Back_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("[KundeMixSelv] Back_Click invoked");
+            BackRequested?.Invoke(this, EventArgs.Empty);
+        }
     }
 }
