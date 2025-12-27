@@ -1,4 +1,4 @@
-﻿﻿using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,6 +12,7 @@ using RobotBarApp.Services.Application;
 using RobotBarApp.Services.Application.Interfaces;
 using RobotBarApp.Services.Interfaces;
 using RobotBarApp.Services.Robot.Interfaces;
+using RobotBarApp.Services.UI;
 using RobotBarApp.View;
 using RobotBarApp.ViewModels;
 
@@ -84,10 +85,13 @@ public partial class App : Application
                 services.AddTransient<KundeMenuView>();
                 services.AddTransient<KundeMixSelvView>();
                 
-                //services
+                // services
                 services.AddSingleton<IEventSessionService, EventSessionService>();
                 services.AddSingleton<INavigationService, NavigationService>();
-                
+
+                // UI sizing settings (initialized once at first customer start)
+                services.AddSingleton<CarouselSizingSettings>();
+
                 services.AddSingleton<IRobotDashboardStreamReader>(sp =>
                 {
                     var log = sp.GetRequiredService<ILogLogic>();

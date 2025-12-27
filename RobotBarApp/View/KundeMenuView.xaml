@@ -1,8 +1,18 @@
 ﻿<Window x:Class="RobotBarApp.View.KundeMenuView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:view="clr-namespace:RobotBarApp.View"
-             Background="Black">
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:view="clr-namespace:RobotBarApp.View"
+        xmlns:behaviors="clr-namespace:RobotBarApp.Behaviors"
+        xmlns:ui="clr-namespace:RobotBarApp.Services.UI"
+        Background="Black">
+
+    <Window.Resources>
+        <!-- Shared sizing settings (initialized once from primary screen size) -->
+        <ObjectDataProvider x:Key="CarouselSizing"
+                            ObjectType="{x:Type ui:CarouselSizingSettings}"
+                            MethodName="get_Instance" />
+    </Window.Resources>
 
     <Grid>
         <!-- Background (optional image); otherwise keep black -->
@@ -72,8 +82,14 @@
                               VerticalScrollBarVisibility="Disabled"
                               PanningMode="HorizontalOnly"
                               PanningDeceleration="0.002"
-                              CanContentScroll="True"
-                              IsManipulationEnabled="True">
+                              IsManipulationEnabled="True"
+                              CanContentScroll="False"
+                              behaviors:CenteredSnapCarouselBehavior.IsEnabled="True"
+                              behaviors:CenteredSnapCarouselBehavior.ItemTemplateRootName="CardRoot"
+                              behaviors:CenteredSnapCarouselBehavior.HighlightScale="1.15"
+                              behaviors:CenteredSnapCarouselBehavior.SnapDebounceMs="220"
+                              behaviors:CenteredSnapCarouselBehavior.SnapAnimationMs="260"
+                              behaviors:CenteredSnapCarouselBehavior.TapCommand="{Binding SelectDrinkCommand}">
                     <ItemsControl ItemsSource="{Binding Drinks}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -83,15 +99,17 @@
 
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <view:KundeMenuItemCard
-                                    Width="800"
-                                    Height="1000"
-                                    Margin="24,0"
-                                    Title="{Binding Name}"
-                                    ImageSource="{Binding ImagePath}"
-                                    IngredientsText="{Binding IngredientsText}"
-                                    Command="{Binding DataContext.SelectDrinkCommand,
-                                  RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
+                                <Grid Width="{Binding Source={StaticResource CarouselSizing}, Path=DrinkCardWidth}"
+                                      Height="{Binding Source={StaticResource CarouselSizing}, Path=DrinkCardHeight}"
+                                      Margin="{Binding Source={StaticResource CarouselSizing}, Path=DrinkCardMargin}"
+                                      ClipToBounds="True">
+                                    <view:KundeMenuItemCard x:Name="CardRoot"
+                                                           Width="{Binding Source={StaticResource CarouselSizing}, Path=DrinkCardWidth}"
+                                                           Height="{Binding Source={StaticResource CarouselSizing}, Path=DrinkCardHeight}"
+                                                           Title="{Binding Name}"
+                                                           ImageSource="{Binding Image}"
+                                                           IngredientsText="{Binding IngredientsText}"/>
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

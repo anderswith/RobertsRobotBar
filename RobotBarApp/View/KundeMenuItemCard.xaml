@@ -6,8 +6,10 @@
     <UserControl.Resources>
         <converters:PathToImageConverter x:Key="PathToImageConverter" />
     </UserControl.Resources>
-    
+
     <Button Background="Transparent"
+            Width="{Binding ActualWidth, ElementName=Root}"
+            Height="{Binding ActualHeight, ElementName=Root}"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             BorderThickness="0"
@@ -16,8 +18,11 @@
             Command="{Binding Command, ElementName=Root}"
             CommandParameter="{Binding}">
         <Border CornerRadius="18"
+                Width="{Binding ActualWidth, ElementName=Root}"
+                Height="{Binding ActualHeight, ElementName=Root}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
+                ClipToBounds="True"
                 Background="#F4F4F4"
                 BorderBrush="#D0D0D0"
                 BorderThickness="2">
@@ -36,11 +41,17 @@
                            HorizontalAlignment="Center"
                            Margin="0,8,0,14"/>
 
-                <Image Grid.Row="1"
-                       Source="{Binding Image, Converter={StaticResource PathToImageConverter}}"
-                       Stretch="Uniform"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Stretch"/>
+                <!-- Fixed image frame: always fills the available middle-row area; image scales uniformly inside (no cropping). -->
+                <Border Grid.Row="1"
+                        Background="#FFFFFF"
+                        CornerRadius="10"
+                        ClipToBounds="True">
+                    <Image Source="{Binding ImageSource, ElementName=Root, Converter={StaticResource PathToImageConverter}}"
+                           Stretch="Uniform"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Border>
 
                 <TextBlock Grid.Row="2"
                            Text="{Binding IngredientsText, ElementName=Root}"

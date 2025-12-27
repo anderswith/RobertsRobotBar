@@ -35,7 +35,8 @@
                     Height="60"
                     Background="Transparent"
                     BorderThickness="0"
-                    Cursor="Hand">
+                    Cursor="Hand"
+                    Click="Back_Click">
                 <Image Source="/Resources/Icons/ArrowWhiteLeft.png"
                        Stretch="Uniform"
                        RenderOptions.BitmapScalingMode="HighQuality"/>
