@@ -35,7 +35,8 @@ namespace RobotBarApp.View
         private static Geometry CreateBowlClipGeometry()
         {
             // Trapezoid clip approximating the inner walls of the glass (normalized 520x520).
-            var topY = 210.0;
+            // This is used to keep the liquid inside the glass bowl.
+            var topY = 180.0;
             var bottomY = 455.0;
 
             var topLeftX = 200.0;
