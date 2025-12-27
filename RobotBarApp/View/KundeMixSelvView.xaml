@@ -3,21 +3,56 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:view="clr-namespace:RobotBarApp.View"
              xmlns:converters="clr-namespace:RobotBarApp.Converters"
+             xmlns:behaviors="clr-namespace:RobotBarApp.Behaviors"
+             xmlns:ui="clr-namespace:RobotBarApp.Services.UI"
              Background="#F2EEE6">
 
     <UserControl.Resources>
+        <ObjectDataProvider x:Key="CarouselSizing"
+                            ObjectType="{x:Type ui:CarouselSizingSettings}"
+                            MethodName="get_Instance" />
+        <converters:OverlayIngredientCardSizeMultiConverter x:Key="OverlayIngredientCardSize"/>
+        <converters:OverlayIngredientCardMarginMultiConverter x:Key="OverlayIngredientCardMargin"/>
         <converters:BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
         <converters:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibility"/>
+        <converters:HexToColorConverter x:Key="HexToColorConverter"/>
+        <converters:HexToBrushConverter x:Key="HexToBrushConverter"/>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+        <!-- Removed SegmentIndexToCanvasTopConverter usage -->
+        <converters:ClToRemoveGlyphConverter x:Key="ClToRemoveGlyphConverter"/>
 
         <DataTemplate x:Key="IngredientCardTemplate">
-            <view:KundeIngredientCard
-                Width="240"
-                Height="460"
-                Margin="18,0"
-                Title="{Binding Name}"
-                ImagePath="{Binding ImagePath}"
-                Command="{Binding DataContext.SelectIngredientCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                CommandParameter="{Binding}"/>
+            <!-- Size is computed from popup's ActualWidth/ActualHeight so overlay never gets oversized. -->
+            <Grid x:Name="OverlayCardSlot"
+                  ClipToBounds="True">
+                <Grid.Width>
+                    <MultiBinding Converter="{StaticResource OverlayIngredientCardSize}" ConverterParameter="W">
+                        <Binding ElementName="OverlayPopup" Path="ActualWidth"/>
+                        <Binding ElementName="OverlayPopup" Path="ActualHeight"/>
+                    </MultiBinding>
+                </Grid.Width>
+                <Grid.Height>
+                    <MultiBinding Converter="{StaticResource OverlayIngredientCardSize}" ConverterParameter="H">
+                        <Binding ElementName="OverlayPopup" Path="ActualWidth"/>
+                        <Binding ElementName="OverlayPopup" Path="ActualHeight"/>
+                    </MultiBinding>
+                </Grid.Height>
+                <Grid.Margin>
+                    <MultiBinding Converter="{StaticResource OverlayIngredientCardMargin}">
+                        <Binding ElementName="OverlayPopup" Path="ActualWidth"/>
+                    </MultiBinding>
+                </Grid.Margin>
+
+                <view:KundeIngredientCard
+                    Width="{Binding ActualWidth, ElementName=OverlayCardSlot}"
+                    Height="{Binding ActualHeight, ElementName=OverlayCardSlot}"
+                    Title="{Binding Name}"
+                    ImagePath="{Binding ImagePath}"
+                    IsEnabled="{Binding IsSelectable}"
+                    Opacity="{Binding IsSelectable, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"
+                    Command="{Binding DataContext.SelectIngredientCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    CommandParameter="{Binding}"/>
+            </Grid>
         </DataTemplate>
 
         <Style x:Key="QtyButtonStyle" TargetType="Button">
@@ -39,21 +74,23 @@
         </Grid.RowDefinitions>
 
         <!-- HEADER -->
-        <Grid Grid.Row="0" Margin="28,18,28,0">
+        <Grid Grid.Row="0" Margin="28,18,28,0" Panel.ZIndex="1000">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Back -->
             <Button Grid.Column="0"
+                    HorizontalAlignment="Left"
                     Width="160"
                     Height="60"
                     Background="Transparent"
                     BorderThickness="0"
                     Cursor="Hand"
-                    Command="{Binding BackCommand}">
+                    Command="{Binding BackCommand}"
+                    Click="Back_Click">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Resources/Icons/ArrowGreenLeft.png"
                            Height="28"
@@ -86,7 +123,7 @@
                   HorizontalAlignment="Left"
                   Margin="0,0,40,0">
 
-                <Viewbox Stretch="Uniform" Width="560" Height="560">
+                <Viewbox Stretch="Uniform" Width="720" Height="720">
                     <Grid Width="520" Height="520">
 
                         <!-- Glass FIRST -->
@@ -98,42 +135,35 @@
                         <!-- Liquid AFTER glass (clip applied in code-behind) -->
                         <Grid x:Name="LiquidLayer"
                               Panel.ZIndex="10"
-                              Visibility="{Binding SelectedIngredientName, Converter={StaticResource StringNotEmptyToVisibility}}">
-                            <Grid.Clip>
-                                <!-- replaced at runtime -->
-                                <RectangleGeometry Rect="0,0,0,0"/>
-                            </Grid.Clip>
+                              Visibility="{Binding HasSelectedIngredients, Converter={StaticResource BoolToVisibility}}">
 
-                            <!-- Liquid disc -->
-                            <Ellipse Width="{Binding LiquidDiscWidth}"
-                                     Height="{Binding LiquidDiscHeight}"
-                                     HorizontalAlignment="Left"
-                                     VerticalAlignment="Top"
-                                     Margin="{Binding LiquidDiscMargin}"
-                                     Opacity="0.95">
-                                <Ellipse.Fill>
-                                    <RadialGradientBrush>
-                                        <GradientStop Color="#E9FEFF" Offset="0.0"/>
-                                        <GradientStop Color="#BFEFF2" Offset="0.55"/>
-                                        <GradientStop Color="#7FD0D8" Offset="1.0"/>
-                                    </RadialGradientBrush>
-                                </Ellipse.Fill>
-                            </Ellipse>
+                            <!-- Bowl container: position the segment stack inside the 520x520 glass grid -->
+                            <Canvas>
+                                <Border Canvas.Left="200"
+                                        Canvas.Top="110"
+                                        Width="185"
+                                        Height="260"
+                                        Background="Transparent">
 
-                            <!-- Highlight -->
-                            <Ellipse Width="{Binding LiquidHighlightWidth}"
-                                     Height="{Binding LiquidHighlightHeight}"
-                                     HorizontalAlignment="Left"
-                                     VerticalAlignment="Top"
-                                     Margin="{Binding LiquidHighlightMargin}"
-                                     Opacity="0.35">
-                                <Ellipse.Fill>
-                                    <RadialGradientBrush>
-                                        <GradientStop Color="#FFFFFFFF" Offset="0.0"/>
-                                        <GradientStop Color="#00FFFFFF" Offset="1.0"/>
-                                    </RadialGradientBrush>
-                                </Ellipse.Fill>
-                            </Ellipse>
+                                    <!-- Simple vertical stack: 15 segments, bottom aligned -->
+                                    <ItemsControl ItemsSource="{Binding LiquidSegments}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Vertical" VerticalAlignment="Bottom"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Rectangle Height="12"
+                                                           Width="185"
+                                                           Opacity="0.85"
+                                                           Fill="{Binding ColorHex, Converter={StaticResource HexToBrushConverter}}"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Border>
+                            </Canvas>
                         </Grid>
 
                         <!-- Connector line -->
@@ -152,48 +182,37 @@
 
             <!-- MIDDLE: selected ingredient + BESTIL -->
             <Grid Grid.Column="1" VerticalAlignment="Center">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+                <StackPanel>
+                    <ItemsControl ItemsSource="{Binding SelectedIngredientsForDisplay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel VerticalAlignment="Bottom"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <TextBlock Text="{Binding DisplayText}"
+                                               FontSize="28"
+                                               Foreground="#2F4A3B"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,18,0"/>
 
-                <StackPanel Grid.Row="0"
-                            Orientation="Horizontal"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Left"
-                            Visibility="{Binding SelectedIngredientName, Converter={StaticResource StringNotEmptyToVisibility}}"
-                            Margin="0,0,0,26">
+                                    <Button Style="{StaticResource QtyButtonStyle}"
+                                            Content="{Binding Cl, Converter={StaticResource ClToRemoveGlyphConverter}}"
+                                            Command="{Binding DataContext.DecreaseClCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Margin="0,0,10,0"/>
 
-                    <TextBlock Text="{Binding SelectedIngredientDisplayText}"
-                               FontSize="28"
-                               Foreground="#2F4A3B"
-                               VerticalAlignment="Center"
-                               Margin="0,0,18,0"/>
-
-                    <Button Style="{StaticResource QtyButtonStyle}"
-                            Content="−"
-                            Command="{Binding DecreaseClCommand}"
-                            Margin="0,0,10,0"/>
-
-                    <Button Style="{StaticResource QtyButtonStyle}"
-                            Content="+"
-                            Command="{Binding IncreaseClCommand}"/>
+                                    <Button Style="{StaticResource QtyButtonStyle}"
+                                            Content="+"
+                                            Command="{Binding DataContext.IncreaseClCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </StackPanel>
-
-                <Button Grid.Row="1"
-                        Width="220"
-                        Height="90"
-                        HorizontalAlignment="Left"
-                        Cursor="Hand"
-                        Background="#F7F4EE"
-                        BorderBrush="#2F4A3B"
-                        BorderThickness="2"
-                        Visibility="{Binding SelectedIngredientName, Converter={StaticResource StringNotEmptyToVisibility}}"
-                        Command="{Binding BestilCommand}">
-                    <Image Source="/Resources/Icons/Bestil.png"
-                           Stretch="Uniform"
-                           RenderOptions.BitmapScalingMode="HighQuality"/>
-                </Button>
             </Grid>
 
             <!-- RIGHT: category selector -->
@@ -231,75 +250,112 @@
                   Background="#99000000"
                   Visibility="{Binding IsOverlayOpen, Converter={StaticResource BoolToVisibility}}">
 
-                <Border Width="1500"
+                <!-- Click-catcher: clicking the dimmed area closes the overlay -->
+                <Border Background="Transparent"
+                        PreviewMouseLeftButtonDown="OverlayBackground_MouseLeftButtonDown"/>
+
+                <Border x:Name="OverlayPopup"
+                        Width="1500"
                         Height="720"
                         Background="White"
                         CornerRadius="6"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
 
-                    <Grid Margin="30">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                    <!-- Prevent clicks inside popup from reaching the background click-catcher, 
+                         while not blocking child controls like the ingredient buttons. -->
+                    <Grid>
+                        <!-- Popup content -->
+                        <Grid Margin="30">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-                        <TextBlock FontSize="44"
-                                   FontWeight="SemiBold"
-                                   Foreground="#2F4A3B"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,10,0,30"
-                                   Text="{Binding OverlayTitle}"/>
+                            <TextBlock FontSize="44"
+                                       FontWeight="SemiBold"
+                                       Foreground="#2F4A3B"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,10,0,30"
+                                       Text="{Binding OverlayTitle}"/>
 
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
 
-                            <Button Grid.Column="0"
-                                    Width="90"
-                                    Height="250"
-                                    Cursor="Hand"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Click="OverlayScrollLeft_Click"
-                                    VerticalAlignment="Center">
-                                <Image Source="/Resources/Icons/ArrowGreenLeft.png" Stretch="Uniform"/>
-                            </Button>
+                                <Button Grid.Column="0"
+                                        Width="90"
+                                        Height="250"
+                                        Cursor="Hand"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Click="OverlayScrollLeft_Click"
+                                        VerticalAlignment="Center">
+                                    <Image Source="/Resources/Icons/ArrowGreenLeft.png" Stretch="Uniform"/>
+                                </Button>
 
-                            <ScrollViewer x:Name="OverlayScroll"
-                                          Grid.Column="1"
-                                          HorizontalScrollBarVisibility="Hidden"
-                                          VerticalScrollBarVisibility="Disabled"
-                                          PanningMode="HorizontalOnly"
-                                          IsManipulationEnabled="True"
-                                          CanContentScroll="True">
-                                <ItemsControl ItemsSource="{Binding OverlayIngredients}"
-                                              ItemTemplate="{StaticResource IngredientCardTemplate}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                            </ScrollViewer>
+                                <ScrollViewer x:Name="OverlayScroll"
+                                              Grid.Column="1"
+                                              HorizontalScrollBarVisibility="Hidden"
+                                              VerticalScrollBarVisibility="Disabled"
+                                              PanningMode="HorizontalOnly"
+                                              IsManipulationEnabled="True"
+                                              CanContentScroll="False"
+                                              behaviors:CenteredSnapCarouselBehavior.IsEnabled="True"
+                                              behaviors:CenteredSnapCarouselBehavior.HighlightScale="1.12"
+                                              behaviors:CenteredSnapCarouselBehavior.SnapDebounceMs="220"
+                                              behaviors:CenteredSnapCarouselBehavior.SnapAnimationMs="240"
+                                              behaviors:CenteredSnapCarouselBehavior.TapCommand="{Binding SelectIngredientCommand}">
+                                    <ItemsControl ItemsSource="{Binding OverlayIngredients}"
+                                                  ItemTemplate="{StaticResource IngredientCardTemplate}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </ScrollViewer>
 
-                            <Button Grid.Column="2"
-                                    Width="90"
-                                    Height="250"
-                                    Cursor="Hand"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Click="OverlayScrollRight_Click"
-                                    VerticalAlignment="Center">
-                                <Image Source="/Resources/Icons/ArrowGreenRight.png" Stretch="Uniform"/>
-                            </Button>
+                                <Button Grid.Column="2"
+                                        Width="90"
+                                        Height="250"
+                                        Cursor="Hand"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Click="OverlayScrollRight_Click"
+                                        VerticalAlignment="Center">
+                                    <Image Source="/Resources/Icons/ArrowGreenRight.png" Stretch="Uniform"/>
+                                </Button>
+                            </Grid>
                         </Grid>
                     </Grid>
                 </Border>
             </Grid>
+
+            <!-- Bottom-centered BESTIL button, spans full layout -->
+            <Button Grid.ColumnSpan="3"
+                    Width="220"
+                    Height="90"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Margin="0,0,0,20"
+                    Cursor="Hand"
+                    Background="#F7F4EE"
+                    BorderBrush="#2F4A3B"
+                    BorderThickness="2"
+                    Padding="0"
+                    Visibility="{Binding HasSelectedIngredients, Converter={StaticResource BoolToVisibility}}"
+                    Command="{Binding BestilCommand}">
+                <Image Source="/Resources/Icons/BestilMixSelv.png"
+                       Stretch="Uniform"
+                       StretchDirection="Both"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+            </Button>
         </Grid>
     </Grid>
 </UserControl>

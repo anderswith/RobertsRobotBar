@@ -1,0 +1,136 @@
+﻿<UserControl x:Class="RobotBarApp.View.KundeMixSelvPourView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:RobotBarApp.Converters"
+             Background="#F2EEE6">
+
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <converters:HexToBrushConverter x:Key="HexToBrushConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER (same style as KundeMixSelvView) -->
+        <Grid Grid.Row="0" Margin="28,18,28,0" Panel.ZIndex="1000">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    HorizontalAlignment="Left"
+                    Width="160"
+                    Height="60"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Command="{Binding BackCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Resources/Icons/ArrowGreenLeft.png"
+                           Height="28"
+                           Margin="0,0,10,0"/>
+                    <TextBlock Text="Tilbage"
+                               FontSize="26"
+                               Foreground="#2F4A3B"/>
+                </StackPanel>
+            </Button>
+
+            <Image Grid.Column="1"
+                   Source="/Resources/Icons/Roberts_robotbar_logo.png"
+                   Height="70"
+                   HorizontalAlignment="Center"
+                   RenderOptions.BitmapScalingMode="HighQuality"/>
+        </Grid>
+
+        <!-- BODY -->
+        <Grid Grid.Row="1" Margin="40,20,40,40">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="720"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="520"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT: just reuse the same glass + liquid visuals -->
+            <Grid Grid.Column="0"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Left"
+                  Margin="0,0,40,0">
+
+                <Viewbox Stretch="Uniform" Width="720" Height="720">
+                    <Grid Width="520" Height="520">
+                        <Image Panel.ZIndex="0"
+                               Source="/Resources/Kundeview/Glass.png"
+                               Stretch="Fill"
+                               RenderOptions.BitmapScalingMode="HighQuality"/>
+
+                        <Grid x:Name="LiquidLayer"
+                              Panel.ZIndex="10"
+                              Visibility="{Binding HasSelectedIngredients, Converter={StaticResource BoolToVisibility}}">
+                            <Canvas>
+                                <Border Canvas.Left="200"
+                                        Canvas.Top="110"
+                                        Width="185"
+                                        Height="260"
+                                        Background="Transparent">
+
+                                    <ItemsControl ItemsSource="{Binding LiquidSegments}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Vertical" VerticalAlignment="Bottom"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Rectangle Height="12"
+                                                           Width="185"
+                                                           Opacity="0.85"
+                                                           Fill="{Binding ColorHex, Converter={StaticResource HexToBrushConverter}}"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Border>
+                            </Canvas>
+                        </Grid>
+                    </Grid>
+                </Viewbox>
+            </Grid>
+
+            <!-- MIDDLE: ingredient list only (no plus/minus) -->
+            <Grid Grid.Column="1" VerticalAlignment="Center">
+                <ItemsControl ItemsSource="{Binding SelectedIngredientsForDisplay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel VerticalAlignment="Bottom"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DisplayText}"
+                                       FontSize="28"
+                                       Foreground="#2F4A3B"
+                                       Margin="0,0,0,16"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+
+            <!-- RIGHT: progress bar, placed ~1/3 up from bottom -->
+            <Grid Grid.Column="2">
+                <ProgressBar Height="44"
+                             Width="360"
+                             VerticalAlignment="Bottom"
+                             HorizontalAlignment="Center"
+                             Margin="0,0,0,220"
+                             Value="{Binding PourProgress}"
+                             Minimum="0"
+                             Maximum="100"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

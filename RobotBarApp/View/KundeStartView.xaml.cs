@@ -1,7 +1,6 @@
-﻿using System;
-using System.Windows;
-using RobotBarApp.BLL.Interfaces;
-using RobotBarApp.ViewModels;
+﻿using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
+using RobotBarApp.Services.UI;
 
 namespace RobotBarApp.View
 {
@@ -10,42 +9,20 @@ namespace RobotBarApp.View
         public KundeStartView()
         {
             InitializeComponent();
+            Loaded += KundeStartView_Loaded;
         }
 
-
-
-        private void MixSelv_Click(object sender, RoutedEventArgs e)
+        private void KundeStartView_Loaded(object sender, RoutedEventArgs e)
         {
-            var mixSelvView = new KundeMixSelvView();
-            mixSelvView.BackRequested += (_, _) => ShowStartScreen();
+            Loaded -= KundeStartView_Loaded;
 
-            ShowChild(mixSelvView);
-        }
+            // Initialize the shared sizing instance used by XAML bindings.
+            var settings = CarouselSizingSettings.Instance;
+            if (settings.IsInitialized)
+                return;
 
-        private void ShowChild(object child)
-        {
-            HostContent.Content = child;
-            StartRoot.Visibility = Visibility.Collapsed;
-        }
-
-        private void ShowStartScreen()
-        {
-            HostContent.Content = null;
-            StartRoot.Visibility = Visibility.Visible;
-
-            // make sure touch focus returns to the window
-            Activate();
-            Focus();
-        }
-
-        private IMenuLogic? ResolveMenuLogic()
-        {
-            if (DataContext is KundeStartViewModel vm)
-            {
-                // VM has the same instance injected; easiest is to reuse DI here, but keep this path for future.
-            }
-
-            return App.AppHost?.Services.GetService(typeof(IMenuLogic)) as IMenuLogic;
+            // Kiosk assumption: use primary screen size.
+            settings.InitializeFromScreenSize(SystemParameters.PrimaryScreenWidth, SystemParameters.PrimaryScreenHeight);
         }
     }
 }

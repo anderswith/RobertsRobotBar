@@ -1,4 +1,4 @@
-﻿using System.Windows;
+﻿﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -19,11 +19,15 @@ namespace RobotBarApp.View
             DependencyProperty.Register(nameof(IngredientsText), typeof(string), typeof(KundeMenuItemCard), new PropertyMetadata(""));
 
         public static readonly DependencyProperty ImageSourceProperty =
-            DependencyProperty.Register(nameof(ImageSource), typeof(ImageSource), typeof(KundeMenuItemCard), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(ImageSource), typeof(object), typeof(KundeMenuItemCard), new PropertyMetadata(null));
 
         public string Title { get => (string)GetValue(TitleProperty); set => SetValue(TitleProperty, value); }
         public string IngredientsText { get => (string)GetValue(IngredientsTextProperty); set => SetValue(IngredientsTextProperty, value); }
-        public ImageSource ImageSource { get => (ImageSource)GetValue(ImageSourceProperty); set => SetValue(ImageSourceProperty, value); }
+        public object ImageSource
+        {
+            get => GetValue(ImageSourceProperty);
+            set => SetValue(ImageSourceProperty, value);
+        }
 
         // Bubble a Click event to parent
         public event RoutedEventHandler Click;

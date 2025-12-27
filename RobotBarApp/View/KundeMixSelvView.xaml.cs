@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using System.Windows.Media;
 using RobotBarApp.ViewModels;
 
@@ -12,9 +13,13 @@ namespace RobotBarApp.View
         {
             InitializeComponent();
 
-            // Ensure we have a VM. If parent already set DataContext, we won't overwrite it.
+            // Prefer DI/parent-provided DataContext.
+            // Fallback to AppHost if nothing is set (keeps designer/runtime robust).
             if (DataContext == null)
-                DataContext = new KundeMixSelvViewModel();
+            {
+                DataContext = App.AppHost?.Services.GetService(typeof(KundeMixSelvViewModel)) as KundeMixSelvViewModel
+                              ?? new KundeMixSelvViewModel();
+            }
 
             if (DataContext is KundeMixSelvViewModel vm)
                 vm.BackRequested += (_, _) => BackRequested?.Invoke(this, EventArgs.Empty);
@@ -30,7 +35,8 @@ namespace RobotBarApp.View
         private static Geometry CreateBowlClipGeometry()
         {
             // Trapezoid clip approximating the inner walls of the glass (normalized 520x520).
-            var topY = 210.0;
+            // This is used to keep the liquid inside the glass bowl.
+            var topY = 180.0;
             var bottomY = 455.0;
 
             var topLeftX = 200.0;
@@ -57,5 +63,19 @@ namespace RobotBarApp.View
 
         private void OverlayScrollRight_Click(object sender, RoutedEventArgs e)
             => OverlayScroll.ScrollToHorizontalOffset(OverlayScroll.HorizontalOffset + 700);
+
+        private void Back_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("[KundeMixSelv] Back_Click invoked");
+            BackRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OverlayBackground_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (DataContext is KundeMixSelvViewModel vm)
+                vm.IsOverlayOpen = false;
+
+            e.Handled = true;
+        }
     }
 }

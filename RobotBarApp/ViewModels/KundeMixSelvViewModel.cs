@@ -1,29 +1,88 @@
-﻿namespace RobotBarApp.ViewModels;
+﻿﻿namespace RobotBarApp.ViewModels;
 
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using RobotBarApp.BLL.Interfaces;
+using RobotBarApp.BE;
 
 public sealed class KundeMixSelvViewModel : ViewModelBase
 {
     public sealed class IngredientChoice
     {
-        public IngredientChoice(string name, string imagePath)
+        public IngredientChoice(string name, string imagePath, string? colorHex = null, bool isSelectable = true)
         {
             Name = name;
             ImagePath = imagePath;
+            ColorHex = string.IsNullOrWhiteSpace(colorHex) ? "#7FD0D8" : colorHex;
+            IsSelectable = isSelectable;
         }
 
         public string Name { get; }
         public string ImagePath { get; }
+        public string ColorHex { get; }
+        public bool IsSelectable { get; }
     }
 
-    public event EventHandler? BackRequested;
+    public sealed class SelectedIngredientItem : ViewModelBase
+    {
+        private int _cl;
 
-    private const int MinCl = 2;
-    private const int MaxCl = 10;
+        public SelectedIngredientItem(string name, string colorHex, int cl)
+        {
+            Name = name;
+            ColorHex = string.IsNullOrWhiteSpace(colorHex) ? "#7FD0D8" : colorHex;
+            _cl = cl;
+        }
+
+        public string Name { get; }
+        public string ColorHex { get; }
+
+        public int Cl
+        {
+            get => _cl;
+            set
+            {
+                if (_cl == value) return;
+                _cl = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string DisplayText => $"{Name} ({Cl}cl)";
+    }
+
+    public sealed class LiquidSegment : ViewModelBase
+    {
+        public LiquidSegment(int index)
+        {
+            Index = index;
+        }
+
+        public int Index { get; }
+
+        private string _colorHex = "#00000000"; // transparent
+        public string ColorHex
+        {
+            get => _colorHex;
+            set
+            {
+                if (_colorHex == value) return;
+                _colorHex = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private const int GlassMaxCl = 30;
+    private const int SegmentCl = 2;
+    private const int SegmentCount = GlassMaxCl / SegmentCl; // 15
+
+    public event EventHandler? BackRequested;
+    public event EventHandler? PourRequested;
 
     // Overlay
     private bool _isOverlayOpen;
@@ -50,41 +109,30 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
 
     public ObservableCollection<IngredientChoice> OverlayIngredients { get; } = new();
 
-    // Selection
-    private IngredientChoice? _selectedIngredient;
-    public IngredientChoice? SelectedIngredient
+    public ObservableCollection<SelectedIngredientItem> SelectedIngredients { get; } = new();
+    public ObservableCollection<LiquidSegment> LiquidSegments { get; } = new();
+
+    public IEnumerable<SelectedIngredientItem> SelectedIngredientsForDisplay => SelectedIngredients.Reverse();
+
+    public bool HasSelectedIngredients => SelectedIngredients.Count > 0;
+
+    // Selection (keep for now but now points at the last-added ingredient)
+    private SelectedIngredientItem? _selectedIngredient;
+    public SelectedIngredientItem? SelectedIngredient
     {
         get => _selectedIngredient;
         private set
         {
             _selectedIngredient = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(SelectedIngredientDisplayText));
             OnPropertyChanged(nameof(SelectedIngredientName));
-
+            OnPropertyChanged(nameof(SelectedIngredientColorHex));
             RaiseCanExecute();
         }
     }
 
     public string SelectedIngredientName => SelectedIngredient?.Name ?? string.Empty;
-
-    private int _selectedCl;
-    public int SelectedCl
-    {
-        get => _selectedCl;
-        private set
-        {
-            _selectedCl = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(SelectedIngredientDisplayText));
-
-            UpdateLiquidVisuals();
-            RaiseCanExecute();
-        }
-    }
-
-    public string SelectedIngredientDisplayText
-        => SelectedIngredient == null ? string.Empty : $"{SelectedIngredient.Name} ({SelectedCl}cl)";
+    public string SelectedIngredientColorHex => SelectedIngredient?.ColorHex ?? "#7FD0D8";
 
     // Liquid visuals (bound directly from VM)
     private double _liquidDiscWidth;
@@ -137,28 +185,58 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
     public ICommand DecreaseClCommand { get; }
     public ICommand BestilCommand { get; }
 
+    private readonly IIngredientLogic? _ingredientLogic;
+    private readonly Guid _eventId;
+
     public KundeMixSelvViewModel()
     {
         BackCommand = new RelayCommand(_ => BackRequested?.Invoke(this, EventArgs.Empty));
 
         SelectCategoryCommand = new RelayCommand(param => SelectCategory(param?.ToString()));
 
-        SelectIngredientCommand = new RelayCommand(
-            param =>
-            {
-                if (param is IngredientChoice choice)
-                    SelectIngredient(choice);
-            });
+        SelectIngredientCommand = new RelayCommand(param =>
+        {
+            if (param is IngredientChoice choice)
+                SelectIngredient(choice);
+        });
 
-        IncreaseClCommand = new RelayCommand(_ => IncreaseCl(), _ => CanIncreaseCl());
-        DecreaseClCommand = new RelayCommand(_ => DecreaseCl(), _ => CanDecreaseCl());
+        IncreaseClCommand = new RelayCommand(param =>
+        {
+            if (param is SelectedIngredientItem item)
+                IncreaseCl(item);
+        }, param => param is SelectedIngredientItem item && CanIncreaseCl(item));
 
-        BestilCommand = new RelayCommand(_ => Bestil(), _ => SelectedIngredient != null);
+        DecreaseClCommand = new RelayCommand(param =>
+        {
+            if (param is SelectedIngredientItem item)
+                DecreaseCl(item);
+        }, param => param is SelectedIngredientItem item && CanDecreaseCl(item));
 
-        // Set defaults for bindings
-        SelectedCl = MinCl;
+        BestilCommand = new RelayCommand(_ => Bestil(), _ => SelectedIngredients.Count > 0);
+
+        SelectedIngredients.CollectionChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(HasSelectedIngredients));
+            OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
+            RaiseCanExecute();
+        };
+
+        // init 15 segments
+        for (var i = 0; i < SegmentCount; i++)
+            LiquidSegments.Add(new LiquidSegment(i));
+
         UpdateLiquidVisuals();
+        UpdateLiquidSegments();
     }
+
+    public KundeMixSelvViewModel(IIngredientLogic ingredientLogic, Guid eventId = default)
+        : this()
+    {
+        _ingredientLogic = ingredientLogic;
+        _eventId = eventId;
+    }
+
+    private Guid EffectiveEventId => _eventId == Guid.Empty ? Guid.Empty : _eventId;
 
     private void SelectCategory(string? category)
     {
@@ -167,54 +245,180 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
 
         OverlayIngredients.Clear();
 
-        // TODO: Replace with real data source (BLL/DB) when ready.
-        OverlayIngredients.Add(new IngredientChoice("Vodka", "/Resources/IngredientPics/doge_20251210150457477.jpg"));
-        OverlayIngredients.Add(new IngredientChoice("Rom", "/Resources/IngredientPics/doge2_20251210150515992.jpg"));
-        OverlayIngredients.Add(new IngredientChoice("Tequila", "/Resources/IngredientPics/doge3_20251210150530232.jpg"));
-        OverlayIngredients.Add(new IngredientChoice("Dry gin", "/Resources/IngredientPics/ingredient_20251207221554255.jpg"));
-        OverlayIngredients.Add(new IngredientChoice("Champagne", "/Resources/IngredientPics/imagecheck8_20251207220129565.jpg"));
+        if (_ingredientLogic != null)
+        {
+            var hasEventContext = EffectiveEventId != Guid.Empty;
+
+            // Map UI button labels to Ingredient.Type values in DB.
+            // NOTE: Your DB uses types like "Alkohol", "Syrup", "Soda" (see IngredientLogic).
+            string? desiredType = cat switch
+            {
+                "Alkohol" => "Alkohol",
+                "Mockohol" => "Mockohol",
+                "Sirup" => "Syrup",
+                "Sodavand" => "Soda",
+                _ => null
+            };
+
+            IEnumerable<Ingredient> ingredients;
+            if (hasEventContext)
+            {
+                ingredients = cat switch
+                {
+                    "Alkohol" => _ingredientLogic.GetAlcohol(EffectiveEventId),
+                    // If Mockohol is event-scoped in your DB via BarSetups, this should ideally be a dedicated BLL method.
+                    // For now, filter all ingredients by the DB type.
+                    "Mockohol" => _ingredientLogic.GetAllIngredients().Where(i => i.Type == "Mockohol"),
+                    "Sirup" => _ingredientLogic.GetSyrups(EffectiveEventId),
+                    "Sodavand" => _ingredientLogic.GetSoda(EffectiveEventId),
+                    _ => _ingredientLogic.GetAllIngredients()
+                };
+            }
+            else
+            {
+                // No event context: still filter correctly by type.
+                ingredients = _ingredientLogic.GetAllIngredients();
+                if (!string.IsNullOrWhiteSpace(desiredType))
+                    ingredients = ingredients.Where(i => i.Type == desiredType);
+            }
+
+            foreach (var i in ingredients)
+            {
+                if (string.IsNullOrWhiteSpace(i.Name))
+                    continue;
+
+                var img = i.Image ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(img) && !img.StartsWith("/"))
+                    img = "/" + img;
+
+                // Disable already-added ingredients
+                var isSelectable = !SelectedIngredients.Any(si => si.Name == i.Name);
+                OverlayIngredients.Add(new IngredientChoice(i.Name, img, i.Color, isSelectable));
+            }
+        }
+        else
+        {
+            // Fallback placeholders (designer/dev mode)
+            OverlayIngredients.Add(new IngredientChoice("Vodka", "/Resources/IngredientPics/doge_20251210150457477.jpg"));
+            OverlayIngredients.Add(new IngredientChoice("Rom", "/Resources/IngredientPics/doge2_20251210150515992.jpg"));
+            OverlayIngredients.Add(new IngredientChoice("Tequila", "/Resources/IngredientPics/doge3_20251210150530232.jpg"));
+        }
 
         IsOverlayOpen = true;
     }
 
     private void SelectIngredient(IngredientChoice choice)
     {
-        Debug.WriteLine($"[KundeMixSelv] SelectIngredient: {choice?.Name} (closing overlay)");
+        if (!choice.IsSelectable)
+            return;
 
-        SelectedIngredient = choice;
-        SelectedCl = MinCl;
+        // Safety net: never add duplicates by name.
+        if (SelectedIngredients.Any(i => i.Name == choice.Name))
+        {
+            IsOverlayOpen = false;
+            return;
+        }
+
+        // Add ingredient as 2cl by default, stacked order.
+        var item = new SelectedIngredientItem(choice.Name, choice.ColorHex, SegmentCl);
+        SelectedIngredients.Add(item);
+        OnPropertyChanged(nameof(HasSelectedIngredients));
+        OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
+
+        SelectedIngredient = item;
+
+        // close overlay
         IsOverlayOpen = false;
 
+        UpdateLiquidSegments();
+        UpdateLiquidVisuals();
         RaiseCanExecute();
     }
 
-    private bool CanIncreaseCl() => SelectedIngredient != null && SelectedCl < MaxCl;
-    private bool CanDecreaseCl() => SelectedIngredient != null && SelectedCl > MinCl;
+    private int CurrentTotalCl => SelectedIngredients.Sum(i => i.Cl);
 
-    private void IncreaseCl()
+    private bool CanIncreaseCl(SelectedIngredientItem? item)
+        => item != null && CurrentTotalCl + SegmentCl <= GlassMaxCl;
+
+    private bool CanDecreaseCl(SelectedIngredientItem? item)
+        => item != null;
+
+    private void IncreaseCl(SelectedIngredientItem item)
     {
-        if (!CanIncreaseCl()) return;
-        SelectedCl++;
+        if (!CanIncreaseCl(item)) return;
+        item.Cl += SegmentCl;
+        UpdateLiquidSegments();
+        UpdateLiquidVisuals();
+        RaiseCanExecute();
+        OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
     }
 
-    private void DecreaseCl()
+    private void DecreaseCl(SelectedIngredientItem item)
     {
-        if (!CanDecreaseCl()) return;
-        SelectedCl--;
+        // At minimum volume: remove ingredient entirely.
+        if (item.Cl <= SegmentCl)
+        {
+            SelectedIngredients.Remove(item);
+            if (ReferenceEquals(SelectedIngredient, item))
+                SelectedIngredient = SelectedIngredients.LastOrDefault();
+
+            UpdateLiquidSegments();
+            UpdateLiquidVisuals();
+            RaiseCanExecute();
+            OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
+
+            // If overlay is open, refresh its items so the removed ingredient becomes selectable again.
+            if (IsOverlayOpen)
+            {
+                // Re-run the last category filter by parsing title ("Vælg xxx").
+                var cat = OverlayTitle.Replace("Vælg ", string.Empty, StringComparison.OrdinalIgnoreCase).Trim();
+                SelectCategory(string.IsNullOrWhiteSpace(cat) ? null : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(cat));
+            }
+
+            return;
+        }
+
+        // Otherwise decrease by 2cl.
+        item.Cl -= SegmentCl;
+        UpdateLiquidSegments();
+        UpdateLiquidVisuals();
+        RaiseCanExecute();
+        OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
     }
 
     private void Bestil()
     {
-        // Placeholder. Later: call ordering service.
-        // Keep UI out of VM? If you prefer, we can raise an event instead.
-        MessageBox.Show($"Bestilt: {SelectedIngredientName} ({SelectedCl}cl)");
+        // Navigate to pour view (host handles swapping views)
+        PourRequested?.Invoke(this, EventArgs.Empty);
     }
 
+    private void UpdateLiquidSegments()
+    {
+        // StackPanel renders items top->bottom.
+        // Because the panel is bottom-aligned, we want filled segments to appear at the bottom and grow upward.
+        // So we fill from the end of the collection backwards.
+
+        // Clear all.
+        for (var i = 0; i < SegmentCount; i++)
+            LiquidSegments[i].ColorHex = "#00000000";
+
+        var writeIndex = SegmentCount - 1;
+        foreach (var ing in SelectedIngredients)
+        {
+            var segs = Math.Max(1, ing.Cl / SegmentCl);
+            for (var s = 0; s < segs && writeIndex >= 0; s++)
+            {
+                LiquidSegments[writeIndex].ColorHex = ing.ColorHex;
+                writeIndex--;
+            }
+        }
+    }
+
+    // Update visuals based on total fill (reuse old math but use total cl)
     private void UpdateLiquidVisuals()
     {
-        // Mirror the old code-behind calculation.
-        var cl = Math.Max(MinCl, Math.Min(MaxCl, SelectedCl));
-        var t = (cl - MinCl) / (double)(MaxCl - MinCl); // 0..1
+        var cl = Math.Max(SegmentCl, Math.Min(GlassMaxCl, CurrentTotalCl));
+        var t = (cl - SegmentCl) / (double)(GlassMaxCl - SegmentCl); // 0..1
 
         var minW = 150.0;
         var maxW = 185.0;
@@ -245,5 +449,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
         if (IncreaseClCommand is RelayCommand rc1) rc1.RaiseCanExecuteChanged();
         if (DecreaseClCommand is RelayCommand rc2) rc2.RaiseCanExecuteChanged();
         if (BestilCommand is RelayCommand rc3) rc3.RaiseCanExecuteChanged();
+
+        // plus/minus per ingredient uses CanExecute via RelayCommand<T>; if not present, UI will still be correct via IsEnabled bindings.
     }
 }

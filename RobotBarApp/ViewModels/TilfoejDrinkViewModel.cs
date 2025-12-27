@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
 using RobotBarApp.BE;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.Services.Interfaces;
+using RobotBarApp.Services.UI;
 
 namespace RobotBarApp.ViewModels
 {
@@ -284,6 +286,16 @@ namespace RobotBarApp.ViewModels
             System.Windows.MessageBox.Show("GUIDE COMING LATER");
         }
 
+        private static bool IsLikelyExternalPath(string? path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                return false;
+
+            // If it already looks like a project-relative resources path, don't copy.
+            var normalized = path.Replace('\\', '/');
+            return Path.IsPathRooted(path) && !normalized.StartsWith("Resources/", StringComparison.OrdinalIgnoreCase);
+        }
+
         private void Save()
         {
             try
@@ -313,12 +325,21 @@ namespace RobotBarApp.ViewModels
                 var scripts = string.IsNullOrWhiteSpace(ScriptText)
                     ? new List<string>()
                     : new List<string> { ScriptText };
+
+                // Ensure image is stored in Resources/DrinkPics and DB contains a relative path.
+                var imageToPersist = ImagePreview ?? "";
+                if (IsLikelyExternalPath(imageToPersist))
+                {
+                    imageToPersist = DrinkImageStorage.SaveToDrinkPics(imageToPersist);
+                    ImagePreview = imageToPersist;
+                }
+
                 if (IsEditMode)
                 {
                     _drinkLogic.UpdateDrink(
                         drinkId: _drinkId!.Value,
                         name: DrinkName,
-                        image: ImagePreview ?? "",
+                        image: imageToPersist,
                         isMocktail: IsMocktail,
                         ingredientIds: ingredientIds,
                         scriptNames: scripts
@@ -331,7 +352,7 @@ namespace RobotBarApp.ViewModels
                 {
                     _drinkLogic.AddDrink(
                         name: DrinkName,
-                        image: ImagePreview ?? "",
+                        image: imageToPersist,
                         isMocktail: IsMocktail,
                         ingredientIds: ingredientIds,
                         scriptNames: scripts

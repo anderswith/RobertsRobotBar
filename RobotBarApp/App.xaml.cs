@@ -12,6 +12,7 @@ using RobotBarApp.Services.Application;
 using RobotBarApp.Services.Application.Interfaces;
 using RobotBarApp.Services.Interfaces;
 using RobotBarApp.Services.Robot.Interfaces;
+using RobotBarApp.Services.UI;
 using RobotBarApp.View;
 using RobotBarApp.ViewModels;
 
@@ -66,6 +67,7 @@ public partial class App : Application
                 services.AddTransient<KundeValgtDrinkViewModel>();
                 services.AddTransient<KundeStartViewModel>();
                 services.AddTransient<KundeMenuViewModel>();
+                services.AddTransient<KundeMixSelvViewModel>();
                 
                 // Views
                 services.AddTransient<EventListView>();
@@ -81,11 +83,15 @@ public partial class App : Application
                 services.AddTransient<KundeValgtDrinkView>();
                 services.AddTransient<KundeStartView>();
                 services.AddTransient<KundeMenuView>();
+                services.AddTransient<KundeMixSelvView>();
                 
-                //services
+                // services
                 services.AddSingleton<IEventSessionService, EventSessionService>();
                 services.AddSingleton<INavigationService, NavigationService>();
-                
+
+                // UI sizing settings (initialized once at first customer start)
+                services.AddSingleton<CarouselSizingSettings>();
+
                 services.AddSingleton<IRobotDashboardStreamReader>(sp =>
                 {
                     var log = sp.GetRequiredService<ILogLogic>();

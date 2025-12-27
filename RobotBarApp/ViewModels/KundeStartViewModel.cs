@@ -44,20 +44,51 @@ public class KundeStartViewModel : ViewModelBase
 
     private void OpenMixSelv()
     {
-        // TODO: replace with real MixSelv view when available
-        var mixSelvWindow = new Window
+        // Show MixSelv inside the existing KundeStartView (HostContent) instead of opening a new window.
+        var startWindow = Application.Current.Windows
+            .OfType<KundeStartView>()
+            .FirstOrDefault();
+
+        if (startWindow == null)
+            return;
+
+        var mixSelvView = ActivatorUtilities.CreateInstance<KundeMixSelvView>(_provider);
+
+        // Inject ingredient logic so MixSelv can populate the overlay carousel from DB.
+        var ingredientLogic = _provider.GetRequiredService<IIngredientLogic>();
+        var mixSelvVm = new KundeMixSelvViewModel(ingredientLogic);
+        mixSelvView.DataContext = mixSelvVm;
+
+        mixSelvVm.PourRequested += (_, _) =>
         {
-            Title = "Mix Selv (placeholder)",
-            WindowState = WindowState.Maximized,
-            WindowStyle = WindowStyle.None,
-            ResizeMode = ResizeMode.NoResize,
-            Background = System.Windows.Media.Brushes.Black
+            // Swap to the pour screen, reusing the same ingredient selection and liquid segments.
+            var pourView = ActivatorUtilities.CreateInstance<KundeMixSelvPourView>(_provider);
+            var pourVm = new KundeMixSelvPourViewModel(mixSelvVm.SelectedIngredients, mixSelvVm.LiquidSegments);
+            pourView.DataContext = pourVm;
+
+            pourVm.BackRequested += (_, _) =>
+            {
+                startWindow.HostContent.Content = mixSelvView;
+                startWindow.Activate();
+                startWindow.Focus();
+            };
+
+            startWindow.HostContent.Content = pourView;
+            startWindow.Activate();
+            startWindow.Focus();
         };
 
-        mixSelvWindow.Show();
-        mixSelvWindow.Activate();
+        mixSelvView.BackRequested += (_, _) =>
+        {
+            // Clear the hosted content and show the start screen again.
+            startWindow.HostContent.Content = null;
+            startWindow.StartRoot.Visibility = Visibility.Visible;
+            startWindow.Activate();
+            startWindow.Focus();
+        };
 
-        CloseKundeStartWindow();
+        startWindow.HostContent.Content = mixSelvView;
+        startWindow.StartRoot.Visibility = Visibility.Collapsed;
     }
 
     private static void CloseKundeStartWindow()
