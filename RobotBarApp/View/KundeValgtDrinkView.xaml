@@ -100,14 +100,19 @@
 
                 <!-- ORDER BUTTON -->
                 <Button Grid.Row="1"
-                        Content="BESTIL"
-                        FontSize="36"
-                        FontWeight="Bold"
                         Height="120"
                         Width="380"
                         HorizontalAlignment="Right"
-                        Margin="0,40,0,0"
-                        Command="{Binding BestilCommand}"/>
+                        Margin="0,40,100,0"
+                        Command="{Binding BestilCommand}"
+                        Padding="0">
+                    <Image Source="/Resources/Icons/BestilDrink.png"
+                           Stretch="Uniform"
+                           StretchDirection="Both"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Button>
             </Grid>
         </Grid>
     </Grid>
