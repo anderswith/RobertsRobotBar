@@ -53,7 +53,10 @@ public class KundeStartViewModel : ViewModelBase
             return;
 
         var mixSelvView = ActivatorUtilities.CreateInstance<KundeMixSelvView>(_provider);
-        mixSelvView.DataContext = ActivatorUtilities.CreateInstance<KundeMixSelvViewModel>(_provider);
+
+        // Inject ingredient logic so MixSelv can populate the overlay carousel from DB.
+        var ingredientLogic = _provider.GetRequiredService<IIngredientLogic>();
+        mixSelvView.DataContext = new KundeMixSelvViewModel(ingredientLogic);
 
         mixSelvView.BackRequested += (_, _) =>
         {

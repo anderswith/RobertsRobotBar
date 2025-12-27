@@ -68,5 +68,13 @@ namespace RobotBarApp.View
             Debug.WriteLine("[KundeMixSelv] Back_Click invoked");
             BackRequested?.Invoke(this, EventArgs.Empty);
         }
+
+        private void OverlayBackground_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (DataContext is KundeMixSelvViewModel vm)
+                vm.IsOverlayOpen = false;
+
+            e.Handled = true;
+        }
     }
 }

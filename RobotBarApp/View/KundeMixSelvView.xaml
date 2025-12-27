@@ -1,7 +1,6 @@
 ﻿<UserControl x:Class="RobotBarApp.View.KundeMixSelvView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:view="clr-namespace:RobotBarApp.View"
              xmlns:converters="clr-namespace:RobotBarApp.Converters"
              xmlns:behaviors="clr-namespace:RobotBarApp.Behaviors"
@@ -12,18 +11,41 @@
         <ObjectDataProvider x:Key="CarouselSizing"
                             ObjectType="{x:Type ui:CarouselSizingSettings}"
                             MethodName="get_Instance" />
+        <converters:OverlayIngredientCardSizeMultiConverter x:Key="OverlayIngredientCardSize"/>
+        <converters:OverlayIngredientCardMarginMultiConverter x:Key="OverlayIngredientCardMargin"/>
         <converters:BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
         <converters:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibility"/>
 
         <DataTemplate x:Key="IngredientCardTemplate">
-            <view:KundeIngredientCard
-                Width="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardWidth}"
-                Height="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardHeight}"
-                Margin="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardMargin}"
-                Title="{Binding Name}"
-                ImagePath="{Binding ImagePath}"
-                Command="{Binding DataContext.SelectIngredientCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                CommandParameter="{Binding}"/>
+            <!-- Size is computed from popup's ActualWidth/ActualHeight so overlay never gets oversized. -->
+            <Grid x:Name="OverlayCardSlot"
+                  ClipToBounds="True">
+                <Grid.Width>
+                    <MultiBinding Converter="{StaticResource OverlayIngredientCardSize}" ConverterParameter="W">
+                        <Binding ElementName="OverlayPopup" Path="ActualWidth"/>
+                        <Binding ElementName="OverlayPopup" Path="ActualHeight"/>
+                    </MultiBinding>
+                </Grid.Width>
+                <Grid.Height>
+                    <MultiBinding Converter="{StaticResource OverlayIngredientCardSize}" ConverterParameter="H">
+                        <Binding ElementName="OverlayPopup" Path="ActualWidth"/>
+                        <Binding ElementName="OverlayPopup" Path="ActualHeight"/>
+                    </MultiBinding>
+                </Grid.Height>
+                <Grid.Margin>
+                    <MultiBinding Converter="{StaticResource OverlayIngredientCardMargin}">
+                        <Binding ElementName="OverlayPopup" Path="ActualWidth"/>
+                    </MultiBinding>
+                </Grid.Margin>
+
+                <view:KundeIngredientCard
+                    Width="{Binding ActualWidth, ElementName=OverlayCardSlot}"
+                    Height="{Binding ActualHeight, ElementName=OverlayCardSlot}"
+                    Title="{Binding Name}"
+                    ImagePath="{Binding ImagePath}"
+                    Command="{Binding DataContext.SelectIngredientCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    CommandParameter="{Binding}"/>
+            </Grid>
         </DataTemplate>
 
         <Style x:Key="QtyButtonStyle" TargetType="Button">
@@ -238,76 +260,86 @@
                   Background="#99000000"
                   Visibility="{Binding IsOverlayOpen, Converter={StaticResource BoolToVisibility}}">
 
-                <Border Width="1500"
+                <!-- Click-catcher: clicking the dimmed area closes the overlay -->
+                <Border Background="Transparent"
+                        PreviewMouseLeftButtonDown="OverlayBackground_MouseLeftButtonDown"/>
+
+                <Border x:Name="OverlayPopup"
+                        Width="1500"
                         Height="720"
                         Background="White"
                         CornerRadius="6"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
 
-                    <Grid Margin="30">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                    <!-- Prevent clicks inside popup from reaching the background click-catcher, 
+                         while not blocking child controls like the ingredient buttons. -->
+                    <Grid>
+                        <!-- Popup content -->
+                        <Grid Margin="30">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-                        <TextBlock FontSize="44"
-                                   FontWeight="SemiBold"
-                                   Foreground="#2F4A3B"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,10,0,30"
-                                   Text="{Binding OverlayTitle}"/>
+                            <TextBlock FontSize="44"
+                                       FontWeight="SemiBold"
+                                       Foreground="#2F4A3B"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,10,0,30"
+                                       Text="{Binding OverlayTitle}"/>
 
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
 
-                            <Button Grid.Column="0"
-                                    Width="90"
-                                    Height="250"
-                                    Cursor="Hand"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Click="OverlayScrollLeft_Click"
-                                    VerticalAlignment="Center">
-                                <Image Source="/Resources/Icons/ArrowGreenLeft.png" Stretch="Uniform"/>
-                            </Button>
+                                <Button Grid.Column="0"
+                                        Width="90"
+                                        Height="250"
+                                        Cursor="Hand"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Click="OverlayScrollLeft_Click"
+                                        VerticalAlignment="Center">
+                                    <Image Source="/Resources/Icons/ArrowGreenLeft.png" Stretch="Uniform"/>
+                                </Button>
 
-                            <ScrollViewer x:Name="OverlayScroll"
-                                          Grid.Column="1"
-                                          HorizontalScrollBarVisibility="Hidden"
-                                          VerticalScrollBarVisibility="Disabled"
-                                          PanningMode="HorizontalOnly"
-                                          IsManipulationEnabled="True"
-                                          CanContentScroll="False"
-                                          behaviors:CenteredSnapCarouselBehavior.IsEnabled="True"
-                                          behaviors:CenteredSnapCarouselBehavior.HighlightScale="1.12"
-                                          behaviors:CenteredSnapCarouselBehavior.SnapDebounceMs="220"
-                                          behaviors:CenteredSnapCarouselBehavior.SnapAnimationMs="240"
-                                          behaviors:CenteredSnapCarouselBehavior.TapCommand="{Binding SelectIngredientCommand}">
-                                <ItemsControl ItemsSource="{Binding OverlayIngredients}"
-                                              ItemTemplate="{StaticResource IngredientCardTemplate}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                            </ScrollViewer>
+                                <ScrollViewer x:Name="OverlayScroll"
+                                              Grid.Column="1"
+                                              HorizontalScrollBarVisibility="Hidden"
+                                              VerticalScrollBarVisibility="Disabled"
+                                              PanningMode="HorizontalOnly"
+                                              IsManipulationEnabled="True"
+                                              CanContentScroll="False"
+                                              behaviors:CenteredSnapCarouselBehavior.IsEnabled="True"
+                                              behaviors:CenteredSnapCarouselBehavior.HighlightScale="1.12"
+                                              behaviors:CenteredSnapCarouselBehavior.SnapDebounceMs="220"
+                                              behaviors:CenteredSnapCarouselBehavior.SnapAnimationMs="240"
+                                              behaviors:CenteredSnapCarouselBehavior.TapCommand="{Binding SelectIngredientCommand}">
+                                    <ItemsControl ItemsSource="{Binding OverlayIngredients}"
+                                                  ItemTemplate="{StaticResource IngredientCardTemplate}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </ScrollViewer>
 
-                            <Button Grid.Column="2"
-                                    Width="90"
-                                    Height="250"
-                                    Cursor="Hand"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Click="OverlayScrollRight_Click"
-                                    VerticalAlignment="Center">
-                                <Image Source="/Resources/Icons/ArrowGreenRight.png" Stretch="Uniform"/>
-                            </Button>
+                                <Button Grid.Column="2"
+                                        Width="90"
+                                        Height="250"
+                                        Cursor="Hand"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Click="OverlayScrollRight_Click"
+                                        VerticalAlignment="Center">
+                                    <Image Source="/Resources/Icons/ArrowGreenRight.png" Stretch="Uniform"/>
+                                </Button>
+                            </Grid>
                         </Grid>
                     </Grid>
                 </Border>

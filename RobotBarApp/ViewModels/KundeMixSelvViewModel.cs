@@ -4,6 +4,8 @@ using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using RobotBarApp.BLL.Interfaces;
+using RobotBarApp.BE;
 
 public sealed class KundeMixSelvViewModel : ViewModelBase
 {
@@ -136,6 +138,9 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
     public ICommand DecreaseClCommand { get; }
     public ICommand BestilCommand { get; }
 
+    private readonly IIngredientLogic? _ingredientLogic;
+    private readonly Guid _eventId;
+
     public KundeMixSelvViewModel()
     {
         BackCommand = new RelayCommand(_ => BackRequested?.Invoke(this, EventArgs.Empty));
@@ -159,6 +164,15 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
         UpdateLiquidVisuals();
     }
 
+    public KundeMixSelvViewModel(IIngredientLogic ingredientLogic, Guid eventId = default)
+        : this()
+    {
+        _ingredientLogic = ingredientLogic;
+        _eventId = eventId;
+    }
+
+    private Guid EffectiveEventId => _eventId == Guid.Empty ? Guid.Empty : _eventId;
+
     private void SelectCategory(string? category)
     {
         var cat = string.IsNullOrWhiteSpace(category) ? "Kategori" : category;
@@ -166,12 +180,62 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
 
         OverlayIngredients.Clear();
 
-        // TODO: Replace with real data source (BLL/DB) when ready.
-        OverlayIngredients.Add(new IngredientChoice("Vodka", "/Resources/IngredientPics/doge_20251210150457477.jpg"));
-        OverlayIngredients.Add(new IngredientChoice("Rom", "/Resources/IngredientPics/doge2_20251210150515992.jpg"));
-        OverlayIngredients.Add(new IngredientChoice("Tequila", "/Resources/IngredientPics/doge3_20251210150530232.jpg"));
-        OverlayIngredients.Add(new IngredientChoice("Dry gin", "/Resources/IngredientPics/ingredient_20251207221554255.jpg"));
-        OverlayIngredients.Add(new IngredientChoice("Champagne", "/Resources/IngredientPics/imagecheck8_20251207220129565.jpg"));
+        if (_ingredientLogic != null)
+        {
+            var hasEventContext = EffectiveEventId != Guid.Empty;
+
+            // Map UI button labels to Ingredient.Type values in DB.
+            // NOTE: Your DB uses types like "Alkohol", "Syrup", "Soda" (see IngredientLogic).
+            string? desiredType = cat switch
+            {
+                "Alkohol" => "Alkohol",
+                "Mockohol" => "Mockohol",
+                "Sirup" => "Syrup",
+                "Sodavand" => "Soda",
+                _ => null
+            };
+
+            IEnumerable<Ingredient> ingredients;
+            if (hasEventContext)
+            {
+                ingredients = cat switch
+                {
+                    "Alkohol" => _ingredientLogic.GetAlcohol(EffectiveEventId),
+                    // If Mockohol is event-scoped in your DB via BarSetups, this should ideally be a dedicated BLL method.
+                    // For now, filter all ingredients by the DB type.
+                    "Mockohol" => _ingredientLogic.GetAllIngredients().Where(i => i.Type == "Mockohol"),
+                    "Sirup" => _ingredientLogic.GetSyrups(EffectiveEventId),
+                    "Sodavand" => _ingredientLogic.GetSoda(EffectiveEventId),
+                    _ => _ingredientLogic.GetAllIngredients()
+                };
+            }
+            else
+            {
+                // No event context: still filter correctly by type.
+                ingredients = _ingredientLogic.GetAllIngredients();
+                if (!string.IsNullOrWhiteSpace(desiredType))
+                    ingredients = ingredients.Where(i => i.Type == desiredType);
+            }
+
+            foreach (var i in ingredients)
+            {
+                if (string.IsNullOrWhiteSpace(i.Name))
+                    continue;
+
+                var img = i.Image ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(img) && !img.StartsWith("/"))
+                    img = "/" + img;
+
+                OverlayIngredients.Add(new IngredientChoice(i.Name, img));
+            }
+        }
+        else
+        {
+            // Fallback placeholders (designer/dev mode)
+            OverlayIngredients.Add(new IngredientChoice("Vodka", "/Resources/IngredientPics/doge_20251210150457477.jpg"));
+            OverlayIngredients.Add(new IngredientChoice("Rom", "/Resources/IngredientPics/doge2_20251210150515992.jpg"));
+            OverlayIngredients.Add(new IngredientChoice("Tequila", "/Resources/IngredientPics/doge3_20251210150530232.jpg"));
+        }
 
         IsOverlayOpen = true;
     }
