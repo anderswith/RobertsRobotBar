@@ -9,10 +9,10 @@
         Background="Black">
     <Grid>
         <!-- This hosts sub-views (Menu/MixSelv). When null, we show the start background + buttons. -->
-        <ContentControl x:Name="HostContent" />
+        <ContentControl x:Name="HostContent" x:FieldModifier="public" />
 
         <!-- START SCREEN (only visible when HostContent is empty) -->
-        <Grid x:Name="StartRoot">
+        <Grid x:Name="StartRoot" x:FieldModifier="public">
             <!-- Background image -->
             <Image Source="/RobotBarApp;component/Resources/Kundeview/Kunde_view.png"
                    Stretch="UniformToFill"
@@ -63,8 +63,7 @@
                         Background="Transparent"
                         BorderThickness="0"
                         Cursor="Hand"
-                        Command="{Binding OpenMixSelvCommand}"
-                        Click="MixSelv_Click">
+                        Command="{Binding OpenMixSelvCommand}">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Grid Background="Transparent">

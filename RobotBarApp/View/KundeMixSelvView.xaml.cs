@@ -12,9 +12,13 @@ namespace RobotBarApp.View
         {
             InitializeComponent();
 
-            // Ensure we have a VM. If parent already set DataContext, we won't overwrite it.
+            // Prefer DI/parent-provided DataContext.
+            // Fallback to AppHost if nothing is set (keeps designer/runtime robust).
             if (DataContext == null)
-                DataContext = new KundeMixSelvViewModel();
+            {
+                DataContext = App.AppHost?.Services.GetService(typeof(KundeMixSelvViewModel)) as KundeMixSelvViewModel
+                              ?? new KundeMixSelvViewModel();
+            }
 
             if (DataContext is KundeMixSelvViewModel vm)
                 vm.BackRequested += (_, _) => BackRequested?.Invoke(this, EventArgs.Empty);

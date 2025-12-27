@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿﻿using System.Diagnostics;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -66,6 +66,7 @@ public partial class App : Application
                 services.AddTransient<KundeValgtDrinkViewModel>();
                 services.AddTransient<KundeStartViewModel>();
                 services.AddTransient<KundeMenuViewModel>();
+                services.AddTransient<KundeMixSelvViewModel>();
                 
                 // Views
                 services.AddTransient<EventListView>();
@@ -81,6 +82,7 @@ public partial class App : Application
                 services.AddTransient<KundeValgtDrinkView>();
                 services.AddTransient<KundeStartView>();
                 services.AddTransient<KundeMenuView>();
+                services.AddTransient<KundeMixSelvView>();
                 
                 //services
                 services.AddSingleton<IEventSessionService, EventSessionService>();

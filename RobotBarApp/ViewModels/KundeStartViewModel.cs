@@ -44,20 +44,28 @@ public class KundeStartViewModel : ViewModelBase
 
     private void OpenMixSelv()
     {
-        // TODO: replace with real MixSelv view when available
-        var mixSelvWindow = new Window
+        // Show MixSelv inside the existing KundeStartView (HostContent) instead of opening a new window.
+        var startWindow = Application.Current.Windows
+            .OfType<KundeStartView>()
+            .FirstOrDefault();
+
+        if (startWindow == null)
+            return;
+
+        var mixSelvView = ActivatorUtilities.CreateInstance<KundeMixSelvView>(_provider);
+        mixSelvView.DataContext = ActivatorUtilities.CreateInstance<KundeMixSelvViewModel>(_provider);
+
+        mixSelvView.BackRequested += (_, _) =>
         {
-            Title = "Mix Selv (placeholder)",
-            WindowState = WindowState.Maximized,
-            WindowStyle = WindowStyle.None,
-            ResizeMode = ResizeMode.NoResize,
-            Background = System.Windows.Media.Brushes.Black
+            // Clear the hosted content and show the start screen again.
+            startWindow.HostContent.Content = null;
+            startWindow.StartRoot.Visibility = Visibility.Visible;
+            startWindow.Activate();
+            startWindow.Focus();
         };
 
-        mixSelvWindow.Show();
-        mixSelvWindow.Activate();
-
-        CloseKundeStartWindow();
+        startWindow.HostContent.Content = mixSelvView;
+        startWindow.StartRoot.Visibility = Visibility.Collapsed;
     }
 
     private static void CloseKundeStartWindow()
