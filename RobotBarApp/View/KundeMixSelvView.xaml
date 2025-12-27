@@ -122,7 +122,7 @@
                   HorizontalAlignment="Left"
                   Margin="0,0,40,0">
 
-                <Viewbox Stretch="Uniform" Width="560" Height="560">
+                <Viewbox Stretch="Uniform" Width="720" Height="720">
                     <Grid Width="520" Height="520">
 
                         <!-- Glass FIRST -->
@@ -211,20 +211,6 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-
-                    <Button Width="220"
-                            Height="90"
-                            HorizontalAlignment="Left"
-                            Cursor="Hand"
-                            Background="#F7F4EE"
-                            BorderBrush="#2F4A3B"
-                            BorderThickness="2"
-                            Visibility="{Binding HasSelectedIngredients, Converter={StaticResource BoolToVisibility}}"
-                            Command="{Binding BestilCommand}">
-                        <Image Source="/Resources/Icons/Bestil.png"
-                               Stretch="Uniform"
-                               RenderOptions.BitmapScalingMode="HighQuality"/>
-                    </Button>
                 </StackPanel>
             </Grid>
 
@@ -347,6 +333,28 @@
                     </Grid>
                 </Border>
             </Grid>
+
+            <!-- Bottom-centered BESTIL button, spans full layout -->
+            <Button Grid.ColumnSpan="3"
+                    Width="220"
+                    Height="90"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Margin="0,0,0,20"
+                    Cursor="Hand"
+                    Background="#F7F4EE"
+                    BorderBrush="#2F4A3B"
+                    BorderThickness="2"
+                    Padding="0"
+                    Visibility="{Binding HasSelectedIngredients, Converter={StaticResource BoolToVisibility}}"
+                    Command="{Binding BestilCommand}">
+                <Image Source="/Resources/Icons/BestilMixSelv.png"
+                       Stretch="Uniform"
+                       StretchDirection="Both"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+            </Button>
         </Grid>
     </Grid>
 </UserControl>
