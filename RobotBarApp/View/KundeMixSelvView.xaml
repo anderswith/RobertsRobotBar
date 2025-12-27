@@ -76,13 +76,14 @@
         <!-- HEADER -->
         <Grid Grid.Row="0" Margin="28,18,28,0" Panel.ZIndex="1000">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Back -->
             <Button Grid.Column="0"
+                    HorizontalAlignment="Left"
                     Width="160"
                     Height="60"
                     Background="Transparent"

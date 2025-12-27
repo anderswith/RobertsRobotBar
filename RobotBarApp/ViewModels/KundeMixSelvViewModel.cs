@@ -1,4 +1,4 @@
-﻿namespace RobotBarApp.ViewModels;
+﻿﻿namespace RobotBarApp.ViewModels;
 
 using System;
 using System.Collections.ObjectModel;
@@ -82,6 +82,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
     private const int SegmentCount = GlassMaxCl / SegmentCl; // 15
 
     public event EventHandler? BackRequested;
+    public event EventHandler? PourRequested;
 
     // Overlay
     private bool _isOverlayOpen;
@@ -387,8 +388,8 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
 
     private void Bestil()
     {
-        // Placeholder. Later: call ordering service.
-        MessageBox.Show($"Bestilt: {string.Join(", ", SelectedIngredients.Select(i => i.DisplayText))}");
+        // Navigate to pour view (host handles swapping views)
+        PourRequested?.Invoke(this, EventArgs.Empty);
     }
 
     private void UpdateLiquidSegments()

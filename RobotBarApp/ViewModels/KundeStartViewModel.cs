@@ -56,7 +56,27 @@ public class KundeStartViewModel : ViewModelBase
 
         // Inject ingredient logic so MixSelv can populate the overlay carousel from DB.
         var ingredientLogic = _provider.GetRequiredService<IIngredientLogic>();
-        mixSelvView.DataContext = new KundeMixSelvViewModel(ingredientLogic);
+        var mixSelvVm = new KundeMixSelvViewModel(ingredientLogic);
+        mixSelvView.DataContext = mixSelvVm;
+
+        mixSelvVm.PourRequested += (_, _) =>
+        {
+            // Swap to the pour screen, reusing the same ingredient selection and liquid segments.
+            var pourView = ActivatorUtilities.CreateInstance<KundeMixSelvPourView>(_provider);
+            var pourVm = new KundeMixSelvPourViewModel(mixSelvVm.SelectedIngredients, mixSelvVm.LiquidSegments);
+            pourView.DataContext = pourVm;
+
+            pourVm.BackRequested += (_, _) =>
+            {
+                startWindow.HostContent.Content = mixSelvView;
+                startWindow.Activate();
+                startWindow.Focus();
+            };
+
+            startWindow.HostContent.Content = pourView;
+            startWindow.Activate();
+            startWindow.Focus();
+        };
 
         mixSelvView.BackRequested += (_, _) =>
         {
