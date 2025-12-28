@@ -90,7 +90,7 @@
                     BorderThickness="0"
                     Cursor="Hand"
                     Command="{Binding BackCommand}"
-                    Click="Back_Click">
+                    >
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Resources/Icons/ArrowGreenLeft.png"
                            Height="28"

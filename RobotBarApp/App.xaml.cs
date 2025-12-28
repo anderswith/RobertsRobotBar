@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿﻿using System.Diagnostics;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -68,6 +68,7 @@ public partial class App : Application
                 services.AddTransient<KundeStartViewModel>();
                 services.AddTransient<KundeMenuViewModel>();
                 services.AddTransient<KundeMixSelvViewModel>();
+                services.AddTransient<KundeMixSelvPourViewModel>();
                 services.AddTransient<KundeMainViewModel>();
                 
                 
