@@ -12,92 +12,27 @@ public class KundeStartViewModel : ViewModelBase
 {
     public ICommand OpenMenuCommand { get; }
     public ICommand OpenMixSelvCommand { get; }
-    private readonly IServiceProvider _provider;
+    private readonly INavigationService _navigation;
+
 
     public KundeStartViewModel(
-        IMenuLogic menuLogic,
-        IServiceProvider provider)
+        INavigationService navigation
+        )
     {
-        _provider = provider;
-
+        _navigation = navigation;
         OpenMenuCommand = new RelayCommand(_ => OpenMenu());
         OpenMixSelvCommand = new RelayCommand(_ => OpenMixSelv());
     }
 
     private void OpenMenu()
     {
-        var menuWindow =
-            ActivatorUtilities.CreateInstance<KundeMenuView>(_provider);
-
-        menuWindow.DataContext =
-            ActivatorUtilities.CreateInstance<KundeMenuViewModel>(_provider);
-
-        menuWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        menuWindow.WindowState = WindowState.Maximized;
-        menuWindow.WindowStyle = WindowStyle.None;
-
-        menuWindow.Show();
-        menuWindow.Activate();
-
-        CloseKundeStartWindow();
+        _navigation.NavigateTo<KundeMenuViewModel>();
     }
 
     private void OpenMixSelv()
     {
-        // Show MixSelv inside the existing KundeStartView (HostContent) instead of opening a new window.
-        var startWindow = Application.Current.Windows
-            .OfType<KundeStartView>()
-            .FirstOrDefault();
-
-        if (startWindow == null)
-            return;
-
-        var mixSelvView = ActivatorUtilities.CreateInstance<KundeMixSelvView>(_provider);
-
-        // Inject ingredient logic so MixSelv can populate the overlay carousel from DB.
-        var ingredientLogic = _provider.GetRequiredService<IIngredientLogic>();
-        var mixSelvVm = new KundeMixSelvViewModel(ingredientLogic);
-        mixSelvView.DataContext = mixSelvVm;
-
-        mixSelvVm.PourRequested += (_, _) =>
-        {
-            // Swap to the pour screen, reusing the same ingredient selection and liquid segments.
-            var pourView = ActivatorUtilities.CreateInstance<KundeMixSelvPourView>(_provider);
-            var pourVm = new KundeMixSelvPourViewModel(mixSelvVm.SelectedIngredients, mixSelvVm.LiquidSegments);
-            pourView.DataContext = pourVm;
-
-            pourVm.BackRequested += (_, _) =>
-            {
-                startWindow.HostContent.Content = mixSelvView;
-                startWindow.Activate();
-                startWindow.Focus();
-            };
-
-            startWindow.HostContent.Content = pourView;
-            startWindow.Activate();
-            startWindow.Focus();
-        };
-
-        mixSelvView.BackRequested += (_, _) =>
-        {
-            // Clear the hosted content and show the start screen again.
-            startWindow.HostContent.Content = null;
-            startWindow.StartRoot.Visibility = Visibility.Visible;
-            startWindow.Activate();
-            startWindow.Focus();
-        };
-
-        startWindow.HostContent.Content = mixSelvView;
-        startWindow.StartRoot.Visibility = Visibility.Collapsed;
+        _navigation.NavigateTo<KundeMixSelvViewModel>();
     }
 
-    private static void CloseKundeStartWindow()
-    {
-        // Find any open KundeStartView window and close it
-        var startWindow = Application.Current.Windows
-            .OfType<KundeStartView>()
-            .FirstOrDefault();
 
-        startWindow?.Close();
-    }
 }

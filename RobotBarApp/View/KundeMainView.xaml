@@ -1,0 +1,41 @@
+<Window x:Class="RobotBarApp.View.KundeMainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:view="clr-namespace:RobotBarApp.View"
+        xmlns:vm="clr-namespace:RobotBarApp.ViewModels"
+        mc:Ignorable="d"
+        Title="KundeMainView"
+        WindowState="Maximized"
+        WindowStyle="None">
+
+    <Grid>
+        <ContentControl Content="{Binding CurrentViewModel}" />
+    </Grid>
+    
+    <Window.Resources>
+
+        <DataTemplate DataType="{x:Type vm:KundeStartViewModel}">
+            <view:KundeStartView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:KundeMenuViewModel}">
+            <view:KundeMenuView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:KundeValgtDrinkViewModel}">
+            <view:KundeValgtDrinkView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:KundeMixSelvViewModel}">
+            <view:KundeMixSelvView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:KundeMixSelvPourViewModel}">
+            <view:KundeMixSelvPourView />
+        </DataTemplate>
+
+    </Window.Resources>
+
+</Window>

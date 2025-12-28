@@ -1,10 +1,11 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using RobotBarApp.Services.UI;
 
 namespace RobotBarApp.View
 {
-    public partial class KundeStartView : Window
+    public partial class KundeStartView : UserControl
     {
         public KundeStartView()
         {
