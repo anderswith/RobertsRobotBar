@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Input;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.BE;
+using RobotBarApp.Services.Interfaces;
 using RobotBarApp.Settings;
 
 public sealed class KundeMixSelvViewModel : ViewModelBase
@@ -193,6 +194,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
     public ICommand DecreaseClCommand { get; }
     public ICommand BestilCommand { get; }
 
+    private readonly INavigationService? _navigation;
     private readonly IIngredientLogic? _ingredientLogic;
     private readonly Guid _eventId;
 
@@ -242,6 +244,40 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
     {
         _ingredientLogic = ingredientLogic;
         _eventId = eventId;
+    }
+
+    // Used by INavigationService navigation (ActivatorUtilities) to pass a single parameter object.
+    public KundeMixSelvViewModel(MixSelvSession session, IIngredientLogic ingredientLogic, INavigationService navigation)
+        : this(ingredientLogic, session.EventId)
+    {
+        _navigation = navigation;
+
+        // Ensure Back behaves consistently even when we were created via parameter navigation.
+        BackCommand = new RelayCommand(_ => _navigation.NavigateTo<KundeStartViewModel>());
+
+        // Replace state collections so the UI can continue with whatever session was passed in.
+        SelectedIngredients.Clear();
+        LiquidSegments.Clear();
+
+        foreach (var item in session.SelectedIngredients)
+            SelectedIngredients.Add(item);
+
+        foreach (var seg in session.LiquidSegments)
+            LiquidSegments.Add(seg);
+
+        UpdateLiquidSegments();
+        UpdateLiquidVisuals();
+        RaiseCanExecute();
+    }
+
+    // Preferred constructor for normal DI activation (no session parameter)
+    public KundeMixSelvViewModel(IIngredientLogic ingredientLogic, INavigationService navigation, Guid eventId = default)
+        : this(ingredientLogic, eventId)
+    {
+        _navigation = navigation;
+
+        // Align behavior with rest of app: Back navigates via INavigationService.
+        BackCommand = new RelayCommand(_ => _navigation.NavigateTo<KundeStartViewModel>());
     }
 
     private Guid EffectiveEventId => _eventId == Guid.Empty ? Guid.Empty : _eventId;
@@ -468,7 +504,15 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
 
     private void Bestil()
     {
-        // Navigate to pour view (host handles swapping views)
+        // Navigate to pour view and pass the current drink graphics/state.
+        if (_navigation != null)
+        {
+            var session = new MixSelvSession(SelectedIngredients, LiquidSegments, EffectiveEventId);
+            _navigation.NavigateTo<KundeMixSelvPourViewModel>(session);
+            return;
+        }
+
+        // Fallback (e.g., designer mode / legacy wiring)
         PourRequested?.Invoke(this, EventArgs.Empty);
     }
 

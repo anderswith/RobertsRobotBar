@@ -1,8 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using RobotBarApp.Services.Interfaces;
 
 namespace RobotBarApp.ViewModels
 {
@@ -31,8 +33,30 @@ namespace RobotBarApp.ViewModels
 
         public ICommand BackCommand { get; }
 
+        private readonly INavigationService? _navigation;
         private readonly CancellationTokenSource _cts = new();
 
+        // Constructor used by NavigationService (single parameter)
+        public KundeMixSelvPourViewModel(MixSelvSession session, INavigationService navigation)
+        {
+            _navigation = navigation;
+
+            SelectedIngredients = session.SelectedIngredients;
+            LiquidSegments = session.LiquidSegments;
+
+            SelectedIngredients.CollectionChanged += (_, _) =>
+            {
+                OnPropertyChanged(nameof(HasSelectedIngredients));
+                OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
+            };
+
+            BackCommand = new RelayCommand(_ => NavigateBackFresh());
+
+            // Temporary demo progress (replace with robot pour progress later).
+            _ = RunFakeProgressAsync(_cts.Token);
+        }
+
+        // Fallback for designer/legacy usage
         public KundeMixSelvPourViewModel(
             ObservableCollection<KundeMixSelvViewModel.SelectedIngredientItem> selectedIngredients,
             ObservableCollection<KundeMixSelvViewModel.LiquidSegment> liquidSegments)
@@ -52,6 +76,20 @@ namespace RobotBarApp.ViewModels
             _ = RunFakeProgressAsync(_cts.Token);
         }
 
+        private void NavigateBackFresh()
+        {
+            _cts.Cancel();
+
+            if (_navigation == null)
+            {
+                BackRequested?.Invoke(this, EventArgs.Empty);
+                return;
+            }
+
+            var emptySession = KundeMixSelvViewModelFactory.CreateEmptySession();
+            _navigation.NavigateTo<KundeMixSelvViewModel>(emptySession);
+        }
+
         private async Task RunFakeProgressAsync(CancellationToken ct)
         {
             PourProgress = 0;
@@ -63,4 +101,3 @@ namespace RobotBarApp.ViewModels
         }
     }
 }
-
