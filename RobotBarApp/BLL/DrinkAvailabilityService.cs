@@ -17,20 +17,30 @@ public class DrinkAvailabilityService : IDrinkAvailabilityService
 
     public IEnumerable<Drink> GetAvailableDrinksForEvent(Guid eventId)
     {
-        // 1. Ingredients available on the bar for this event
-        var barIngredientIds = _barSetupRepo
+        // 1. Build lookup: IngredientId -> PositionNumber for THIS event
+        var barPositions = _barSetupRepo
             .GetBarSetupForEvent(eventId)
-            .Select(bs => bs.IngredientId)
-            .ToList();
+            .ToDictionary(
+                bs => bs.IngredientId,
+                bs => bs.PositionNumber);
 
-        // 2. All drinks with their DrinkContent loaded
-        var drinks = _drinkRepo.GetAllDrinksWithContent().ToList();
+        // 2. Load all drinks with full ingredient + position metadata
+        var drinks = _drinkRepo
+            .GetAllDrinksWithContentAndIngredientPositions();
 
-        // 3. Filter drinks that can be made from bar ingredients
+        // 3. Filter drinks by position compatibility
         return drinks
             .Where(drink =>
                 drink.DrinkContents.All(dc =>
-                    barIngredientIds.Contains(dc.IngredientId)))
+                {
+                    // Ingredient must exist on the bar
+                    if (!barPositions.TryGetValue(dc.IngredientId, out var barPosition))
+                        return false;
+
+                    // Ingredient must allow that position
+                    return dc.Ingredient.IngredientPositions
+                        .Any(ip => ip.Position == barPosition);
+                }))
             .ToList();
     }
 }
