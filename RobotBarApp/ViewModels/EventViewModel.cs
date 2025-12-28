@@ -143,16 +143,11 @@ namespace RobotBarApp.ViewModels
         private void Launch()
         {
             _eventSessionService.StartEvent(EventId);
-            var vm = ActivatorUtilities.CreateInstance<KundeStartViewModel>(_provider);
+            var customerWindow =
+                _provider.GetRequiredService<KundeMainView>();
 
-            var startWindow = ActivatorUtilities.CreateInstance<KundeStartView>(_provider);
-            startWindow.DataContext = vm;
-            startWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            startWindow.WindowState = WindowState.Maximized;
-            startWindow.WindowStyle = WindowStyle.None;
-
-            startWindow.Show();
-            startWindow.Activate();
+            customerWindow.Show();
+            customerWindow.Activate();
 
         }
     }

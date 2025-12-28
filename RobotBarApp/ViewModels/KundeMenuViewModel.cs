@@ -20,15 +20,13 @@ public class KundeMenuViewModel : ViewModelBase
     public ICommand BackCommand { get; }
     
     private readonly INavigationService _navigation;
-    private readonly IServiceProvider _provider;
     
     public KundeMenuViewModel(
         IMenuLogic menuLogic,
-        INavigationService navigation,
-        IServiceProvider provider)
+        INavigationService navigation)
     {
         _navigation = navigation;
-        _provider = provider;
+
         Drinks = new ObservableCollection<Drink>(
             menuLogic.GetMenuWithDrinksAndIngredients());
         
@@ -40,31 +38,12 @@ public class KundeMenuViewModel : ViewModelBase
     {
         if (parameter is not Drink drink)
             return;
-
-        var vm = ActivatorUtilities.CreateInstance<KundeValgtDrinkViewModel>(
-            _provider,
-            drink); // runtime data only
-
-        var window = new KundeValgtDrinkView
-        {
-            DataContext = vm,
-            WindowState = WindowState.Maximized,
-            WindowStyle = WindowStyle.None
-        };
-
-        window.Show();
-        CloseMenu();
+        _navigation.NavigateTo<KundeValgtDrinkViewModel>(drink);
+        
     }
     private void GoBack()
     {
         _navigation.NavigateTo<KundeStartViewModel>();
     }
     
-    private static void CloseMenu()
-    {
-        Application.Current.Windows
-            .OfType<KundeMenuView>()
-            .FirstOrDefault()
-            ?.Close();
-    }
 }

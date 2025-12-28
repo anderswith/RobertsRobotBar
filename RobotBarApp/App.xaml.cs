@@ -68,6 +68,8 @@ public partial class App : Application
                 services.AddTransient<KundeStartViewModel>();
                 services.AddTransient<KundeMenuViewModel>();
                 services.AddTransient<KundeMixSelvViewModel>();
+                services.AddTransient<KundeMainViewModel>();
+                
                 
                 // Views
                 services.AddTransient<EventListView>();
@@ -84,10 +86,13 @@ public partial class App : Application
                 services.AddTransient<KundeStartView>();
                 services.AddTransient<KundeMenuView>();
                 services.AddTransient<KundeMixSelvView>();
+                services.AddTransient<KundeMainView>();
+               
                 
                 // services
                 services.AddSingleton<IEventSessionService, EventSessionService>();
                 services.AddSingleton<INavigationService, NavigationService>();
+
 
                 // UI sizing settings (initialized once at first customer start)
                 services.AddSingleton<CarouselSizingSettings>();

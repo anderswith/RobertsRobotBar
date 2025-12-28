@@ -4,6 +4,7 @@ using System.Windows.Media;
 using RobotBarApp.BE;
 using RobotBarApp.BLL;
 using RobotBarApp.BLL.Interfaces;
+using RobotBarApp.Services.Interfaces;
 
 namespace RobotBarApp.ViewModels;
 
@@ -14,13 +15,16 @@ public class KundeValgtDrinkViewModel : ViewModelBase
     public string DrinkImagePath { get; }
     public string IngredientsText { get; }
     public Drink SelectedDrink { get; }
-    public ICommand BestilCommand { get; }
+    public ICommand OrderCommand { get; }
+    public ICommand BackCommand { get; }
+    private readonly INavigationService _navigationService;
 
-    public KundeValgtDrinkViewModel(IRobotLogic robotLogic, Drink drink)
+    public KundeValgtDrinkViewModel(IRobotLogic robotLogic, Drink drink, INavigationService navigation)
     {
         SelectedDrink = drink;
         _robotLogic = robotLogic;
         DrinkName = drink.Name;
+        _navigationService = navigation;
 
         IngredientsText = drink.DrinkContents != null && drink.DrinkContents.Any()
             ? string.Join(
@@ -29,12 +33,17 @@ public class KundeValgtDrinkViewModel : ViewModelBase
             : "Ingen ingredienser";
         
         DrinkImagePath = drink.Image;
-        
-        BestilCommand = new RelayCommand(_ => Bestil());
+        BackCommand = new RelayCommand(_ => GoBack());
+        OrderCommand = new RelayCommand(_ => Order());
     }
     
-    private void Bestil()
+    private void Order()
     {
        _robotLogic.RunDrinkScripts(SelectedDrink.DrinkId);
+    }
+    private void GoBack()
+    {
+        _navigationService.NavigateTo<KundeMenuViewModel>();
+            
     }
 }
