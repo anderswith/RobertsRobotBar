@@ -1,4 +1,4 @@
-﻿﻿namespace RobotBarApp.ViewModels;
+﻿namespace RobotBarApp.ViewModels;
 
 using System;
 using System.Collections.ObjectModel;
@@ -8,21 +8,24 @@ using System.Windows;
 using System.Windows.Input;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.BE;
+using RobotBarApp.Settings;
 
 public sealed class KundeMixSelvViewModel : ViewModelBase
 {
     public sealed class IngredientChoice
     {
-        public IngredientChoice(string name, string imagePath, string? colorHex = null, bool isSelectable = true)
+        public IngredientChoice(string name, string imagePath, string? type = null, string? colorHex = null, bool isSelectable = true)
         {
             Name = name;
             ImagePath = imagePath;
+            Type = type ?? string.Empty;
             ColorHex = string.IsNullOrWhiteSpace(colorHex) ? "#7FD0D8" : colorHex;
             IsSelectable = isSelectable;
         }
 
         public string Name { get; }
         public string ImagePath { get; }
+        public string Type { get; }
         public string ColorHex { get; }
         public bool IsSelectable { get; }
     }
@@ -31,14 +34,16 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
     {
         private int _cl;
 
-        public SelectedIngredientItem(string name, string colorHex, int cl)
+        public SelectedIngredientItem(string name, string type, string colorHex, int cl)
         {
             Name = name;
+            Type = type ?? string.Empty;
             ColorHex = string.IsNullOrWhiteSpace(colorHex) ? "#7FD0D8" : colorHex;
             _cl = cl;
         }
 
         public string Name { get; }
+        public string Type { get; }
         public string ColorHex { get; }
 
         public int Cl
@@ -49,6 +54,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
                 if (_cl == value) return;
                 _cl = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(DisplayText));
             }
         }
 
@@ -77,8 +83,8 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
         }
     }
 
-    private const int GlassMaxCl = 30;
-    private const int SegmentCl = 2;
+    private const int GlassMaxCl = MixSelvLimits.GlassMaxCl;
+    private const int SegmentCl = MixSelvLimits.StepCl;
     private const int SegmentCount = GlassMaxCl / SegmentCl; // 15
 
     public event EventHandler? BackRequested;
@@ -249,8 +255,6 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
         {
             var hasEventContext = EffectiveEventId != Guid.Empty;
 
-            // Map UI button labels to Ingredient.Type values in DB.
-            // NOTE: Your DB uses types like "Alkohol", "Syrup", "Soda" (see IngredientLogic).
             string? desiredType = cat switch
             {
                 "Alkohol" => "Alkohol",
@@ -266,8 +270,6 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
                 ingredients = cat switch
                 {
                     "Alkohol" => _ingredientLogic.GetAlcohol(EffectiveEventId),
-                    // If Mockohol is event-scoped in your DB via BarSetups, this should ideally be a dedicated BLL method.
-                    // For now, filter all ingredients by the DB type.
                     "Mockohol" => _ingredientLogic.GetAllIngredients().Where(i => i.Type == "Mockohol"),
                     "Sirup" => _ingredientLogic.GetSyrups(EffectiveEventId),
                     "Sodavand" => _ingredientLogic.GetSoda(EffectiveEventId),
@@ -276,7 +278,6 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
             }
             else
             {
-                // No event context: still filter correctly by type.
                 ingredients = _ingredientLogic.GetAllIngredients();
                 if (!string.IsNullOrWhiteSpace(desiredType))
                     ingredients = ingredients.Where(i => i.Type == desiredType);
@@ -291,17 +292,15 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
                 if (!string.IsNullOrWhiteSpace(img) && !img.StartsWith("/"))
                     img = "/" + img;
 
-                // Disable already-added ingredients
                 var isSelectable = !SelectedIngredients.Any(si => si.Name == i.Name);
-                OverlayIngredients.Add(new IngredientChoice(i.Name, img, i.Color, isSelectable));
+                OverlayIngredients.Add(new IngredientChoice(i.Name, img, i.Type, i.Color, isSelectable));
             }
         }
         else
         {
-            // Fallback placeholders (designer/dev mode)
-            OverlayIngredients.Add(new IngredientChoice("Vodka", "/Resources/IngredientPics/doge_20251210150457477.jpg"));
-            OverlayIngredients.Add(new IngredientChoice("Rom", "/Resources/IngredientPics/doge2_20251210150515992.jpg"));
-            OverlayIngredients.Add(new IngredientChoice("Tequila", "/Resources/IngredientPics/doge3_20251210150530232.jpg"));
+            OverlayIngredients.Add(new IngredientChoice("Vodka", "/Resources/IngredientPics/doge_20251210150457477.jpg", "Alkohol"));
+            OverlayIngredients.Add(new IngredientChoice("Rom", "/Resources/IngredientPics/doge2_20251210150515992.jpg", "Alkohol"));
+            OverlayIngredients.Add(new IngredientChoice("Tequila", "/Resources/IngredientPics/doge3_20251210150530232.jpg", "Alkohol"));
         }
 
         IsOverlayOpen = true;
@@ -312,15 +311,13 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
         if (!choice.IsSelectable)
             return;
 
-        // Safety net: never add duplicates by name.
         if (SelectedIngredients.Any(i => i.Name == choice.Name))
         {
             IsOverlayOpen = false;
             return;
         }
 
-        // Add ingredient as 2cl by default, stacked order.
-        var item = new SelectedIngredientItem(choice.Name, choice.ColorHex, SegmentCl);
+        var item = new SelectedIngredientItem(choice.Name, choice.Type, choice.ColorHex, SegmentCl);
         SelectedIngredients.Add(item);
         OnPropertyChanged(nameof(HasSelectedIngredients));
         OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
@@ -337,15 +334,40 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
 
     private int CurrentTotalCl => SelectedIngredients.Sum(i => i.Cl);
 
+    private int CurrentRestrictedTotalCl => SelectedIngredients
+        .Where(i => MixSelvLimits.RestrictedTypes.Contains(i.Type))
+        .Sum(i => i.Cl);
+
+    private bool IsRestrictedType(string? type)
+        => !string.IsNullOrWhiteSpace(type) && MixSelvLimits.RestrictedTypes.Contains(type);
+
     private bool CanIncreaseCl(SelectedIngredientItem? item)
-        => item != null && CurrentTotalCl + SegmentCl <= GlassMaxCl;
+    {
+        if (item == null) return false;
+
+        // Glass capacity cap.
+        if (CurrentTotalCl + SegmentCl > GlassMaxCl)
+            return false;
+
+        // Combined restricted cap.
+        if (IsRestrictedType(item.Type))
+        {
+            if (CurrentRestrictedTotalCl + SegmentCl > MixSelvLimits.RestrictedMaxCl)
+                return false;
+        }
+
+        return true;
+    }
 
     private bool CanDecreaseCl(SelectedIngredientItem? item)
         => item != null;
 
     private void IncreaseCl(SelectedIngredientItem item)
     {
-        if (!CanIncreaseCl(item)) return;
+        // Hard stop too (even though CanExecute should disable the button).
+        if (!CanIncreaseCl(item))
+            return;
+
         item.Cl += SegmentCl;
         UpdateLiquidSegments();
         UpdateLiquidVisuals();
