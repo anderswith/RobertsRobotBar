@@ -7,9 +7,14 @@
 public static class MixSelvLimits
 {
     /// <summary>
-    /// Step size when user presses +/-.
+    /// Step size when user presses +/- for normal ingredients.
     /// </summary>
     public const int StepCl = 2;
+
+    /// <summary>
+    /// Step size for Soda/Juice ingredients (treated as chunks).
+    /// </summary>
+    public const int SodaChunkCl = 20;
 
     /// <summary>
     /// Maximum total capacity of the glass.
@@ -27,4 +32,3 @@ public static class MixSelvLimits
     /// </summary>
     public static readonly string[] RestrictedTypes = { "Alkohol", "Mockohol", "Syrup" };
 }
-

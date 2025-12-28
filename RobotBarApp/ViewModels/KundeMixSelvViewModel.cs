@@ -87,6 +87,8 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
     private const int SegmentCl = MixSelvLimits.StepCl;
     private const int SegmentCount = GlassMaxCl / SegmentCl; // 15
 
+    private static bool IsSodaType(string? type) => string.Equals(type, "Soda", StringComparison.OrdinalIgnoreCase);
+
     public event EventHandler? BackRequested;
     public event EventHandler? PourRequested;
 
@@ -283,6 +285,8 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
                     ingredients = ingredients.Where(i => i.Type == desiredType);
             }
 
+            var hasRoomForSodaChunk = (GlassMaxCl - CurrentTotalCl) >= MixSelvLimits.SodaChunkCl;
+
             foreach (var i in ingredients)
             {
                 if (string.IsNullOrWhiteSpace(i.Name))
@@ -292,7 +296,13 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
                 if (!string.IsNullOrWhiteSpace(img) && !img.StartsWith("/"))
                     img = "/" + img;
 
+                // Disable already-added ingredients.
                 var isSelectable = !SelectedIngredients.Any(si => si.Name == i.Name);
+
+                // Additionally: Soda requires enough room for a full chunk (20cl)
+                if (isSelectable && IsSodaType(i.Type) && !hasRoomForSodaChunk)
+                    isSelectable = false;
+
                 OverlayIngredients.Add(new IngredientChoice(i.Name, img, i.Type, i.Color, isSelectable));
             }
         }
@@ -317,7 +327,16 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
             return;
         }
 
-        var item = new SelectedIngredientItem(choice.Name, choice.Type, choice.ColorHex, SegmentCl);
+        // Soda/Juice is added as a fixed 20cl chunk (if there's room).
+        var initialCl = IsSodaType(choice.Type) ? MixSelvLimits.SodaChunkCl : SegmentCl;
+        if (CurrentTotalCl + initialCl > GlassMaxCl)
+        {
+            // Not enough room; do nothing.
+            IsOverlayOpen = false;
+            return;
+        }
+
+        var item = new SelectedIngredientItem(choice.Name, choice.Type, choice.ColorHex, initialCl);
         SelectedIngredients.Add(item);
         OnPropertyChanged(nameof(HasSelectedIngredients));
         OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
@@ -345,14 +364,16 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
     {
         if (item == null) return false;
 
+        var step = IsSodaType(item.Type) ? MixSelvLimits.SodaChunkCl : SegmentCl;
+
         // Glass capacity cap.
-        if (CurrentTotalCl + SegmentCl > GlassMaxCl)
+        if (CurrentTotalCl + step > GlassMaxCl)
             return false;
 
-        // Combined restricted cap.
+        // Combined restricted cap applies only to restricted types (not Soda).
         if (IsRestrictedType(item.Type))
         {
-            if (CurrentRestrictedTotalCl + SegmentCl > MixSelvLimits.RestrictedMaxCl)
+            if (CurrentRestrictedTotalCl + step > MixSelvLimits.RestrictedMaxCl)
                 return false;
         }
 
@@ -364,11 +385,12 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
 
     private void IncreaseCl(SelectedIngredientItem item)
     {
-        // Hard stop too (even though CanExecute should disable the button).
         if (!CanIncreaseCl(item))
             return;
 
-        item.Cl += SegmentCl;
+        var step = IsSodaType(item.Type) ? MixSelvLimits.SodaChunkCl : SegmentCl;
+        item.Cl += step;
+
         UpdateLiquidSegments();
         UpdateLiquidVisuals();
         RaiseCanExecute();
@@ -377,7 +399,44 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
 
     private void DecreaseCl(SelectedIngredientItem item)
     {
-        // At minimum volume: remove ingredient entirely.
+        var isSoda = IsSodaType(item.Type);
+
+        if (isSoda)
+        {
+            // Soda/Juice is handled in 20cl chunks.
+            // If fewer than 2 chunks remain (<40cl), the button should act as X (remove entirely).
+            if (item.Cl < (2 * MixSelvLimits.SodaChunkCl))
+            {
+                SelectedIngredients.Remove(item);
+                if (ReferenceEquals(SelectedIngredient, item))
+                    SelectedIngredient = SelectedIngredients.LastOrDefault();
+
+                UpdateLiquidSegments();
+                UpdateLiquidVisuals();
+                RaiseCanExecute();
+                OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
+
+                // If overlay is open, refresh its items so the removed ingredient becomes selectable igen.
+                if (IsOverlayOpen)
+                {
+                    var cat = OverlayTitle.Replace("Vælg ", string.Empty, StringComparison.OrdinalIgnoreCase).Trim();
+                    SelectCategory(string.IsNullOrWhiteSpace(cat) ? null : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(cat));
+                }
+
+                return;
+            }
+
+            // Otherwise decrease by one soda chunk.
+            item.Cl -= MixSelvLimits.SodaChunkCl;
+
+            UpdateLiquidSegments();
+            UpdateLiquidVisuals();
+            RaiseCanExecute();
+            OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
+            return;
+        }
+
+        // Non-soda behavior (2cl steps): at minimum volume, remove ingredient entirely.
         if (item.Cl <= SegmentCl)
         {
             SelectedIngredients.Remove(item);
@@ -389,10 +448,9 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
             RaiseCanExecute();
             OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
 
-            // If overlay is open, refresh its items so the removed ingredient becomes selectable again.
+            // If overlay is open, refresh its items so the removed ingredient becomes selectable igen.
             if (IsOverlayOpen)
             {
-                // Re-run the last category filter by parsing title ("Vælg xxx").
                 var cat = OverlayTitle.Replace("Vælg ", string.Empty, StringComparison.OrdinalIgnoreCase).Trim();
                 SelectCategory(string.IsNullOrWhiteSpace(cat) ? null : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(cat));
             }
@@ -473,5 +531,12 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
         if (BestilCommand is RelayCommand rc3) rc3.RaiseCanExecuteChanged();
 
         // plus/minus per ingredient uses CanExecute via RelayCommand<T>; if not present, UI will still be correct via IsEnabled bindings.
+
+        // If overlay is open, refresh it so Soda items can be greyed out when there's no room for a chunk.
+        if (IsOverlayOpen)
+        {
+            var cat = OverlayTitle.Replace("Vælg ", string.Empty, StringComparison.OrdinalIgnoreCase).Trim();
+            SelectCategory(string.IsNullOrWhiteSpace(cat) ? null : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(cat));
+        }
     }
 }
