@@ -16,5 +16,6 @@ public interface IDrinkRepository
     IEnumerable<Ingredient> GetAvailableIngredientsForDrink(Guid drinkId);
     bool Exists(Guid drinkId);
     void RemoveDrinkContent(DrinkContent content);
+    IEnumerable<Drink> GetAllDrinksWithContentAndIngredientPositions();
 
 }

@@ -19,6 +19,7 @@ namespace RobotBarApp.ViewModels
         private readonly IDrinkLogic _drinkLogic;
         private readonly INavigationService _navigation;
         private readonly IEventLogic _eventLogic;
+        private readonly IImageStorageService _imageStorageService;
         private readonly Guid _eventId;
         
         private readonly Guid? _drinkId;
@@ -28,6 +29,7 @@ namespace RobotBarApp.ViewModels
             IDrinkLogic drinkLogic,
             INavigationService navigation,
             IEventLogic eventLogic,
+            IImageStorageService imageStorageService,
             Guid contextId)
             
         {
@@ -35,6 +37,7 @@ namespace RobotBarApp.ViewModels
             _drinkLogic = drinkLogic;
             _navigation = navigation;
             _eventLogic = eventLogic;
+            _imageStorageService = imageStorageService;
             
             if (_drinkLogic.Exists(contextId))
             {
@@ -330,7 +333,11 @@ namespace RobotBarApp.ViewModels
                 var imageToPersist = ImagePreview ?? "";
                 if (IsLikelyExternalPath(imageToPersist))
                 {
-                    imageToPersist = DrinkImageStorage.SaveToDrinkPics(imageToPersist);
+                    imageToPersist = _imageStorageService.SaveImage(
+                        imageToPersist,
+                        "DrinkPics",
+                        DrinkName);
+
                     ImagePreview = imageToPersist;
                 }
 
@@ -364,7 +371,7 @@ namespace RobotBarApp.ViewModels
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message, "Error");
+                MessageBox.Show(ex.Message, "Error");
             }
         }
     }

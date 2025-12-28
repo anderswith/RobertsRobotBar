@@ -92,6 +92,7 @@ public partial class App : Application
                 // services
                 services.AddSingleton<IEventSessionService, EventSessionService>();
                 services.AddSingleton<INavigationService, NavigationService>();
+                services.AddSingleton<IImageStorageService, ImageStorageService>();
 
 
                 // UI sizing settings (initialized once at first customer start)

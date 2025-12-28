@@ -100,5 +100,13 @@ public class DrinkRepository : IDrinkRepository
     {
         return _context.Drinks.Any(d => d.DrinkId == drinkId);
     }
+    public IEnumerable<Drink> GetAllDrinksWithContentAndIngredientPositions()
+    {
+        return _context.Drinks
+            .Include(d => d.DrinkContents)
+            .ThenInclude(dc => dc.Ingredient)
+            .ThenInclude(i => i.IngredientPositions)
+            .ToList();
+    }
 
 }

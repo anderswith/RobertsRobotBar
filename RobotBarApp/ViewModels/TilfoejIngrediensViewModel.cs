@@ -14,6 +14,7 @@ namespace RobotBarApp.ViewModels
         private readonly INavigationService _navigation;
         private readonly IIngredientLogic _ingredientLogic;
         private readonly IRobotLogic _robotLogic;
+        private readonly IImageStorageService _imageStorageService;
         
         private readonly Guid? _ingredientId;
         public bool IsEditMode => _ingredientId.HasValue;
@@ -76,12 +77,15 @@ namespace RobotBarApp.ViewModels
             INavigationService navigation,
             IIngredientLogic ingredientLogic,
             IRobotLogic robotLogic,
+            IImageStorageService imageStorageService,
             Guid? ingredientId = null
+            
             )
         {
             _navigation = navigation;
             _ingredientLogic = ingredientLogic;
             _robotLogic = robotLogic;
+            _imageStorageService = imageStorageService;
             _ingredientId = ingredientId;
             
 
@@ -177,7 +181,10 @@ namespace RobotBarApp.ViewModels
             {
                 var imagePath = IsEditMode
                     ? ImagePreview
-                    : CopyImageToResources();
+                    : _imageStorageService.SaveImage(
+                        ImagePreview,
+                        "IngredientPics",
+                        IngredientName);
 
                 if (IsEditMode)
                 {
@@ -220,26 +227,6 @@ namespace RobotBarApp.ViewModels
             {
                 MessageBox.Show(ex.Message);
             }
-        }
-
-        private string CopyImageToResources()
-        {
-            var projectRoot = Directory.GetParent(AppContext.BaseDirectory)
-                .Parent.Parent.Parent.FullName;
-
-            var destinationFolder = Path.Combine(projectRoot, "Resources", "IngredientPics");
-            Directory.CreateDirectory(destinationFolder);
-
-            var extension = Path.GetExtension(ImagePreview);
-            var safeName = new string((IngredientName ?? "ingredient")
-                .Select(ch => Path.GetInvalidFileNameChars().Contains(ch) ? '_' : ch).ToArray());
-
-            var fileName = $"{safeName}_{DateTime.UtcNow:yyyyMMddHHmmssfff}{extension}";
-            var destinationPath = Path.Combine(destinationFolder, fileName);
-
-            File.Copy(ImagePreview, destinationPath, overwrite: true);
-
-            return Path.Combine("Resources", "IngredientPics", fileName).Replace("\\", "/");
         }
 
         public class ColorOption

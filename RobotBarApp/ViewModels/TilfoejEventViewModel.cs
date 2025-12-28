@@ -16,6 +16,7 @@ namespace RobotBarApp.ViewModels
         private readonly IIngredientLogic _ingredientLogic;
         private readonly IEventLogic _eventLogic;
         private readonly IBarSetupLogic _barSetupLogic;
+        private readonly IImageStorageService _imageStorageService;
         
         private readonly Guid? _eventId;
         public bool IsEditMode => _eventId.HasValue;
@@ -24,9 +25,10 @@ namespace RobotBarApp.ViewModels
             IIngredientLogic ingredientLogic,
             IEventLogic eventLogic,
             IBarSetupLogic barSetupLogic,
+            IImageStorageService imageStorageService,
             Guid contextId)
         {
-            
+            _imageStorageService = imageStorageService;
             _navigationService = navigationService;
             _ingredientLogic = ingredientLogic;
             _eventLogic = eventLogic;
@@ -71,7 +73,7 @@ namespace RobotBarApp.ViewModels
 
                 if (string.IsNullOrWhiteSpace(ImagePath))
                     throw new Exception("You have to select an image");
-
+                
                 Step = 2;
             }
             catch (Exception ex)
@@ -79,7 +81,6 @@ namespace RobotBarApp.ViewModels
                 MessageBox.Show(ex.Message);
             }
         }
-
 
         public RelayCommand SelectSlotCommand { get; }
         public RelayCommand AddIngredientCommand { get; }
@@ -106,7 +107,7 @@ namespace RobotBarApp.ViewModels
                 FilteredIngredients.Add(ing);
             }
         }
-
+      
         private void AddIngredient(object param)
         {
             if (_selectedSlot == null) return;
@@ -167,7 +168,12 @@ namespace RobotBarApp.ViewModels
                 var finalImagePath = ImagePath;
 
                 if (!ImagePath.StartsWith("Resources/"))
-                    finalImagePath = CopyEventImageToResources();
+                {
+                    finalImagePath = _imageStorageService.SaveImage(
+                        ImagePath,
+                        "EventPics",
+                        EventName);
+                }
 
                 if (!IsEditMode)
                 {
@@ -239,27 +245,6 @@ namespace RobotBarApp.ViewModels
                 _navigationService.NavigateTo<KatalogViewModel>();
             else
                 _navigationService.NavigateTo<EventListViewModel>();
-        }
-
-        private string CopyEventImageToResources()
-        {
-            var projectRoot = Directory.GetParent(AppContext.BaseDirectory)
-                .Parent.Parent.Parent.FullName;
-
-            var destinationFolder = Path.Combine(projectRoot, "Resources", "EventPics");
-            Directory.CreateDirectory(destinationFolder);
-
-            var extension = Path.GetExtension(ImagePath);
-            var safeName = new string((EventName ?? "event")
-                .Select(ch => Path.GetInvalidFileNameChars().Contains(ch) ? '_' : ch).ToArray());
-
-            var fileName = $"{safeName}_{DateTime.UtcNow:yyyyMMddHHmmssfff}{extension}";
-            var destinationPath = Path.Combine(destinationFolder, fileName);
-
-            File.Copy(ImagePath, destinationPath, overwrite: true);
-
-            // store project-local relative path
-            return Path.Combine("Resources", "EventPics", fileName).Replace("\\", "/");
         }
 
     }
