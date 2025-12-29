@@ -2,9 +2,52 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:RobotBarApp.Converters"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              Background="Black">
+
     <UserControl.Resources>
         <converters:PathToImageConverter x:Key="PathToImageConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <converters:BooleanToVisibilityConverter x:Key="InverseBoolToVis" Invert="True" />
+
+        <!-- Spinner sizing: change these later to resize easily -->
+        <sys:Double x:Key="SpinnerSize">160</sys:Double>
+        <sys:Double x:Key="SpinnerStroke">8</sys:Double>
+        <!-- Margin expects a Thickness, not a Double -->
+        <Thickness x:Key="SpinnerInnerPadding">26</Thickness>
+
+        <!-- ===== Spinner storyboards ===== -->
+        <Storyboard x:Key="OuterSpinStoryboard" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="OuterRotate"
+                             Storyboard.TargetProperty="Angle"
+                             From="0" To="360"
+                             Duration="0:0:3" />
+        </Storyboard>
+
+        <Storyboard x:Key="InnerSpinStoryboard" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="InnerRotate"
+                             Storyboard.TargetProperty="Angle"
+                             From="0" To="-360"
+                             Duration="0:0:2" />
+        </Storyboard>
+
+        <Storyboard x:Key="PulseStoryboard" RepeatBehavior="Forever" AutoReverse="True">
+            <DoubleAnimation Storyboard.TargetName="SubMessageText"
+                             Storyboard.TargetProperty="Opacity"
+                             From="1.0" To="0.5"
+                             Duration="0:0:1" />
+        </Storyboard>
+
+        <Storyboard x:Key="SlideInStoryboard">
+            <DoubleAnimation Storyboard.TargetName="ContentTranslate"
+                             Storyboard.TargetProperty="Y"
+                             From="20" To="0"
+                             Duration="0:0:0.6" />
+            <DoubleAnimation Storyboard.TargetName="OrderingContentRoot"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0" To="1"
+                             Duration="0:0:0.6" />
+        </Storyboard>
     </UserControl.Resources>
 
     <Grid>
@@ -33,7 +76,8 @@
                     Background="Transparent"
                     BorderThickness="0"
                     Cursor="Hand"
-                    Command="{Binding BackCommand}">
+                    Command="{Binding BackCommand}"
+                    Visibility="{Binding IsOrdering, Converter={StaticResource InverseBoolToVis}}">
                 <Image Source="/Resources/Icons/ArrowWhiteLeft.png"
                        Stretch="Uniform"
                        RenderOptions.BitmapScalingMode="HighQuality"/>
@@ -72,9 +116,7 @@
                                Margin="0,0,0,20"/>
 
                     <!-- Drink image -->
-                    <Image
-                        Source="{Binding DrinkImagePath,
-                        Converter={StaticResource PathToImageConverter}}"
+                    <Image Source="{Binding DrinkImagePath, Converter={StaticResource PathToImageConverter}}"
                            Stretch="Uniform"
                            Height="600"
                            RenderOptions.BitmapScalingMode="HighQuality"/>
@@ -88,21 +130,23 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Ingredients -->
+                <!-- Ingredients (hidden while ordering) -->
                 <TextBlock Text="{Binding IngredientsText}"
                            FontSize="32"
                            Foreground="White"
                            TextWrapping="Wrap"
-                           VerticalAlignment="Top"/>
+                           VerticalAlignment="Top"
+                           Visibility="{Binding IsOrdering, Converter={StaticResource InverseBoolToVis}}"/>
 
-                <!-- ORDER BUTTON -->
+                <!-- ORDER BUTTON (hidden while ordering) -->
                 <Button Grid.Row="1"
                         Height="120"
                         Width="380"
                         HorizontalAlignment="Right"
                         Margin="0,40,100,0"
                         Command="{Binding BestilCommand}"
-                        Padding="0">
+                        Padding="0"
+                        Visibility="{Binding IsOrdering, Converter={StaticResource InverseBoolToVis}}">
                     <Image Source="/Resources/Icons/BestilDrink.png"
                            Stretch="Uniform"
                            StretchDirection="Both"
@@ -110,6 +154,120 @@
                            VerticalAlignment="Stretch"
                            RenderOptions.BitmapScalingMode="HighQuality"/>
                 </Button>
+
+                <!-- SPINNER PANEL (visible while ordering) -->
+                <Grid Grid.Row="0"
+                      Grid.RowSpan="2"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Visibility="{Binding IsOrdering, Converter={StaticResource BoolToVis}}">
+
+                    <StackPanel x:Name="OrderingContentRoot"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Opacity="0">
+
+                        <!-- Slide-in effect -->
+                        <StackPanel.RenderTransform>
+                            <TranslateTransform x:Name="ContentTranslate" Y="20" />
+                        </StackPanel.RenderTransform>
+
+                        <StackPanel.Triggers>
+                            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                <BeginStoryboard Storyboard="{StaticResource SlideInStoryboard}" />
+                            </EventTrigger>
+                        </StackPanel.Triggers>
+
+                        <!-- Robot logo -->
+                        <Image Source="/Resources/Icons/robot_hoved_logo.png"
+                               Height="120"
+                               Margin="0,0,0,30"
+                               HorizontalAlignment="Center"
+                               RenderOptions.BitmapScalingMode="HighQuality" />
+
+                        <!-- ===== Spinner: two semi-circles, scalable ===== -->
+                        <Grid Margin="0,0,0,30"
+                              Width="{StaticResource SpinnerSize}"
+                              Height="{StaticResource SpinnerSize}">
+
+                            <Grid.Triggers>
+                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                    <BeginStoryboard Storyboard="{StaticResource OuterSpinStoryboard}" />
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                    <BeginStoryboard Storyboard="{StaticResource InnerSpinStoryboard}" />
+                                </EventTrigger>
+                            </Grid.Triggers>
+
+                            <!-- OUTER semi-circle (blue) -->
+                            <Viewbox Stretch="Fill">
+                                <Canvas Width="100" Height="100">
+                                    <!-- Left half of a circle: top -> bottom -->
+                                    <Path Stroke="#3b82f6"
+                                          StrokeThickness="{StaticResource SpinnerStroke}"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          Fill="Transparent"
+                                          Data="M 50,5 A 45,45 0 0 1 50,95">
+                                        <Path.RenderTransform>
+                                            <RotateTransform x:Name="OuterRotate"
+                                                             Angle="0"
+                                                             CenterX="50"
+                                                             CenterY="50" />
+                                        </Path.RenderTransform>
+                                    </Path>
+                                </Canvas>
+                            </Viewbox>
+
+                            <!-- INNER semi-circle (purple), inset so it's smaller -->
+                            <Viewbox Stretch="Fill" Margin="{StaticResource SpinnerInnerPadding}">
+                                <Canvas Width="100" Height="100">
+                                    <!-- Right half of a circle: bottom -> top -->
+                                    <Path Stroke="#a855f7"
+                                          StrokeThickness="{StaticResource SpinnerStroke}"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          Fill="Transparent"
+                                          Data="M 50,90 A 40,40 0 0 0 50,10">
+                                        <Path.RenderTransform>
+                                            <RotateTransform x:Name="InnerRotate"
+                                                             Angle="0"
+                                                             CenterX="50"
+                                                             CenterY="50" />
+                                        </Path.RenderTransform>
+                                    </Path>
+                                </Canvas>
+                            </Viewbox>
+
+                            <!-- Center icon -->
+                            <TextBlock Text="🍸"
+                                       FontSize="48"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Text -->
+                        <TextBlock Text="Mixer din drink"
+                                   FontSize="34"
+                                   FontWeight="SemiBold"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,10"/>
+
+                        <TextBlock x:Name="SubMessageText"
+                                   Text="Vent venligst..."
+                                   FontSize="24"
+                                   Foreground="#fbbf24"
+                                   HorizontalAlignment="Center">
+                            <TextBlock.Triggers>
+                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                    <BeginStoryboard Storyboard="{StaticResource PulseStoryboard}" />
+                                </EventTrigger>
+                            </TextBlock.Triggers>
+                        </TextBlock>
+
+                    </StackPanel>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>
