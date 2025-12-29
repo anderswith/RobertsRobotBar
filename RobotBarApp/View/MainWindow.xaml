@@ -52,6 +52,10 @@
             <view:EventView />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type vm:CalibrationWizardViewModel}">
+            <view:CalibrationWizardView />
+        </DataTemplate>
+
     </Window.Resources>
 
     <Grid>
@@ -84,6 +88,23 @@
                                Margin="0,5,10,10"
                                Stretch="Uniform"/>
                     </StackPanel>
+                </Button>
+                
+                <!-- Calibrate guide -->
+                <Button Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Height="35"
+                        Margin="0,0,90,0"
+                        Padding="12,4"
+                        Content="Kalibrering"
+                        Background="Transparent"
+                        Foreground="White"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Command="{Binding NavigateCalibrationCommand}">
                 </Button>
 
                 <!-- Hamburger menu -->
