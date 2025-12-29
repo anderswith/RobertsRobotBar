@@ -362,17 +362,19 @@
                     <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol4"/>
                 </Grid.ColumnDefinitions>
 
-                <ComboBox Width="150"
-                          Height="35"
-                          FontSize="14"
-                          HorizontalAlignment="Left"
-                          ItemsSource="{Binding SyrupOptions}"
-                          DisplayMemberPath="Name"
-                          SelectedValuePath="IngredientId"
-                          SelectedItem="{Binding SelectedSyrup1}" />
+                <ComboBox Grid.Column="0"
+                          Width="150"
+                         Height="35"
+                         FontSize="14"
+                         HorizontalAlignment="Left"
+                         ItemsSource="{Binding SyrupOptions}"
+                         DisplayMemberPath="Name"
+                         SelectedValuePath="IngredientId"
+                         SelectedItem="{Binding SelectedSyrup1}" />
 
 
-                <ComboBox Width="150"
+                <ComboBox Grid.Column="2" 
+                            Width="150"
                           Height="35"
                           FontSize="14"
                           HorizontalAlignment="Left"
@@ -382,7 +384,8 @@
                           SelectedItem="{Binding SelectedSyrup2}" />
 
 
-                <ComboBox Width="150"
+                <ComboBox Grid.Column="4" 
+                    Width="150"
                           Height="35"
                           FontSize="14"
                           HorizontalAlignment="Left"
@@ -414,24 +417,28 @@
                     <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol4"/>
                 </Grid.ColumnDefinitions>
 
-                <ComboBox Width="150"
-                          Height="35"
-                          FontSize="14"
-                          HorizontalAlignment="Left"
-                          ItemsSource="{Binding SodaOptions}"
-                          DisplayMemberPath="Name"
-                          SelectedValuePath="IngredientId"
-                          SelectedItem="{Binding SelectedSoda1}" />
+                <ComboBox Grid.Column="0"
+                    Width="150"
+                     Height="35"
+                     FontSize="14"
+                     HorizontalAlignment="Left"
+                     ItemsSource="{Binding SodaOptions}"
+                     DisplayMemberPath="Name"
+                     SelectedValuePath="IngredientId"
+                     SelectedItem="{Binding SelectedSoda1}" />
 
 
-                <ComboBox Width="150"
-                          Height="35"
-                          FontSize="14"
-                          HorizontalAlignment="Left"
-                          ItemsSource="{Binding SodaOptions}"
-                          DisplayMemberPath="Name"
-                          SelectedValuePath="IngredientId"
-                          SelectedItem="{Binding SelectedSoda2}" />
+                <ComboBox Grid.Column="2"
+                    Width="150"
+                     Height="35"
+                     FontSize="14"
+                     HorizontalAlignment="Left"
+                     ItemsSource="{Binding SodaOptions}"
+                     DisplayMemberPath="Name"
+                     SelectedValuePath="IngredientId"
+                     SelectedItem="{Binding SelectedSoda2}" />
+                
+                
 
             </Grid>
 
