@@ -15,6 +15,7 @@ namespace RobotBarApp.ViewModels
         public ICommand NavigateKatalogCommand { get; }
         public ICommand NavigateTilfoejIngrediensCommand { get; }
         public ICommand NavigateTilfoejEventCommand { get; }
+        public ICommand NavigateCalibrationCommand { get; }
 
         public MainWindowViewModel(INavigationService navigationService)
         {
@@ -43,6 +44,10 @@ namespace RobotBarApp.ViewModels
             // Tilføj Event
             NavigateTilfoejEventCommand = new RelayCommand(_ =>
                 _navigationService.NavigateTo<TilfoejEventViewModel>(Guid.NewGuid()));
+
+            // Kalibrering
+            NavigateCalibrationCommand = new RelayCommand(_ =>
+                _navigationService.NavigateTo<CalibrationWizardViewModel>());
 
             // Set default view
             _navigationService.NavigateTo<EventListViewModel>();

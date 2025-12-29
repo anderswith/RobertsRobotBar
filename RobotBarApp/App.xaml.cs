@@ -70,6 +70,7 @@ public partial class App : Application
                 services.AddTransient<KundeMixSelvViewModel>();
                 services.AddTransient<KundeMixSelvPourViewModel>();
                 services.AddTransient<KundeMainViewModel>();
+                services.AddTransient<CalibrationWizardViewModel>();
                 
                 
                 // Views
@@ -88,6 +89,7 @@ public partial class App : Application
                 services.AddTransient<KundeMenuView>();
                 services.AddTransient<KundeMixSelvView>();
                 services.AddTransient<KundeMainView>();
+                services.AddTransient<CalibrationWizardView>();
                
                 
                 // services
