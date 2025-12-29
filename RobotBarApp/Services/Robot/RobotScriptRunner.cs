@@ -8,6 +8,9 @@ public class RobotScriptRunner : IRobotScriptRunner
     private readonly ILogLogic _log;
     private readonly IRobotDashboardStreamReader _reader;
     private readonly ConcurrentQueue<string> _queue = new();
+    private int _finishedScriptCount;
+    private int _totalScriptCount;
+    public event Action? DrinkFinished;
 
     private bool _isRunning = false;
     private readonly object _lock = new();
@@ -23,11 +26,23 @@ public class RobotScriptRunner : IRobotScriptRunner
 
     public void QueueScripts(IEnumerable<string> scripts)
     {
+        var scriptList = scripts
+            .Where(s => !string.IsNullOrWhiteSpace(s))
+            .ToList();
+
+        TriggerScriptFinished(scriptList);
+        
         foreach (var s in scripts)
             if (!string.IsNullOrWhiteSpace(s))
                 _queue.Enqueue(s);
 
         TryStartNext();
+    }
+
+    public void TriggerScriptFinished(IEnumerable<string> scripts)
+    {
+        _totalScriptCount = scripts.Count();
+        _finishedScriptCount = 0;
     }
 
     private void TryStartNext()
@@ -70,6 +85,16 @@ public class RobotScriptRunner : IRobotScriptRunner
         lock (_lock)
         {
             _isRunning = false;
+        }
+        _finishedScriptCount++;
+
+        Console.WriteLine(
+            $"Script færdig ({_finishedScriptCount}/{_totalScriptCount})");
+
+        if (_finishedScriptCount == _totalScriptCount)
+        {
+            Console.WriteLine("alle scripts er færdige");
+            DrinkFinished?.Invoke();
         }
 
         TryStartNext();
