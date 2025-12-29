@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RobotBarApp.BE;
 
-public class IngredientScript
+public class SingleScript
 {
     [Key]
     public Guid ScriptId { get; set; }

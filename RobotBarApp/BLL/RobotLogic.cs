@@ -56,7 +56,11 @@ public class RobotLogic : IRobotLogic
 
         foreach (var ing in ingredients)
         {
-            foreach (var script in ing.IngredientScripts.OrderBy(s => s.Number))
+            foreach (var script in ing.SingleScripts.OrderBy(s => s.Number))
+            {
+                scripts.Add(script.UrScript);
+            }
+            foreach (var script in ing.DoubleScripts.OrderBy(s => s.Number))
             {
                 scripts.Add(script.UrScript);
             }

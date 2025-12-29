@@ -12,18 +12,17 @@ public class IngredientLogic : IIngredientLogic
     {
         _ingredientRepository = ingredientRepository;
     }
-    public void AddIngredient(string name, string type, string image, string dose, string color, int positionNumber, List<string> scriptNames)
+    public void AddIngredient(string name, string type, string image, string color, int positionNumber, List<string> singleScriptNames, List<string> doubleScriptNames)
     {
         
-        IngredientValidation(name, type, image, dose, color, positionNumber, scriptNames);
-        dose = dose?.ToLowerInvariant();
+        IngredientValidation(name, type, image, color, positionNumber, singleScriptNames, doubleScriptNames);
+
         Ingredient ingredient = new Ingredient
         {
             IngredientId = Guid.NewGuid(),
             Name = name,
             Type = type,
             Image = image,
-            Dose = dose,
             Color = color,
             IngredientPositions = new List<IngredientPosition>
             {
@@ -33,24 +32,38 @@ public class IngredientLogic : IIngredientLogic
                     Position = positionNumber
                 }
             },
-            IngredientScripts = new List<IngredientScript>()
+            SingleScripts = new List<SingleScript>(),
+            DoubleScripts = new List<DoubleScript>()
         };
         
-        int number = 1;
-        foreach (var scriptName in scriptNames)
+        int singleNumber = 1;
+        foreach (var singletName in singleScriptNames)
         {
-            ingredient.IngredientScripts.Add(new IngredientScript
+            ingredient.SingleScripts.Add(new SingleScript
             {
                 ScriptId = Guid.NewGuid(),
-                UrScript = scriptName,
-                Number = number++,
+                UrScript = singletName,
+                Number = singleNumber++,
+                IngredientId = ingredient.IngredientId
+            });
+        }
+        
+        int doubleNumber = 1;
+        foreach (var doubleName in doubleScriptNames)
+        {
+            ingredient.DoubleScripts.Add(new DoubleScript
+            {
+                ScriptId = Guid.NewGuid(),
+                UrScript = doubleName,
+                Number = doubleNumber++,
                 IngredientId = ingredient.IngredientId
             });
         }
         _ingredientRepository.AddIngredient(ingredient);
     }
 
-    private static void IngredientValidation(string name, string type, string image, string dose, string color, int positionNumber, List<string> scriptNames)
+    private static void IngredientValidation(string name, string type, string image, string color, int positionNumber, 
+        List<string> singleScriptNames, List<string> doubleScriptNames)
     {
         if(positionNumber <= 0)
         {
@@ -74,24 +87,25 @@ public class IngredientLogic : IIngredientLogic
         {
             throw new AggregateException("Ingredient color cannot be null or empty.");
         }
-
-        var normalizedDose = dose?.ToLowerInvariant();
-        if(string.IsNullOrEmpty(normalizedDose) || normalizedDose !="single" && normalizedDose !="double")
-        {
-            throw new ArgumentException("Ingredient dose has to be single or double.");
-        }
         
-
-        if (scriptNames == null || scriptNames.Count == 0)
+        if (singleScriptNames == null || singleScriptNames.Count == 0)
         {
-            throw new ArgumentException("Ingredient must have at least one script.");
+            throw new ArgumentException("Ingredient must have at least one single script.");
         }
 
-        if (scriptNames.Any(s => string.IsNullOrWhiteSpace(s)))
+        if (singleScriptNames.Any(s => string.IsNullOrWhiteSpace(s)))
         {
             throw new ArgumentException("Script name cannot be null or whitespace.");
         }
-        
+        if (doubleScriptNames == null || doubleScriptNames.Count == 0)
+        {
+            throw new ArgumentException("Ingredient must have atleast one double script.");
+        }
+
+        if (doubleScriptNames.Any(s => string.IsNullOrWhiteSpace(s)))
+        {
+            throw new ArgumentException("Script name cannot be null or whitespace.");
+        }
     }
 
     public IEnumerable<Ingredient> GetAllIngredients()
@@ -124,15 +138,16 @@ public class IngredientLogic : IIngredientLogic
         _ingredientRepository.DeleteIngredient(ingredient);
         
     }
-    public void UpdateIngredient(Guid ingredientId, string name, string type, string image, string dose, string color, int positionNumber, List<string> scriptNames)
+    public void UpdateIngredient(Guid ingredientId, string name, string type, string image, string color, 
+        int positionNumber, List<string> singleScriptNames, List<string> doubleScriptNames) 
     {
         if(Guid.Empty == ingredientId)
         {
             throw new ArgumentException("Ingredient ID cannot be empty.");
         }
-        IngredientValidation(name, type, image, dose, color, positionNumber, scriptNames);
+        IngredientValidation(name, type, image, color, positionNumber, singleScriptNames, doubleScriptNames);
        
-        dose = dose?.ToLowerInvariant();
+
         var existingIngredient = _ingredientRepository.GetIngredientById(ingredientId);
         if (existingIngredient == null)
         {
@@ -142,7 +157,6 @@ public class IngredientLogic : IIngredientLogic
         existingIngredient.Name = name;
         existingIngredient.Type = type;
         existingIngredient.Image = image;
-        existingIngredient.Dose = dose;
         existingIngredient.Color = color;
         
         // Position
@@ -164,24 +178,40 @@ public class IngredientLogic : IIngredientLogic
         
         
         
-        // Scripts
-        var script = existingIngredient.IngredientScripts.FirstOrDefault();
+        // single script
+        var singleScript = existingIngredient.SingleScripts.FirstOrDefault();
 
-        if (script == null)
+        if (singleScript == null)
         {
-            existingIngredient.IngredientScripts.Add(new IngredientScript
+            existingIngredient.SingleScripts.Add(new SingleScript
             {
                 ScriptId = Guid.NewGuid(),
                 IngredientId = existingIngredient.IngredientId,
-                UrScript = scriptNames.First(),
+                UrScript = singleScriptNames.First(),
                 Number = 1
             });
         }
         else
         {
-            script.UrScript = scriptNames.First();
+            singleScript.UrScript = singleScriptNames.First();
         }
-
+        
+        // doubel script
+        var doubleScript = existingIngredient.DoubleScripts.FirstOrDefault();
+        if (doubleScript == null)
+        {
+            existingIngredient.DoubleScripts.Add(new DoubleScript
+            {
+                ScriptId = Guid.NewGuid(),
+                IngredientId = existingIngredient.IngredientId,
+                UrScript = doubleScriptNames.First(),
+                Number = 1
+            });
+        }
+        else
+        {
+            doubleScript.UrScript = doubleScriptNames.First();
+        }
         
         _ingredientRepository.UpdateIngredient(existingIngredient);
         
