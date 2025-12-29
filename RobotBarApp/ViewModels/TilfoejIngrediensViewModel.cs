@@ -170,12 +170,37 @@ namespace RobotBarApp.ViewModels
                 IsSyrup   ? "Syrup" :
                 IsSoda    ? "Soda" :
                 "Ukendt";
+            if (type == "Ukendt")
+            {
+                MessageBox.Show("Ingredient must have a type");
+                return;
+            }
 
             string dose = IsSingleDose ? "Single" : "Double";
 
+            if (string.IsNullOrWhiteSpace(ScriptText))
+            {
+                MessageBox.Show("Script is required");
+                return;
+            }
+
+            if (!ScriptText.EndsWith(".urp", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("Script must end with .urp");
+                return;
+            }
+
+            if (ScriptText.Any(c => c == 'æ' || c == 'ø' || c == 'å'))
+            {
+                MessageBox.Show("Script cannot contain æ, ø or å");
+                return;
+            }
             var scripts = new List<string>();
             if (!string.IsNullOrWhiteSpace(ScriptText))
+            {
                 scripts.Add(ScriptText);
+            }
+                
 
             try
             {
