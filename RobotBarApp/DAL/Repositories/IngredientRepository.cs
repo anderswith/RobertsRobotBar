@@ -26,7 +26,7 @@ public class IngredientRepository : IIngredientRepository
     {
         return _context.Ingredients
             .Include(i => i.IngredientPositions)
-            .Include(i => i.IngredientScripts)
+            .Include(i => i.SingleScripts)
             .FirstOrDefault(i => i.IngredientId == ingredientId);
     }
     public void DeleteIngredient(Ingredient ingredient)
@@ -59,7 +59,8 @@ public class IngredientRepository : IIngredientRepository
     {
         return _context.Ingredients
             .Where(i => ingredientIds.Contains(i.IngredientId))
-            .Include(i => i.IngredientScripts)
+            .Include(i => i.SingleScripts)
+            .Include(x => x.DoubleScripts)
             .ToList();
     }
 

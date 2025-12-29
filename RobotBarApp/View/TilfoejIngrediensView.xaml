@@ -25,8 +25,10 @@
                 <RowDefinition Height="Auto" />   <!-- Holder(e) / Dosering -->
                 <RowDefinition Height="20" />
                 <RowDefinition Height="Auto" />   <!-- Script -->
-                <RowDefinition Height="*" />      <!-- Spacer -->
+                <RowDefinition Height="20" />      <!-- Spacer -->
                 <RowDefinition Height="Auto" />   <!-- Buttons -->
+                <RowDefinition Height="*" />      <!-- 7 -->
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <!-- Outer layout: label column + content column -->
@@ -189,8 +191,8 @@
             <!-- Inner grid for Holder combobox and Dosering -->
             <Grid Grid.Row="4" Grid.Column="2" Margin="0,0,0,10">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />   <!-- Holder combo -->
-                    <ColumnDefinition Width="40" />   <!-- gap -->
+                    <ColumnDefinition Width="100" />   <!-- Holder combo -->
+                    <ColumnDefinition Width="400" />   <!-- gap -->
                     <ColumnDefinition Width="Auto" /> <!-- 'Dosering:' -->
                     <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="Auto" /> <!-- radios -->
@@ -198,28 +200,15 @@
 
                 <ComboBox Grid.Column="0"
                           Height="35"
+                          
+                          Width="100"
                           FontSize="16"
                           ItemsSource="{Binding Holders}"
                           SelectedItem="{Binding SelectedHolder, Mode=TwoWay}" />
 
-                <TextBlock Grid.Column="2"
-                           VerticalAlignment="Center"
-                           FontSize="18"
-                           Text="Dosering:"/>
 
-                <StackPanel Grid.Column="4"
-                            Orientation="Horizontal"
-                            VerticalAlignment="Center">
-                    <RadioButton Content="Single"
-                                 GroupName="DoseringGroup"
-                                 FontSize="16"
-                                 Margin="0,0,20,0"
-                                 IsChecked="{Binding IsSingleDose, Mode=TwoWay}" />
-                    <RadioButton Content="Dobbel"
-                                 GroupName="DoseringGroup"
-                                 FontSize="16"
-                                 IsChecked="{Binding IsDoubleDose, Mode=TwoWay}" />
-                </StackPanel>
+
+
             </Grid>
 
             <!-- Row 6: Script -->
@@ -227,19 +216,31 @@
             <TextBlock Grid.Row="6" Grid.Column="0"
                        VerticalAlignment="Center"
                        FontSize="18"
-                       Text="Script:"/>
+                       Text="SingleScript:"/>
 
             <TextBox Grid.Row="6" Grid.Column="2"
                      Height="40"
                      FontSize="16"
                      Padding="6"
                      HorizontalAlignment="Stretch"
-                     Text="{Binding ScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                     Text="{Binding SingleScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            
+            <TextBlock Grid.Row="8" Grid.Column="0"
+                       VerticalAlignment="Center"
+                       FontSize="18"
+                       Text="DoubleScript:"/>
+
+            <TextBox Grid.Row="8" Grid.Column="2"
+                     Height="40"
+                     FontSize="16"
+                     Padding="6"
+                     HorizontalAlignment="Stretch"
+                     Text="{Binding DoubleScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!-- Row 8: Buttons -->
 
             <!-- Guide bottom left -->
-            <Button Grid.Row="8" Grid.Column="0"
+            <Button Grid.Row="9" Grid.Column="0"
                     Content="Guide"
                     Width="100"
                     Height="40"
@@ -251,7 +252,7 @@
                     Command="{Binding GuideCommand}" />
 
             <!-- Annullér & Gem bottom right -->
-            <StackPanel Grid.Row="8" Grid.Column="2"
+            <StackPanel Grid.Row="9" Grid.Column="2"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right"
                         Margin="0,20,0,0">

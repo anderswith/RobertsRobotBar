@@ -55,15 +55,19 @@ namespace RobotBarApp.ViewModels
             get => _selectedHolder;
             set => SetProperty(ref _selectedHolder, value);
         }
+        
 
-        public bool IsSingleDose { get; set; } = true;
-        public bool IsDoubleDose { get; set; }
-
-        private string _scriptText = "";
-        public string ScriptText
+        private string _singleScript = "";
+        public string SingleScriptText
         {
-            get => _scriptText;
-            set => SetProperty(ref _scriptText, value);
+            get => _singleScript;
+            set => SetProperty(ref _singleScript, value);
+        }
+        private string _doubleScript = "";
+        public string DoubleScriptText
+        {
+            get => _doubleScript;
+            set => SetProperty(ref _doubleScript, value);
         }
 
 
@@ -116,15 +120,17 @@ namespace RobotBarApp.ViewModels
             IsMock    = ingredient.Type == "Mock";
             IsSyrup   = ingredient.Type == "Syrup";
             IsSoda    = ingredient.Type == "Soda";
-
-            IsSingleDose = ingredient.Dose == "Single";
-            IsDoubleDose = ingredient.Dose == "Double";
+            
 
             SelectedHolder = ingredient.IngredientPositions
                 .Select(p => p.Position)
                 .FirstOrDefault();
 
-            ScriptText = ingredient.IngredientScripts
+            SingleScriptText = ingredient.SingleScripts
+                .OrderBy(s => s.Number)
+                .FirstOrDefault()?.UrScript ?? "";
+            
+            DoubleScriptText = ingredient.DoubleScripts
                 .OrderBy(s => s.Number)
                 .FirstOrDefault()?.UrScript ?? "";
         }
@@ -175,30 +181,43 @@ namespace RobotBarApp.ViewModels
                 MessageBox.Show("Ingredient must have a type");
                 return;
             }
+            
 
-            string dose = IsSingleDose ? "Single" : "Double";
-
-            if (string.IsNullOrWhiteSpace(ScriptText))
+            if (string.IsNullOrWhiteSpace(SingleScriptText) && string.IsNullOrWhiteSpace(DoubleScriptText))
             {
-                MessageBox.Show("Script is required");
+                MessageBox.Show("At least one script is required");
                 return;
             }
 
-            if (!ScriptText.EndsWith(".urp", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(SingleScriptText) &&
+                !SingleScriptText.EndsWith(".urp", StringComparison.OrdinalIgnoreCase))
             {
-                MessageBox.Show("Script must end with .urp");
+                MessageBox.Show("Single script must end with .urp");
                 return;
             }
 
-            if (ScriptText.Any(c => c == 'æ' || c == 'ø' || c == 'å'))
+            if (!string.IsNullOrWhiteSpace(DoubleScriptText) &&
+                !DoubleScriptText.EndsWith(".urp", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("Double script must end with .urp");
+                return;
+            }
+
+            if (SingleScriptText.Any(c => c == 'æ' || c == 'ø' || c == 'å') || DoubleScriptText.Any(c => c == 'æ' || c == 'ø' || c == 'å'))
             {
                 MessageBox.Show("Script cannot contain æ, ø or å");
                 return;
             }
-            var scripts = new List<string>();
-            if (!string.IsNullOrWhiteSpace(ScriptText))
+            
+            var singleScripts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(SingleScriptText))
             {
-                scripts.Add(ScriptText);
+                singleScripts.Add(SingleScriptText);
+            }
+            var doubleScripts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(DoubleScriptText))
+            {
+                doubleScripts.Add(DoubleScriptText);
             }
                 
 
@@ -218,10 +237,10 @@ namespace RobotBarApp.ViewModels
                         name: IngredientName,
                         type: type,
                         image: imagePath,
-                        dose: dose,
                         color: Color,
                         positionNumber: SelectedHolder,
-                        scriptNames: scripts
+                        singleScriptNames: singleScripts,
+                        doubleScriptNames: doubleScripts
                     );
                 }
                 else
@@ -230,10 +249,10 @@ namespace RobotBarApp.ViewModels
                         name: IngredientName,
                         type: type,
                         image: imagePath,
-                        dose: dose,
                         color: Color,
                         positionNumber: SelectedHolder,
-                        scriptNames: scripts
+                        singleScriptNames: singleScripts,
+                        doubleScriptNames: doubleScripts
                     );
                 }
 

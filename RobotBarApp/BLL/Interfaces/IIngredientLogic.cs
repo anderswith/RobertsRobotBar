@@ -4,11 +4,13 @@ namespace RobotBarApp.BLL.Interfaces;
 
 public interface IIngredientLogic
 {
-    void AddIngredient(string name, string type, string image, string dose, string color, int positionNumber, List<string> scriptNames);
+    void AddIngredient(string name, string type, string image, string color, int positionNumber,
+        List<string> singleScriptNames, List<string> doubleScriptNames);
     IEnumerable<Ingredient> GetAllIngredients();
     Ingredient? GetIngredientById(Guid ingredientId);
     void DeleteIngredient(Guid ingredientId);
-    void UpdateIngredient(Guid ingredientId, string name, string type, string image, string dose, string color, int positionNumber, List<string> scriptNames);
+    void UpdateIngredient(Guid ingredientId, string name, string type, string image, string color, int positionNumber,
+        List<string> singleScriptNames, List<string> doubleScriptNames);
     IEnumerable<Ingredient> GetAlcohol(Guid eventId);
     IEnumerable<Ingredient> GetSyrups(Guid eventId);
     IEnumerable<Ingredient> GetSoda(Guid eventId);
