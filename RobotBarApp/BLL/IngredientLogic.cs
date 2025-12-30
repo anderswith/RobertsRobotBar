@@ -30,7 +30,7 @@ public class IngredientLogic : IIngredientLogic
                 {
                     IngredientPositionId = Guid.NewGuid(),
                     Position = positionNumber
-                }
+                } 
             },
             SingleScripts = new List<SingleScript>(),
             DoubleScripts = new List<DoubleScript>()

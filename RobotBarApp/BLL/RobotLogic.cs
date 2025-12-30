@@ -84,12 +84,17 @@ public class RobotLogic : IRobotLogic
         }
         _drinkUseCountLogic.AddDrinkUseCount(drinkId, eventId);
         
-        var ingredientIds = drink.DrinkContents
-            .Select(dc => dc.IngredientId)
-            .ToList();
-       foreach (var ingredientId in ingredientIds)
+        foreach (var content in drink.DrinkContents)
         {
-            _ingredientUseCountLogic.AddIngredientUseCount(ingredientId, eventId);
+            int count =
+                content.Dose == "double" ? 2 : 1;
+
+            for (int i = 0; i < count; i++)
+            {
+                _ingredientUseCountLogic.AddIngredientUseCount(
+                    content.IngredientId,
+                    eventId);
+            }
         }
         var scripts = new List<string>();
 

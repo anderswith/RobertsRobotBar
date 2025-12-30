@@ -27,6 +27,7 @@ public class IngredientRepository : IIngredientRepository
         return _context.Ingredients
             .Include(i => i.IngredientPositions)
             .Include(i => i.SingleScripts)
+            .Include(i => i.DoubleScripts)
             .FirstOrDefault(i => i.IngredientId == ingredientId);
     }
     public void DeleteIngredient(Ingredient ingredient)

@@ -92,6 +92,10 @@ namespace RobotBarApp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Dose")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("DrinkId")
                         .HasColumnType("TEXT");
 

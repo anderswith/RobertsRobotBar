@@ -150,7 +150,7 @@
                               HorizontalAlignment="Left"
                               ItemsSource="{Binding AlcoholOptions}"
                               DisplayMemberPath="Name"
-                              SelectedValuePath="IngredientId"
+                              
                               SelectedItem="{Binding SelectedAlcohol1}" />
 
 
@@ -167,26 +167,14 @@
                                     VerticalAlignment="Center"
                                     Margin="5,0,0,0"
                                     HorizontalAlignment="Left">
-                            <TextBlock Text="{Binding AlcoholAmount1}" />
-                            <TextBlock Text="cl" Margin="3,0,0,0"/>
+                            <ComboBox Width="80"
+                                      Height="35"
+                                      Margin="5,0,0,0"
+                                      ItemsSource="{Binding DoseOptions}"
+                                      SelectedItem="{Binding AlcoholDose1}" />
                         </StackPanel>
 
-                        <Grid Grid.Column="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Button Grid.Row="0"
-                                    Content="▲"
-                                    Padding="0"
-                                    FontSize="10"
-                                    Command="{Binding IncreaseAlcoholAmount1Command}" />
-                            <Button Grid.Row="1"
-                                    Content="▼"
-                                    Padding="0"
-                                    FontSize="10"
-                                    Command="{Binding DecreaseAlcoholAmount1Command}" />
-                        </Grid>
+                        
                     </Grid>
                 </StackPanel>
 
@@ -200,7 +188,7 @@
                               HorizontalAlignment="Left"
                               ItemsSource="{Binding AlcoholOptions}"
                               DisplayMemberPath="Name"
-                              SelectedValuePath="IngredientId"
+                             
                               SelectedItem="{Binding SelectedAlcohol2}" />
 
 
@@ -217,26 +205,14 @@
                                     VerticalAlignment="Center"
                                     Margin="5,0,0,0"
                                     HorizontalAlignment="Left">
-                            <TextBlock Text="{Binding AlcoholAmount2}" />
-                            <TextBlock Text="cl" Margin="3,0,0,0"/>
+                            <ComboBox Width="80"
+                                      Height="35"
+                                      Margin="5,0,0,0"
+                                      ItemsSource="{Binding DoseOptions}"
+                                      SelectedItem="{Binding AlcoholDose2}" />
                         </StackPanel>
 
-                        <Grid Grid.Column="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Button Grid.Row="0"
-                                    Content="▲"
-                                    Padding="0"
-                                    FontSize="10"
-                                    Command="{Binding IncreaseAlcoholAmount2Command}" />
-                            <Button Grid.Row="1"
-                                    Content="▼"
-                                    Padding="0"
-                                    FontSize="10"
-                                    Command="{Binding DecreaseAlcoholAmount2Command}" />
-                        </Grid>
+                        
                     </Grid>
                 </StackPanel>
 
@@ -250,7 +226,7 @@
                               HorizontalAlignment="Left"
                               ItemsSource="{Binding AlcoholOptions}"
                               DisplayMemberPath="Name"
-                              SelectedValuePath="IngredientId"
+                              
                               SelectedItem="{Binding SelectedAlcohol3}" />
 
 
@@ -267,26 +243,14 @@
                                     VerticalAlignment="Center"
                                     Margin="5,0,0,0"
                                     HorizontalAlignment="Left">
-                            <TextBlock Text="{Binding AlcoholAmount3}" />
-                            <TextBlock Text="cl" Margin="3,0,0,0"/>
+                            <ComboBox Width="80"
+                                      Height="35"
+                                      Margin="5,0,0,0"
+                                      ItemsSource="{Binding DoseOptions}"
+                                      SelectedItem="{Binding AlcoholDose3}" />
                         </StackPanel>
 
-                        <Grid Grid.Column="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Button Grid.Row="0"
-                                    Content="▲"
-                                    Padding="0"
-                                    FontSize="10"
-                                    Command="{Binding IncreaseAlcoholAmount3Command}" />
-                            <Button Grid.Row="1"
-                                    Content="▼"
-                                    Padding="0"
-                                    FontSize="10"
-                                    Command="{Binding DecreaseAlcoholAmount3Command}" />
-                        </Grid>
+                       
                     </Grid>
                 </StackPanel>
 
@@ -300,7 +264,7 @@
                               HorizontalAlignment="Left"
                               ItemsSource="{Binding AlcoholOptions}"
                               DisplayMemberPath="Name"
-                              SelectedValuePath="IngredientId"
+                             
                               SelectedItem="{Binding SelectedAlcohol4}" />
 
 
@@ -317,26 +281,14 @@
                                     VerticalAlignment="Center"
                                     Margin="5,0,0,0"
                                     HorizontalAlignment="Left">
-                            <TextBlock Text="{Binding AlcoholAmount4}" />
-                            <TextBlock Text="cl" Margin="3,0,0,0"/>
+                            <ComboBox Width="80"
+                                      Height="35"
+                                      Margin="5,0,0,0"
+                                      ItemsSource="{Binding DoseOptions}"
+                                      SelectedItem="{Binding AlcoholDose4}" />
                         </StackPanel>
 
-                        <Grid Grid.Column="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Button Grid.Row="0"
-                                    Content="▲"
-                                    Padding="0"
-                                    FontSize="10"
-                                    Command="{Binding IncreaseAlcoholAmount4Command}" />
-                            <Button Grid.Row="1"
-                                    Content="▼"
-                                    Padding="0"
-                                    FontSize="10"
-                                    Command="{Binding DecreaseAlcoholAmount4Command}" />
-                        </Grid>
+                        
                     </Grid>
                 </StackPanel>
             </Grid>
@@ -369,7 +321,7 @@
                          HorizontalAlignment="Left"
                          ItemsSource="{Binding SyrupOptions}"
                          DisplayMemberPath="Name"
-                         SelectedValuePath="IngredientId"
+                         
                          SelectedItem="{Binding SelectedSyrup1}" />
 
 
@@ -380,7 +332,7 @@
                           HorizontalAlignment="Left"
                           ItemsSource="{Binding SyrupOptions}"
                           DisplayMemberPath="Name"
-                          SelectedValuePath="IngredientId"
+                          
                           SelectedItem="{Binding SelectedSyrup2}" />
 
 
@@ -391,7 +343,7 @@
                           HorizontalAlignment="Left"
                           ItemsSource="{Binding SyrupOptions}"
                           DisplayMemberPath="Name"
-                          SelectedValuePath="IngredientId"
+                          
                           SelectedItem="{Binding SelectedSyrup3}" />
 
             </Grid>
@@ -424,7 +376,7 @@
                      HorizontalAlignment="Left"
                      ItemsSource="{Binding SodaOptions}"
                      DisplayMemberPath="Name"
-                     SelectedValuePath="IngredientId"
+                     
                      SelectedItem="{Binding SelectedSoda1}" />
 
 
@@ -435,7 +387,7 @@
                      HorizontalAlignment="Left"
                      ItemsSource="{Binding SodaOptions}"
                      DisplayMemberPath="Name"
-                     SelectedValuePath="IngredientId"
+                     
                      SelectedItem="{Binding SelectedSoda2}" />
                 
                 

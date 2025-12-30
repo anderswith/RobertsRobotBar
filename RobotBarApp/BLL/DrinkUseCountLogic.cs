@@ -12,7 +12,6 @@ public class DrinkUseCountLogic : IDrinkUseCountLogic
         _drinkUseCountRepository = drinkUseCountRepository;
     }
     public void AddDrinkUseCount(Guid drinkId, Guid eventId)
-    
     {
         var drinkUseCount = new DrinkUseCount
         {

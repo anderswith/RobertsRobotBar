@@ -5,6 +5,7 @@ using RobotBarApp.Services.Interfaces;
 using RobotBarApp.BLL.Interfaces;
 using System.IO;
 using System.Windows;
+using RobotBarApp.BE;
 
 
 namespace RobotBarApp.ViewModels
@@ -122,17 +123,22 @@ namespace RobotBarApp.ViewModels
             IsSoda    = ingredient.Type == "Soda";
             
 
-            SelectedHolder = ingredient.IngredientPositions
-                .Select(p => p.Position)
-                .FirstOrDefault();
+            SelectedHolder = ingredient.IngredientPositions?
+                                 .Select(p => p.Position)
+                                 .FirstOrDefault()
+                             ?? SelectedHolder;
 
-            SingleScriptText = ingredient.SingleScripts
-                .OrderBy(s => s.Number)
-                .FirstOrDefault()?.UrScript ?? "";
-            
-            DoubleScriptText = ingredient.DoubleScripts
-                .OrderBy(s => s.Number)
-                .FirstOrDefault()?.UrScript ?? "";
+            SingleScriptText = (ingredient.SingleScripts ?? Enumerable.Empty<SingleScript>())
+                               .OrderBy(s => s.Number)
+                               .FirstOrDefault()
+                               ?.UrScript
+                               ?? "";
+
+            DoubleScriptText = (ingredient.DoubleScripts ?? Enumerable.Empty<DoubleScript>())
+                               .OrderBy(s => s.Number)
+                               .FirstOrDefault()
+                               ?.UrScript
+                               ?? "";
         }
         
 
@@ -164,7 +170,14 @@ namespace RobotBarApp.ViewModels
 
         private void Cancel()
         {
-            _navigation.NavigateTo<EventListViewModel>(); 
+            if (IsEditMode)
+            {
+                _navigation.NavigateTo<KatalogViewModel>();
+            }
+            else
+            {
+                _navigation.NavigateTo<EventListViewModel>();
+            }
         }
 
         private void Save()
