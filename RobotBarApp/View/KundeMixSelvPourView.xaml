@@ -119,17 +119,37 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Grid>
+            
 
             <!-- RIGHT: progress bar, placed ~1/3 up from bottom -->
             <Grid Grid.Column="2">
-                <ProgressBar Height="44"
-                             Width="360"
-                             VerticalAlignment="Bottom"
-                             HorizontalAlignment="Center"
-                             Margin="0,0,0,220"
-                             Value="{Binding PourProgress}"
-                             Minimum="0"
-                             Maximum="100"/>
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Bottom"
+                            Margin="0,0,0,220">
+
+                    <!-- Step counter -->
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,0,0,10">
+                        <TextBlock Text="Step "
+                                   FontSize="16"/>
+                        <TextBlock Text="{Binding CurrentStep}"
+                                   FontSize="16"
+                                   FontWeight="Bold"/>
+                        <TextBlock Text=" / "
+                                   FontSize="16"/>
+                        <TextBlock Text="{Binding TotalSteps}"
+                                   FontSize="16"
+                                   FontWeight="Bold"/>
+                    </StackPanel>
+
+                    <!-- Progress bar -->
+                    <ProgressBar Height="44"
+                                 Width="360"
+                                 Value="{Binding PourProgress}"
+                                 Minimum="0"
+                                 Maximum="100"/>
+                </StackPanel>
             </Grid>
         </Grid>
     </Grid>

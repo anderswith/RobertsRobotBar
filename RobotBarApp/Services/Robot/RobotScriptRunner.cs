@@ -11,6 +11,8 @@ public class RobotScriptRunner : IRobotScriptRunner
     private int _finishedScriptCount;
     private int _totalScriptCount;
     public event Action? DrinkFinished;
+    public event Action<int, int>? ScriptFinished;
+    public event Action<int>? ScriptsStarted;
 
     private bool _isRunning = false;
     private readonly object _lock = new();
@@ -20,8 +22,8 @@ public class RobotScriptRunner : IRobotScriptRunner
         _comms = comms;
         _reader = reader;
         _log = logLogic;
-
-        _reader.ProgramFinished += OnScriptFinished;
+        
+        _reader.ProgramFinished += OnProgramFinished;
     }
 
     public void QueueScripts(IEnumerable<string> scripts)
@@ -29,6 +31,9 @@ public class RobotScriptRunner : IRobotScriptRunner
         var scriptList = scripts
             .Where(s => !string.IsNullOrWhiteSpace(s))
             .ToList();
+        _totalScriptCount = scriptList.Count;
+        _finishedScriptCount = 0;
+        ScriptsStarted?.Invoke(_totalScriptCount);
 
         TriggerScriptFinished(scriptList);
         
@@ -80,13 +85,15 @@ public class RobotScriptRunner : IRobotScriptRunner
         }
     }
 
-    private void OnScriptFinished()
+    private void OnProgramFinished()
     {
         lock (_lock)
         {
             _isRunning = false;
         }
         _finishedScriptCount++;
+        
+        ScriptFinished?.Invoke(_finishedScriptCount, _totalScriptCount);
 
         Console.WriteLine(
             $"Script færdig ({_finishedScriptCount}/{_totalScriptCount})");

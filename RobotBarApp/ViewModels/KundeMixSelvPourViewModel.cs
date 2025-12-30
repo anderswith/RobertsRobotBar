@@ -3,7 +3,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.Services.Interfaces;
 
 namespace RobotBarApp.ViewModels
@@ -14,6 +16,7 @@ namespace RobotBarApp.ViewModels
     /// </summary>
     public sealed class KundeMixSelvPourViewModel : ViewModelBase
     {
+        private readonly IRobotLogic _robotLogic;
         public event EventHandler? BackRequested;
 
         public ObservableCollection<KundeMixSelvViewModel.SelectedIngredientItem> SelectedIngredients { get; }
@@ -30,6 +33,20 @@ namespace RobotBarApp.ViewModels
             get => _pourProgress;
             set { _pourProgress = value; OnPropertyChanged(); }
         }
+        
+        private int _currentStep;
+        public int CurrentStep
+        {
+            get => _currentStep;
+            set => SetProperty(ref _currentStep, value);
+        }
+
+        private int _totalSteps;
+        public int TotalSteps
+        {
+            get => _totalSteps;
+            set => SetProperty(ref _totalSteps, value);
+        }
 
         public ICommand BackCommand { get; }
 
@@ -37,9 +54,13 @@ namespace RobotBarApp.ViewModels
         private readonly CancellationTokenSource _cts = new();
 
         // Constructor used by NavigationService (single parameter)
-        public KundeMixSelvPourViewModel(MixSelvSession session, INavigationService navigation)
+        public KundeMixSelvPourViewModel(MixSelvSession session, INavigationService navigation, IRobotLogic robotLogic)
         {
             _navigation = navigation;
+            _robotLogic = robotLogic;
+            _robotLogic.ScriptFinished += OnScriptFinished;
+            _robotLogic.DrinkFinished += OnDrinkFinished;
+            _robotLogic.ScriptsStarted += OnScriptsStarted;
 
             SelectedIngredients = session.SelectedIngredients;
             LiquidSegments = session.LiquidSegments;
@@ -55,6 +76,15 @@ namespace RobotBarApp.ViewModels
             // Temporary demo progress (replace with robot pour progress later).
             _ = RunFakeProgressAsync(_cts.Token);
         }
+        private void OnScriptsStarted(int total)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                TotalSteps = total;
+                CurrentStep = 1; 
+            });
+        }
+        
 
         // Fallback for designer/legacy usage
         public KundeMixSelvPourViewModel(
@@ -75,10 +105,34 @@ namespace RobotBarApp.ViewModels
             // Temporary demo progress (replace with robot pour progress later).
             _ = RunFakeProgressAsync(_cts.Token);
         }
+        
+        private void OnDrinkFinished()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                _cts.Cancel();               // stop progress
+                PourProgress = 100;
+
+                _robotLogic.DrinkFinished -= OnDrinkFinished;
+
+                //_navigation!.NavigateTo<VærsgoViewModel>();
+            });
+        }
+        private void OnScriptFinished(int finished, int total)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                CurrentStep = finished;
+                TotalSteps = total;
+            });
+        }
 
         private void NavigateBackFresh()
         {
             _cts.Cancel();
+
+            if (_robotLogic != null)
+                _robotLogic.DrinkFinished -= OnDrinkFinished;
 
             if (_navigation == null)
             {

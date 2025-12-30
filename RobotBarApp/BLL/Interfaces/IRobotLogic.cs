@@ -6,4 +6,7 @@ public interface IRobotLogic
     void RunIngredientScript(List<Guid> ingredientIds);
     void RunDrinkScripts(Guid drinkId);
     event Action DrinkFinished;
+
+    event Action<int, int>? ScriptFinished;
+    event Action<int>? ScriptsStarted;
 }

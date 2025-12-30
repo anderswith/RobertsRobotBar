@@ -13,6 +13,8 @@ public class RobotLogic : IRobotLogic
     private readonly IIngredientUseCountLogic _ingredientUseCountLogic;
     private readonly IEventSessionService _eventSession;
     public event Action? DrinkFinished;
+    public event Action<int, int>? ScriptFinished;
+    public event Action<int>? ScriptsStarted;
     
     public RobotLogic(IRobotScriptRunner scriptRunner, 
         IIngredientLogic ingredientLogic, 
@@ -28,7 +30,11 @@ public class RobotLogic : IRobotLogic
         _drinkUseCountLogic = drinkUseCountLogic;
         _eventSession = eventSessionService;
         
+        _scriptRunner.ScriptsStarted += total =>
+            ScriptsStarted?.Invoke(total);
         scriptRunner.DrinkFinished += () => DrinkFinished?.Invoke();
+        _scriptRunner.ScriptFinished += (f, t) =>
+            ScriptFinished?.Invoke(f, t);
     }
     
     public void RunRobotScripts(IEnumerable<string> scripts)
