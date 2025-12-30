@@ -35,6 +35,8 @@ public class KundeValgtDrinkViewModel : ViewModelBase
         _robotLogic = robotLogic;
         DrinkName = drink.Name;
         _navigationService = navigation;
+        
+        _robotLogic.DrinkFinished += OnDrinkFinished;
 
         IngredientsText = drink.DrinkContents != null && drink.DrinkContents.Any()
             ? string.Join(
@@ -47,6 +49,19 @@ public class KundeValgtDrinkViewModel : ViewModelBase
         OrderCommand = new RelayCommand(_ => _ = OrderAsync());
         BestilCommand = OrderCommand;
     }
+    
+    private void OnDrinkFinished()
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            IsOrdering = false;
+
+            //_navigationService.NavigateTo<VærsgoViewModel>();
+
+            // unsubscribe
+            _robotLogic.DrinkFinished -= OnDrinkFinished;
+        });
+    }
 
     private async Task OrderAsync()
     {
@@ -55,15 +70,11 @@ public class KundeValgtDrinkViewModel : ViewModelBase
         IsOrdering = true;
         try
         {
-            // Run on a background thread so the UI can animate while ordering.
             await Task.Run(() => _robotLogic.RunDrinkScripts(SelectedDrink.DrinkId));
-
-            // TEST MODE: Keep the spinner visible until the user presses Back.
-            // (So we don't set IsOrdering=false here.)
+            
         }
         catch (Exception ex)
         {
-            // If it fails, stop the spinner so the user can try again.
             IsOrdering = false;
             MessageBox.Show(ex.Message, "Order failed", MessageBoxButton.OK, MessageBoxImage.Error);
         }
