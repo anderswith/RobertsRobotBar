@@ -65,7 +65,7 @@ public class ScriptCreationWizardViewModel : ViewModelBase
             Number = 1,
             Title = "Gentagelse af program",
             Description = "Åbn et nyt program og kryds af gentagelse af, så scriptet kun kører en gang.",
-            ImageSource = "/RobotBarApp;component/Resources/KalibreringGuide/AfkrydsGentag.jpg"
+            ImageSource = "/RobotBarApp;component/Resources/ScriptGuide/AfkrydsGentag.jpg"
         });
 
         Steps.Add(new ScriptGuideStep
@@ -75,7 +75,7 @@ public class ScriptCreationWizardViewModel : ViewModelBase
             Description =
                 "Sæt det første viapunkt til hjem - enten kør robotten til første punkt i et andet program eller ret på graderne til robot leddene. " +
                 "Scripts skal altid starte og slutte ved hjemmepunktet for at have et fælles punkt og en glidende gennemgang fra den ene script til den næste.",
-            ImageSource = "/RobotBarApp;component/Resources/KalibreringGuide/Hjem.jpg"
+            ImageSource = "/RobotBarApp;component/Resources/ScriptGuide/Hjem.jpg"
         });
 
         Steps.Add(new ScriptGuideStep
@@ -83,7 +83,7 @@ public class ScriptCreationWizardViewModel : ViewModelBase
             Number = 3,
             Title = "Bevægelse",
             Description = "Der er to måder man kan flytte robotten på. Den ene er at ændre i led graderne for at få den ønskede position, og den anden er ‘friløb’.",
-            ImageSource = "/RobotBarApp;component/Resources/KalibreringGuide/Hjem.jpg"
+            ImageSource = "/RobotBarApp;component/Resources/ScriptGuide/Hjem.jpg"
         });
 
         Steps.Add(new ScriptGuideStep
@@ -91,7 +91,7 @@ public class ScriptCreationWizardViewModel : ViewModelBase
             Number = 4,
             Title = "Friløb",
             Description = "Friløb er den nemmeste og kræver blot at du holder knappen nede enten på skærmen eller bag på tablet'en.",
-            ImageSource = "/RobotBarApp;component/Resources/KalibreringGuide/FriKnap.jpg"
+            ImageSource = "/RobotBarApp;component/Resources/ScriptGuide/FriKnap.jpg"
         });
 
         Steps.Add(new ScriptGuideStep
@@ -99,7 +99,7 @@ public class ScriptCreationWizardViewModel : ViewModelBase
             Number = 5,
             Title = "Friløb",
             Description = "Mens du eller en anden aktiverer friløb, kan man nemt flytte robotten der hvor man gerne vil have den.",
-            ImageSource = "/RobotBarApp;component/Resources/KalibreringGuide/FlytRobot.jpg"
+            ImageSource = "/RobotBarApp;component/Resources/ScriptGuide/FlytRobot.jpg"
         });
 
         Steps.Add(new ScriptGuideStep
@@ -109,7 +109,7 @@ public class ScriptCreationWizardViewModel : ViewModelBase
             Description =
                 "Tilføj viapunkter, klo kommandoer, vente punkter eller andet efter behov. Husk at robotten altid følger den korteste rute mellem to viapunkter, " +
                 "så tilføj gerne mange punkter indimellem.",
-            ImageSource = "/RobotBarApp;component/Resources/KalibreringGuide/Viapunkter.jpg"
+            ImageSource = "/RobotBarApp;component/Resources/ScriptGuide/Viapunkter.jpg"
         });
 
         Steps.Add(new ScriptGuideStep
@@ -143,7 +143,7 @@ public class ScriptCreationWizardViewModel : ViewModelBase
             Number = 10,
             Title = "Navngivning",
             Description = "Når scriptet er færdigt, skal den gemmes. Brug ikke specialkarakterer som å, ø og æ, da de gør, at scriptet ikke kan køres. Brug lowerCamelCase.",
-            ImageSource = "/RobotBarApp;component/Resources/KalibreringGuide/NavngivningTablet.jpg"
+            ImageSource = "/RobotBarApp;component/Resources/ScriptGuide/NavngivningTablet.jpg"
         });
 
         Steps.Add(new ScriptGuideStep
@@ -151,7 +151,7 @@ public class ScriptCreationWizardViewModel : ViewModelBase
             Number = 11,
             Title = "Navngivning",
             Description = ".urp bliver tilføjet automatisk på tablet, men husk at skrive det ind i programmet og brug det samme navn til scriptet. Husk at tjekke for stavefejl.",
-            ImageSource = "/RobotBarApp;component/Resources/KalibreringGuide/NavngivningProgram.jpg"
+            ImageSource = "/RobotBarApp;component/Resources/ScriptGuide/NavngivningProgram.png"
         });
     }
 
