@@ -72,6 +72,7 @@ public partial class App : Application
                 services.AddTransient<KundeMainViewModel>();
                 services.AddTransient<CalibrationWizardViewModel>();
                 services.AddTransient<ScriptCreationWizardViewModel>();
+                services.AddTransient<KundeDrinkKlarViewModel>();
 
                 // Views
                 services.AddTransient<EventListView>();
@@ -91,6 +92,7 @@ public partial class App : Application
                 services.AddTransient<KundeMainView>();
                 services.AddTransient<CalibrationWizardView>();
                 services.AddTransient<ScriptCreationWizardView>();
+                services.AddTransient<KundeDrinkKlarView>();
 
                 // services
                 services.AddSingleton<IEventSessionService, EventSessionService>();

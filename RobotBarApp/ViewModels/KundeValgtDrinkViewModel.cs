@@ -56,7 +56,7 @@ public class KundeValgtDrinkViewModel : ViewModelBase
         {
             IsOrdering = false;
 
-            //_navigationService.NavigateTo<VærsgoViewModel>();
+            _navigationService.NavigateTo<KundeDrinkKlarViewModel>();
 
             // unsubscribe
             _robotLogic.DrinkFinished -= OnDrinkFinished;
