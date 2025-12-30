@@ -153,7 +153,7 @@ namespace RobotBarApp.ViewModels
 
         private void ShowGuide()
         {
-            System.Windows.MessageBox.Show("Guide kommer senere :)");
+            _navigation.NavigateTo<ScriptCreationWizardViewModel>(ScriptCreationWizardViewModel.ScriptGuideReturnTarget.Ingredient);
         }
 
         private void Cancel()

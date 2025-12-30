@@ -286,7 +286,8 @@ namespace RobotBarApp.ViewModels
 
         private void ShowGuide()
         {
-            System.Windows.MessageBox.Show("GUIDE COMING LATER");
+            // Pass the same contextId this VM was constructed with (eventId in create mode, drinkId in edit mode)
+            _navigation.NavigateTo<ScriptCreationWizardViewModel>(_drinkId ?? _eventId);
         }
 
         private static bool IsLikelyExternalPath(string? path)
