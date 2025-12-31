@@ -35,6 +35,9 @@
         <DataTemplate DataType="{x:Type vm:KundeMixSelvPourViewModel}">
             <view:KundeMixSelvPourView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:KundeDrinkKlarViewModel}">
+            <view:KundeDrinkKlarView />
+        </DataTemplate>
 
     </Window.Resources>
 
