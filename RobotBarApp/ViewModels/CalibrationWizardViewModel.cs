@@ -95,7 +95,7 @@ public class CalibrationWizardViewModel : ViewModelBase
             Number = 4,
             Title = "Hjemme position",
             Description =
-                "Start robotten op og tjek om den står i “hjemme” positionen. Hvis du er i tvivl, kan du åbne et program og manuelt køre til første viapunkt eller tjekke om koordinaterne på robot ledene passer til dem på billedet.\n\n" +
+                "Start robotten op og tjek om den står i “hjemme” positionen. Hvis du er i tvivl, kan du åbne et program og manuelt køre til første viapunkt eller tjekke om koordinaterne på robot leddene passer til dem på billedet.\n\n" +
                 "Pas på! Kør robotten langsomt til hjemme positionen for at undgå, at den kører ind i sig selv. Kig evt. på tablet animationen for at bekræfte at bevægelserne ser rigtige ud.",
             ImageSource = "/RobotBarApp;component/Resources/KalibreringGuide/HjemGraderRobotLed.jpg"
         });
