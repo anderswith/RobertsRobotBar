@@ -296,7 +296,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
             string? desiredType = cat switch
             {
                 "Alkohol" => "Alkohol",
-                "Mockohol" => "Mockohol",
+                "Mockohol" => "Mock",
                 "Sirup" => "Syrup",
                 "Sodavand" => "Soda",
                 _ => null
@@ -308,7 +308,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
                 ingredients = cat switch
                 {
                     "Alkohol" => _ingredientLogic.GetAlcohol(EffectiveEventId),
-                    "Mockohol" => _ingredientLogic.GetAllIngredients().Where(i => i.Type == "Mockohol"),
+                    "Mockohol" => _ingredientLogic.getMockohol(EffectiveEventId),
                     "Sirup" => _ingredientLogic.GetSyrups(EffectiveEventId),
                     "Sodavand" => _ingredientLogic.GetSoda(EffectiveEventId),
                     _ => _ingredientLogic.GetAllIngredients()
