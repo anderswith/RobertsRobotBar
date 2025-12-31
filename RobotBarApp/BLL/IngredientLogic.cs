@@ -235,6 +235,10 @@ public class IngredientLogic : IIngredientLogic
     {
         return _ingredientRepository.GetIngredientsWithScripts(ingredientIds);
     }
+    public IEnumerable<Ingredient> getMockohol(Guid eventId)
+    {
+        return _ingredientRepository.GetIngredientByType("Mock", eventId);
+    }
 
     public IEnumerable<Ingredient> GetIngredientsForPositions()
     {

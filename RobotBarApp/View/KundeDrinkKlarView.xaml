@@ -91,7 +91,7 @@
                                  Height="4"
                                  Minimum="0"
                                  Maximum="1"
-                                 Value="{Binding Progress}"
+                                 Value="{Binding Progress,  Mode=OneWay}"
                                  FlowDirection="RightToLeft"
                                  Background="#2BFFFFFF"
                                  Foreground="#FFFFFFFF"
