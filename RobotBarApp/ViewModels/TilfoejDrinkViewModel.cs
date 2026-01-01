@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
@@ -14,7 +15,6 @@ namespace RobotBarApp.ViewModels
 {
     public class TilfoejDrinkViewModel : ViewModelBase
     {
-       
         private readonly IIngredientLogic _ingredientLogic;
         private readonly IDrinkLogic _drinkLogic;
         private readonly INavigationService _navigation;
@@ -24,6 +24,10 @@ namespace RobotBarApp.ViewModels
         
         private readonly Guid? _drinkId;
         public bool IsEditMode => _drinkId.HasValue;
+
+        // Guard so setting IsMocktail during initial edit-load doesn't clear selections
+        private bool _isInitializing;
+
         public TilfoejDrinkViewModel(
             IIngredientLogic ingredientLogic,
             IDrinkLogic drinkLogic,
@@ -31,7 +35,6 @@ namespace RobotBarApp.ViewModels
             IEventLogic eventLogic,
             IImageStorageService imageStorageService,
             Guid contextId)
-            
         {
             _ingredientLogic = ingredientLogic;
             _drinkLogic = drinkLogic;
@@ -71,13 +74,12 @@ namespace RobotBarApp.ViewModels
             SaveCommand = new RelayCommand(_ => Save());
             CancelCommand = new RelayCommand(_ => Cancel());
             GuideCommand = new RelayCommand(_ => ShowGuide());
-            
+
             LoadIngredientLists();
             if (IsEditMode)
             {
                 LoadDrinkForEdit();
             }
-            
         }
         
         private void LoadDrinkForEdit()
@@ -89,50 +91,63 @@ namespace RobotBarApp.ViewModels
             if (drink == null)
                 throw new KeyNotFoundException("Drink not found.");
 
-            // Basic fields
-            DrinkName   = drink.Name;
-            ImagePreview = drink.Image;
-            IsMocktail  = drink.IsMocktail;
-            
-            ScriptText = drink.DrinkScripts?
-                             .OrderBy(s => s.Number)
-                             .FirstOrDefault()
-                             ?.UrScript
-                         ?? "";
+            _isInitializing = true;
+            try
+            {
+                // Basic fields
+                DrinkName = drink.Name;
+                ImagePreview = drink.Image;
 
-            var alcoholContents = drink.DrinkContents
-                .Where(dc => dc.Ingredient.Type == "Alkohol")
-                .ToList();
+                // Set IsMocktail first so options list is correct before assigning SelectedAlcohol*
+                IsMocktail = drink.IsMocktail;
 
-            SelectedAlcohol1 = alcoholContents.ElementAtOrDefault(0)?.Ingredient;
-            AlcoholDose1     = alcoholContents.ElementAtOrDefault(0)?.Dose ?? "single";
+                ScriptText = drink.DrinkScripts?
+                                     .OrderBy(s => s.Number)
+                                     .FirstOrDefault()
+                                     ?.UrScript
+                                 ?? "";
 
-            SelectedAlcohol2 = alcoholContents.ElementAtOrDefault(1)?.Ingredient;
-            AlcoholDose2     = alcoholContents.ElementAtOrDefault(1)?.Dose ?? "single";
+                // Load the correct "spirit" type based on mocktail flag
+                var spiritType = drink.IsMocktail ? "Mock" : "Alkohol";
 
-            SelectedAlcohol3 = alcoholContents.ElementAtOrDefault(2)?.Ingredient;
-            AlcoholDose3     = alcoholContents.ElementAtOrDefault(2)?.Dose ?? "single";
+                var spiritContents = drink.DrinkContents
+                    .Where(dc => dc.Ingredient.Type == spiritType)
+                    .ToList();
 
-            SelectedAlcohol4 = alcoholContents.ElementAtOrDefault(3)?.Ingredient;
-            AlcoholDose4     = alcoholContents.ElementAtOrDefault(3)?.Dose ?? "single";
+                SelectedAlcohol1 = spiritContents.ElementAtOrDefault(0)?.Ingredient;
+                AlcoholDose1 = spiritContents.ElementAtOrDefault(0)?.Dose ?? "single";
 
-            SelectedSyrup1 = drink.DrinkContents
-                .FirstOrDefault(dc => dc.Ingredient.Type == "Syrup")?.Ingredient;
+                SelectedAlcohol2 = spiritContents.ElementAtOrDefault(1)?.Ingredient;
+                AlcoholDose2 = spiritContents.ElementAtOrDefault(1)?.Dose ?? "single";
 
-            SelectedSyrup2 = drink.DrinkContents
-                .Where(dc => dc.Ingredient.Type == "Syrup")
-                .Skip(1).FirstOrDefault()?.Ingredient;
+                SelectedAlcohol3 = spiritContents.ElementAtOrDefault(2)?.Ingredient;
+                AlcoholDose3 = spiritContents.ElementAtOrDefault(2)?.Dose ?? "single";
 
-            SelectedSyrup3 = drink.DrinkContents
-                .Where(dc => dc.Ingredient.Type == "Syrup")
-                .Skip(2).FirstOrDefault()?.Ingredient;
+                SelectedAlcohol4 = spiritContents.ElementAtOrDefault(3)?.Ingredient;
+                AlcoholDose4 = spiritContents.ElementAtOrDefault(3)?.Dose ?? "single";
 
-            SelectedSoda1 = drink.DrinkContents
-                .FirstOrDefault(dc => dc.Ingredient.Type == "Soda")?.Ingredient;
+                SelectedSyrup1 = drink.DrinkContents
+                    .FirstOrDefault(dc => dc.Ingredient.Type == "Syrup")?.Ingredient;
 
-            SelectedSoda2 = drink.DrinkContents
-                .Where(dc => dc.Ingredient.Type == "Soda")
-                .Skip(1).FirstOrDefault()?.Ingredient;
+                SelectedSyrup2 = drink.DrinkContents
+                    .Where(dc => dc.Ingredient.Type == "Syrup")
+                    .Skip(1).FirstOrDefault()?.Ingredient;
+
+                SelectedSyrup3 = drink.DrinkContents
+                    .Where(dc => dc.Ingredient.Type == "Syrup")
+                    .Skip(2).FirstOrDefault()?.Ingredient;
+
+                SelectedSoda1 = drink.DrinkContents
+                    .FirstOrDefault(dc => dc.Ingredient.Type == "Soda")?.Ingredient;
+
+                SelectedSoda2 = drink.DrinkContents
+                    .Where(dc => dc.Ingredient.Type == "Soda")
+                    .Skip(1).FirstOrDefault()?.Ingredient;
+            }
+            finally
+            {
+                _isInitializing = false;
+            }
         }
         private void Cancel()
         {
@@ -158,8 +173,25 @@ namespace RobotBarApp.ViewModels
         public bool IsMocktail
         {
             get => _isMocktail;
-            set => SetProperty(ref _isMocktail, value);
+            set
+            {
+                if (_isMocktail == value)
+                    return;
+
+                _isMocktail = value;
+                OnPropertyChanged();
+
+                // Update label + options
+                OnPropertyChanged(nameof(AlcoholSectionTitle));
+                RefreshAlcoholOrMockoholOptions();
+
+                // If user toggles, clear already selected spirit so it can't mix Alkohol/Mock
+                if (!_isInitializing)
+                    ClearSpiritSelections();
+            }
         }
+
+        public string AlcoholSectionTitle => IsMocktail ? "Mockohol:" : "Alkohol:";
 
         private string _scriptText = "";
         public string ScriptText
@@ -175,21 +207,45 @@ namespace RobotBarApp.ViewModels
             set => SetProperty(ref _imagePreview, value);
         }
 
-
-
         public ObservableCollection<Ingredient> AlcoholOptions { get; } = new();
         public ObservableCollection<Ingredient> SyrupOptions { get; } = new();
         public ObservableCollection<Ingredient> SodaOptions { get; } = new();
 
         private void LoadIngredientLists()
         {
-            AlcoholOptions.Clear();
+            RefreshAlcoholOrMockoholOptions();
+
             SyrupOptions.Clear();
             SodaOptions.Clear();
 
-            foreach (var i in _ingredientLogic.GetAlcohol(_eventId)) AlcoholOptions.Add(i);
             foreach (var i in _ingredientLogic.GetSyrups(_eventId)) SyrupOptions.Add(i);
             foreach (var i in _ingredientLogic.GetSoda(_eventId)) SodaOptions.Add(i);
+        }
+
+        private void RefreshAlcoholOrMockoholOptions()
+        {
+            AlcoholOptions.Clear();
+
+            var source = IsMocktail
+                ? _ingredientLogic.getMockohol(_eventId)
+                : _ingredientLogic.GetAlcohol(_eventId);
+
+            foreach (var i in source)
+                AlcoholOptions.Add(i);
+        }
+
+        private void ClearSpiritSelections()
+        {
+            SelectedAlcohol1 = null;
+            SelectedAlcohol2 = null;
+            SelectedAlcohol3 = null;
+            SelectedAlcohol4 = null;
+
+            // Reset doses too (keeps UI consistent)
+            AlcoholDose1 = "single";
+            AlcoholDose2 = "single";
+            AlcoholDose3 = "single";
+            AlcoholDose4 = "single";
         }
 
         private Ingredient? _selectedAlcohol1;

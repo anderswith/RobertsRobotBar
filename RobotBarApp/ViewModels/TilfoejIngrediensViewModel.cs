@@ -115,7 +115,9 @@ namespace RobotBarApp.ViewModels
 
             IngredientName = ingredient.Name;
             ImagePreview = ingredient.Image;
-            
+
+            // Load saved color so edit doesn't reset to default
+            Color = string.IsNullOrWhiteSpace(ingredient.Color) ? Color : ingredient.Color;
 
             IsAlkohol = ingredient.Type == "Alkohol";
             IsMock    = ingredient.Type == "Mock";
