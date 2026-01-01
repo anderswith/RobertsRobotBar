@@ -69,7 +69,7 @@ public class RobotLogic : IRobotLogic
 
             _ingredientUseCountLogic.AddIngredientUseCount(ingredientId, eventId);
 
-            if (cl == 2)
+            if (cl == 2 || cl == 20)
             {
                 foreach (var script in ingredient.SingleScripts.OrderBy(s => s.Number))
                     scripts.Add(script.UrScript);
