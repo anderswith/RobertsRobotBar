@@ -11,26 +11,50 @@
 
     <UserControl.Resources>
         <conv:PathToImageConverter x:Key="PathToImageConverter" />
+
+        <!-- Keep admin typography consistent -->
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Slightly smaller button text (matches TilfoejIngrediensView) -->
+        <Style TargetType="Button">
+            <Setter Property="FontSize" Value="16"/>
+        </Style>
+
+        <!-- Make ComboBox selected text align nicely (prevents it looking too high) -->
+        <Style TargetType="ComboBox">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
     </UserControl.Resources>
 
     <Border HorizontalAlignment="Center"
             VerticalAlignment="Top"
-            Margin="0,20,0,0"
+            Margin="40,60,40,30"
             Padding="30"
+            Width="1200"
+            MaxWidth="1400"
             Background="Transparent">
 
         <!-- Shared size for Alkohol/Syrup/Sodavand inner grids -->
         <Grid Grid.IsSharedSizeScope="True">
 
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>   <!-- Title -->
+                <RowDefinition Height="12"/>
+                <RowDefinition Height="Auto"/>   <!-- Divider -->
+                <RowDefinition Height="40"/>
+
                 <RowDefinition Height="Auto"/>   <!-- Navn / Mocktail / Script -->
-                <RowDefinition Height="20"/>
+                <RowDefinition Height="28"/>
                 <RowDefinition Height="Auto"/>   <!-- Billed -->
-                <RowDefinition Height="20"/>
+                <RowDefinition Height="28"/>
                 <RowDefinition Height="Auto"/>   <!-- Alkohol -->
-                <RowDefinition Height="15"/>
+                <RowDefinition Height="22"/>
                 <RowDefinition Height="Auto"/>   <!-- Syrup -->
-                <RowDefinition Height="15"/>
+                <RowDefinition Height="22"/>
                 <RowDefinition Height="Auto"/>   <!-- Sodavand -->
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>   <!-- Buttons -->
@@ -42,14 +66,22 @@
                 <ColumnDefinition Width="*"/>      <!-- content -->
             </Grid.ColumnDefinitions>
 
+            <!-- Title -->
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                       Text="Tilføj drink"
+                       FontSize="26"
+                       FontWeight="SemiBold" />
+
+            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                    BorderBrush="#FFCCCCCC"
+                    BorderThickness="0,0,0,1" />
+
             <!-- ========== Row 0: Navn / Mocktail / Script ========== -->
 
-            <TextBlock Grid.Row="0" Grid.Column="0"
-                       VerticalAlignment="Center"
-                       FontSize="18"
+            <TextBlock Grid.Row="4" Grid.Column="0"
                        Text="Navn:"/>
 
-            <Grid Grid.Row="0" Grid.Column="2" Margin="0,0,0,10">
+            <Grid Grid.Row="4" Grid.Column="2" Margin="0,0,0,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="40"/>
@@ -66,31 +98,31 @@
                 <TextBox Grid.Column="0"
                          Height="35"
                          Width="250"
-                         FontSize="16"
+                         FontSize="18"
                          Padding="6"
                          HorizontalAlignment="Left"
                          Text="{Binding DrinkName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <!-- Mocktail? -->
                 <TextBlock Grid.Column="2"
-                           VerticalAlignment="Center"
-                           FontSize="18"
                            Text="Mocktail?"/>
 
                 <CheckBox Grid.Column="4"
                           VerticalAlignment="Center"
-                          IsChecked="{Binding IsMocktail, Mode=TwoWay}" />
+                          IsChecked="{Binding IsMocktail, Mode=TwoWay}">
+                    <CheckBox.LayoutTransform>
+                        <ScaleTransform ScaleX="1.35" ScaleY="1.35" />
+                    </CheckBox.LayoutTransform>
+                </CheckBox>
 
                 <!-- Script -->
                 <TextBlock Grid.Column="6"
-                           VerticalAlignment="Center"
-                           FontSize="18"
                            Text="Script:"/>
 
                 <TextBox Grid.Column="8"
                          Height="35"
-                         Width="250"
-                         FontSize="16"
+                         Width="320"
+                         FontSize="18"
                          Padding="6"
                          HorizontalAlignment="Left"
                          Text="{Binding ScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -98,16 +130,15 @@
 
             <!-- ========== Row 2: Billed ========== -->
 
-            <TextBlock Grid.Row="2" Grid.Column="0"
+            <TextBlock Grid.Row="6" Grid.Column="0"
                        VerticalAlignment="Top"
-                       FontSize="18"
                        Text="Billed:"/>
 
-            <StackPanel Grid.Row="2" Grid.Column="2"
+            <StackPanel Grid.Row="6" Grid.Column="2"
                         Orientation="Horizontal"
                         Margin="0,0,0,15"
                         HorizontalAlignment="Left">
-                <Border Width="80" Height="60"
+                <Border Width="80" Height="44"
                         BorderBrush="Black"
                         BorderThickness="2"
                         Background="White"
@@ -118,7 +149,7 @@
 
                 <Button Content="Vælg"
                         Width="90"
-                        Height="35"
+                        Height="44"
                         Padding="10,2"
                         VerticalAlignment="Center"
                         Command="{Binding ChooseImageCommand}" />
@@ -127,12 +158,12 @@
 
             <!-- ========== Row 4: Alkohol (defines shared column sizes) ========== -->
 
-            <TextBlock Grid.Row="4" Grid.Column="0"
+            <TextBlock Grid.Row="8" Grid.Column="0"
                        VerticalAlignment="Center"
-                       FontSize="18"
                        Text="{Binding AlcoholSectionTitle}"/>
 
-            <Grid Grid.Row="4" Grid.Column="2"
+            <!-- Revert Alkohol section back to original 4-slot single-row layout -->
+            <Grid Grid.Row="8" Grid.Column="2"
                   Margin="0,0,0,5"
                   HorizontalAlignment="Left">
                 <Grid.ColumnDefinitions>
@@ -141,172 +172,69 @@
                     <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol2"/>
                     <ColumnDefinition Width="20"/>
                     <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol3"/>
-                    <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol4"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Slot 1 -->
-                <StackPanel Grid.Column="0"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Left">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
                     <ComboBox Width="150"
                               Height="35"
                               FontSize="14"
                               HorizontalAlignment="Left"
                               ItemsSource="{Binding AlcoholOptions}"
                               DisplayMemberPath="Name"
-                              
                               SelectedItem="{Binding SelectedAlcohol1}" />
 
-
-                    <Grid Width="80" Height="35"
-                          Margin="5,0,0,0"
-                          HorizontalAlignment="Left">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="22"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0"
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Center"
-                                    Margin="5,0,0,0"
-                                    HorizontalAlignment="Left">
-                            <ComboBox Width="80"
-                                      Height="35"
-                                      Margin="5,0,0,0"
-                                      ItemsSource="{Binding DoseOptions}"
-                                      SelectedItem="{Binding AlcoholDose1}" />
-                        </StackPanel>
-
-                        
-                    </Grid>
+                    <ComboBox Width="70"
+                              Height="35"
+                              Margin="8,0,0,0"
+                              ItemsSource="{Binding DoseOptions}"
+                              SelectedItem="{Binding AlcoholDose1}" />
                 </StackPanel>
 
                 <!-- Slot 2 -->
-                <StackPanel Grid.Column="2"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Left">
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Left">
                     <ComboBox Width="150"
                               Height="35"
                               FontSize="14"
                               HorizontalAlignment="Left"
                               ItemsSource="{Binding AlcoholOptions}"
                               DisplayMemberPath="Name"
-                             
                               SelectedItem="{Binding SelectedAlcohol2}" />
 
-
-                    <Grid Width="80" Height="35"
-                          Margin="5,0,0,0"
-                          HorizontalAlignment="Left">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="22"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0"
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Center"
-                                    Margin="5,0,0,0"
-                                    HorizontalAlignment="Left">
-                            <ComboBox Width="80"
-                                      Height="35"
-                                      Margin="5,0,0,0"
-                                      ItemsSource="{Binding DoseOptions}"
-                                      SelectedItem="{Binding AlcoholDose2}" />
-                        </StackPanel>
-
-                        
-                    </Grid>
+                    <ComboBox Width="70"
+                              Height="35"
+                              Margin="8,0,0,0"
+                              ItemsSource="{Binding DoseOptions}"
+                              SelectedItem="{Binding AlcoholDose2}" />
                 </StackPanel>
 
                 <!-- Slot 3 -->
-                <StackPanel Grid.Column="4"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Left">
+                <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Left">
                     <ComboBox Width="150"
                               Height="35"
                               FontSize="14"
                               HorizontalAlignment="Left"
                               ItemsSource="{Binding AlcoholOptions}"
                               DisplayMemberPath="Name"
-                              
                               SelectedItem="{Binding SelectedAlcohol3}" />
 
-
-                    <Grid Width="80" Height="35"
-                          Margin="5,0,0,0"
-                          HorizontalAlignment="Left">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="22"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0"
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Center"
-                                    Margin="5,0,0,0"
-                                    HorizontalAlignment="Left">
-                            <ComboBox Width="80"
-                                      Height="35"
-                                      Margin="5,0,0,0"
-                                      ItemsSource="{Binding DoseOptions}"
-                                      SelectedItem="{Binding AlcoholDose3}" />
-                        </StackPanel>
-
-                       
-                    </Grid>
-                </StackPanel>
-
-                <!-- Slot 4 -->
-                <StackPanel Grid.Column="6"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Left">
-                    <ComboBox Width="150"
+                    <ComboBox Width="70"
                               Height="35"
-                              FontSize="14"
-                              HorizontalAlignment="Left"
-                              ItemsSource="{Binding AlcoholOptions}"
-                              DisplayMemberPath="Name"
-                             
-                              SelectedItem="{Binding SelectedAlcohol4}" />
-
-
-                    <Grid Width="80" Height="35"
-                          Margin="5,0,0,0"
-                          HorizontalAlignment="Left">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="22"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0"
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Center"
-                                    Margin="5,0,0,0"
-                                    HorizontalAlignment="Left">
-                            <ComboBox Width="80"
-                                      Height="35"
-                                      Margin="5,0,0,0"
-                                      ItemsSource="{Binding DoseOptions}"
-                                      SelectedItem="{Binding AlcoholDose4}" />
-                        </StackPanel>
-
-                        
-                    </Grid>
+                              Margin="8,0,0,0"
+                              ItemsSource="{Binding DoseOptions}"
+                              SelectedItem="{Binding AlcoholDose3}" />
                 </StackPanel>
             </Grid>
 
 
             <!-- ========== Row 6: Syrup (shares column widths with Alcohol) ========== -->
 
-            <TextBlock Grid.Row="6" Grid.Column="0"
+            <TextBlock Grid.Row="10" Grid.Column="0"
                        VerticalAlignment="Center"
-                       FontSize="18"
                        Text="Syrup:"/>
 
-            <Grid Grid.Row="6" Grid.Column="2"
+            <!-- Revert Syrup ComboBoxes to original sizes (Width=150) -->
+            <Grid Grid.Row="10" Grid.Column="2"
                   Margin="0,0,0,5"
                   HorizontalAlignment="Left">
                 <Grid.ColumnDefinitions>
@@ -321,47 +249,41 @@
 
                 <ComboBox Grid.Column="0"
                           Width="150"
-                         Height="35"
-                         FontSize="14"
-                         HorizontalAlignment="Left"
-                         ItemsSource="{Binding SyrupOptions}"
-                         DisplayMemberPath="Name"
-                         
-                         SelectedItem="{Binding SelectedSyrup1}" />
-
-
-                <ComboBox Grid.Column="2" 
-                            Width="150"
                           Height="35"
                           FontSize="14"
                           HorizontalAlignment="Left"
                           ItemsSource="{Binding SyrupOptions}"
                           DisplayMemberPath="Name"
-                          
+                          SelectedItem="{Binding SelectedSyrup1}" />
+
+                <ComboBox Grid.Column="2"
+                          Width="150"
+                          Height="35"
+                          FontSize="14"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding SyrupOptions}"
+                          DisplayMemberPath="Name"
                           SelectedItem="{Binding SelectedSyrup2}" />
 
-
-                <ComboBox Grid.Column="4" 
-                    Width="150"
+                <ComboBox Grid.Column="4"
+                          Width="150"
                           Height="35"
                           FontSize="14"
                           HorizontalAlignment="Left"
                           ItemsSource="{Binding SyrupOptions}"
                           DisplayMemberPath="Name"
-                          
                           SelectedItem="{Binding SelectedSyrup3}" />
-
             </Grid>
 
 
             <!-- ========== Row 8: Sodavand (shares column widths) ========== -->
 
-            <TextBlock Grid.Row="8" Grid.Column="0"
+            <TextBlock Grid.Row="12" Grid.Column="0"
                        VerticalAlignment="Center"
-                       FontSize="18"
                        Text="Sodavand:"/>
 
-            <Grid Grid.Row="8" Grid.Column="2"
+            <!-- Revert Soda ComboBoxes to original sizes (Width=150) -->
+            <Grid Grid.Row="12" Grid.Column="2"
                   Margin="0,0,0,5"
                   HorizontalAlignment="Left">
                 <Grid.ColumnDefinitions>
@@ -375,55 +297,49 @@
                 </Grid.ColumnDefinitions>
 
                 <ComboBox Grid.Column="0"
-                    Width="150"
-                     Height="35"
-                     FontSize="14"
-                     HorizontalAlignment="Left"
-                     ItemsSource="{Binding SodaOptions}"
-                     DisplayMemberPath="Name"
-                     
-                     SelectedItem="{Binding SelectedSoda1}" />
-
+                          Width="150"
+                          Height="35"
+                          FontSize="14"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding SodaOptions}"
+                          DisplayMemberPath="Name"
+                          SelectedItem="{Binding SelectedSoda1}" />
 
                 <ComboBox Grid.Column="2"
-                    Width="150"
-                     Height="35"
-                     FontSize="14"
-                     HorizontalAlignment="Left"
-                     ItemsSource="{Binding SodaOptions}"
-                     DisplayMemberPath="Name"
-                     
-                     SelectedItem="{Binding SelectedSoda2}" />
-                
-                
-
+                          Width="150"
+                          Height="35"
+                          FontSize="14"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding SodaOptions}"
+                          DisplayMemberPath="Name"
+                          SelectedItem="{Binding SelectedSoda2}" />
             </Grid>
 
 
             <!-- ========== Row 10: Buttons ========== -->
 
-            <Button Grid.Row="10" Grid.Column="0"
+            <Button Grid.Row="14" Grid.Column="0"
                     Content="Guide"
                     Width="100"
-                    Height="40"
+                    Height="44"
                     Margin="0,20,0,0"
                     Background="#FFB0B0B0"
                     BorderBrush="#FF888888"
                     Command="{Binding GuideCommand}" />
 
-            <StackPanel Grid.Row="10" Grid.Column="2"
+            <StackPanel Grid.Row="14" Grid.Column="2"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right"
                         Margin="0,20,0,0">
                 <Button Content="Annullér"
                         Width="110"
-                        Height="40"
+                        Height="44"
                         Background="White"
                         Margin="0,0,10,0"
                         Command="{Binding CancelCommand}" />
                 <Button Content="Gem"
                         Width="110"
-                        Height="40"
+                        Height="44"
                         Background="#FF6BE86B"
                         Command="{Binding SaveCommand}" />
             </StackPanel>
