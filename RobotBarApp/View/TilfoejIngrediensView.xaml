@@ -182,14 +182,11 @@
                             <!-- Replace the invalid MultiBinding with a normal Binding using HexToBrushConverter -->
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Margin="2">
-                                        <Border Width="24" Height="24"
-                                                Background="{Binding Hex, Converter={StaticResource HexToBrushConverter}}"
-                                                BorderBrush="#FF444444"
-                                                BorderThickness="1"
-                                                CornerRadius="3" />
-                                        <TextBlock Text="{Binding Name}" Margin="8,0,0,0" VerticalAlignment="Center"/>
-                                    </StackPanel>
+                                    <Border Height="26"
+                                            Background="{Binding Hex, Converter={StaticResource HexToBrushConverter}}"
+                                            BorderBrush="Black"
+                                            BorderThickness="1"
+                                            Margin="2"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
 
