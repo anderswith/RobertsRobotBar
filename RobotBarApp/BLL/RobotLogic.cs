@@ -109,10 +109,60 @@ public class RobotLogic : IRobotLogic
 
         foreach (var script in drink.DrinkScripts.OrderBy(s => s.Number))
         {
-            
-            var scriptName = script.UrScript.Trim(); ;
+            var scriptName = script.UrScript.Trim();
             scripts.Add(scriptName);
         }
+        _scriptRunner.QueueScripts(scripts);
+    }
+
+    public void RunMixSelvScripts(IEnumerable<(Guid IngredientId, int Cl)> ingredients)
+    {
+        if (ingredients == null)
+            throw new ArgumentNullException(nameof(ingredients));
+
+        var items = ingredients
+            .Where(x => x.IngredientId != Guid.Empty)
+            .ToList();
+
+        if (items.Count == 0)
+            throw new ArgumentException("No ingredients provided.", nameof(ingredients));
+
+        // Fetch full ingredient data (including scripts)
+        var ids = items.Select(i => i.IngredientId).Distinct().ToList();
+        var ingredientsWithScripts = _ingredientLogic.GetIngredientsWithScripts(ids)
+            .ToDictionary(i => i.IngredientId);
+
+        var scripts = new List<string>();
+
+        var eventId = _eventSession.CurrentEventId!.Value;
+
+        foreach (var (ingredientId, cl) in items)
+        {
+            if (!ingredientsWithScripts.TryGetValue(ingredientId, out var ing))
+                throw new ArgumentException($"Ingredient not found for id {ingredientId}.");
+
+            // Dose selection rule:
+            // 2cl => single
+            // 4cl or more => double
+            var useDouble = cl >= 4;
+
+            // Use-count logic mirrors drink logic: double counts as 2 uses.
+            var useCount = useDouble ? 2 : 1;
+            for (var i = 0; i < useCount; i++)
+                _ingredientUseCountLogic.AddIngredientUseCount(ingredientId, eventId);
+
+            if (useDouble)
+            {
+                foreach (var script in ing.DoubleScripts.OrderBy(s => s.Number))
+                    scripts.Add(script.UrScript);
+            }
+            else
+            {
+                foreach (var script in ing.SingleScripts.OrderBy(s => s.Number))
+                    scripts.Add(script.UrScript);
+            }
+        }
+
         _scriptRunner.QueueScripts(scripts);
     }
 

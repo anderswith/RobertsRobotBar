@@ -3,10 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:conv="clr-namespace:RobotBarApp.Converters"
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="1000"
              Background="#FFE5E5E5">
+
+    <UserControl.Resources>
+        <conv:PathToImageConverter x:Key="PathToImageConverter" />
+        <conv:BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
 
     <!-- Center form and limit width so it doesn't stretch across the whole screen -->
     <Border HorizontalAlignment="Center"
@@ -136,7 +142,7 @@
                         BorderBrush="Black"
                         BorderThickness="2"
                         Background="White">
-                    <Image Source="{Binding ImagePreview, Mode=OneWay}"
+                    <Image Source="{Binding ImagePreview, Converter={StaticResource PathToImageConverter}}"
                            Stretch="Uniform" />
                 </Border>
 
@@ -228,14 +234,16 @@
             <TextBlock Grid.Row="8" Grid.Column="0"
                        VerticalAlignment="Center"
                        FontSize="18"
-                       Text="DoubleScript:"/>
+                       Text="DoubleScript:"
+                       Visibility="{Binding ShowDoubleScript, Converter={StaticResource BoolToVis}}"/>
 
             <TextBox Grid.Row="8" Grid.Column="2"
                      Height="40"
                      FontSize="16"
                      Padding="6"
                      HorizontalAlignment="Stretch"
-                     Text="{Binding DoubleScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                     Text="{Binding DoubleScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Visibility="{Binding ShowDoubleScript, Converter={StaticResource BoolToVis}}" />
 
             <!-- Row 8: Buttons -->
 
