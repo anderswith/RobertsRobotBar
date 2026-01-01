@@ -27,8 +27,27 @@ public static class MixSelvLimits
     public const int RestrictedMaxCl = 10;
 
     /// <summary>
-    /// Ingredient types in the DB that count towards RestrictedMaxCl.
-    /// Note: Syrup is stored as "Syrup" in your DB.
+    /// Allowed amount for a single shot (cl).
     /// </summary>
-    public static readonly string[] RestrictedTypes = { "Alkohol", "Mockohol", "Syrup" };
+    public const int SingleShotCl = 2;
+
+    /// <summary>
+    /// Allowed amount for a double shot (cl).
+    /// </summary>
+    public const int DoubleShotCl = 4;
+
+    /// <summary>
+    /// Combined max for Alkohol + Mock (subset of RestrictedMaxCl).
+    /// </summary>
+    public const int AlcoholAndMockMaxCl = 4;
+
+    /// <summary>
+    /// Ingredient types in the DB that count towards RestrictedMaxCl.
+    /// </summary>
+    public static readonly string[] RestrictedTypes = { "Alkohol", "Mock", "Syrup" };
+
+    /// <summary>
+    /// Ingredient types that count towards AlcoholAndMockMaxCl.
+    /// </summary>
+    public static readonly string[] AlcoholAndMockTypes = { "Alkohol", "Mock" };
 }
