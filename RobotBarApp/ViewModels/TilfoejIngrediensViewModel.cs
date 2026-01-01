@@ -20,6 +20,16 @@ namespace RobotBarApp.ViewModels
         private readonly Guid? _ingredientId;
         public bool IsEditMode => _ingredientId.HasValue;
 
+        // Holder positions (used by UI + save)
+        public ObservableCollection<int> Holders { get; } = new();
+
+        private int _selectedHolder;
+        public int SelectedHolder
+        {
+            get => _selectedHolder;
+            set => SetProperty(ref _selectedHolder, value);
+        }
+
 
         private string _ingredientName = "";
         public string IngredientName
@@ -35,28 +45,76 @@ namespace RobotBarApp.ViewModels
             set => SetProperty(ref _color, value);
         }
 
-        private string _imagePreview;
+        private string _imagePreview = "";
         public string ImagePreview
         {
             get => _imagePreview;
             set => SetProperty(ref _imagePreview, value);
         }
 
-        public bool IsAlkohol { get; set; }
-        public bool IsMock { get; set; }
-        public bool IsSyrup { get; set; }
-        public bool IsSoda { get; set; }
-
-
-        public ObservableCollection<int> Holders { get; } = new();
-
-        private int _selectedHolder;
-        public int SelectedHolder
+        private bool _isAlkohol;
+        public bool IsAlkohol
         {
-            get => _selectedHolder;
-            set => SetProperty(ref _selectedHolder, value);
+            get => _isAlkohol;
+            set
+            {
+                if (SetProperty(ref _isAlkohol, value) && value)
+                    SetIngredientTypeExclusive("Alkohol");
+            }
         }
-        
+
+        private bool _isMock;
+        public bool IsMock
+        {
+            get => _isMock;
+            set
+            {
+                if (SetProperty(ref _isMock, value) && value)
+                    SetIngredientTypeExclusive("Mock");
+            }
+        }
+
+        private bool _isSyrup;
+        public bool IsSyrup
+        {
+            get => _isSyrup;
+            set
+            {
+                if (SetProperty(ref _isSyrup, value) && value)
+                    SetIngredientTypeExclusive("Syrup");
+            }
+        }
+
+        private bool _isSoda;
+        public bool IsSoda
+        {
+            get => _isSoda;
+            set
+            {
+                if (SetProperty(ref _isSoda, value) && value)
+                    SetIngredientTypeExclusive("Soda");
+            }
+        }
+
+        // When Soda is selected, we hide the "DoubleScript" input.
+        public bool ShowDoubleScript => !IsSoda;
+
+        private void SetIngredientTypeExclusive(string type)
+        {
+            // Ensure only one type is selected at a time.
+            // IMPORTANT: set backing fields directly to avoid recursion.
+            _isAlkohol = type == "Alkohol";
+            _isMock = type == "Mock";
+            _isSyrup = type == "Syrup";
+            _isSoda = type == "Soda";
+
+            OnPropertyChanged(nameof(IsAlkohol));
+            OnPropertyChanged(nameof(IsMock));
+            OnPropertyChanged(nameof(IsSyrup));
+            OnPropertyChanged(nameof(IsSoda));
+            OnPropertyChanged(nameof(ShowDoubleScript));
+        }
+
 
         private string _singleScript = "";
         public string SingleScriptText
@@ -119,11 +177,8 @@ namespace RobotBarApp.ViewModels
             // Load saved color so edit doesn't reset to default
             Color = string.IsNullOrWhiteSpace(ingredient.Color) ? Color : ingredient.Color;
 
-            IsAlkohol = ingredient.Type == "Alkohol";
-            IsMock    = ingredient.Type == "Mock";
-            IsSyrup   = ingredient.Type == "Syrup";
-            IsSoda    = ingredient.Type == "Soda";
-            
+            // Use the helper so we get correct UI updates (e.g., ShowDoubleScript)
+            SetIngredientTypeExclusive(ingredient.Type);
 
             SelectedHolder = ingredient.IngredientPositions?
                                  .Select(p => p.Position)
@@ -141,6 +196,10 @@ namespace RobotBarApp.ViewModels
                                .FirstOrDefault()
                                ?.UrScript
                                ?? "";
+
+            // For Soda, we treat scripts as "one script only". If double is missing, mirror single.
+            if (IsSoda && !string.IsNullOrWhiteSpace(SingleScriptText) && string.IsNullOrWhiteSpace(DoubleScriptText))
+                DoubleScriptText = SingleScriptText;
         }
         
 
@@ -184,19 +243,23 @@ namespace RobotBarApp.ViewModels
 
         private void Save()
         {
-            
             string type =
                 IsAlkohol ? "Alkohol" :
-                IsMock    ? "Mock" :
-                IsSyrup   ? "Syrup" :
-                IsSoda    ? "Soda" :
+                IsMock ? "Mock" :
+                IsSyrup ? "Syrup" :
+                IsSoda ? "Soda" :
                 "Ukendt";
+
             if (type == "Ukendt")
             {
                 MessageBox.Show("Ingredient must have a type");
                 return;
             }
-            
+
+            // Soda only has one script in the UI. To satisfy the rest of the system,
+            // copy single -> double right before validation/persist.
+            if (type == "Soda")
+                DoubleScriptText = SingleScriptText;
 
             if (string.IsNullOrWhiteSpace(SingleScriptText) && string.IsNullOrWhiteSpace(DoubleScriptText))
             {
