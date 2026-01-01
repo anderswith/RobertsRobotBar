@@ -110,14 +110,12 @@ namespace RobotBarApp.ViewModels
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                _cts.Cancel();               // stop progress
-                PourProgress = 100;
-
                 _robotLogic.DrinkFinished -= OnDrinkFinished;
 
-                //_navigation!.NavigateTo<VærsgoViewModel>();
+                _navigation!.NavigateTo<KundeDrinkKlarViewModel>();
             });
         }
+
         private void OnScriptFinished(int finished, int total)
         {
             Application.Current.Dispatcher.Invoke(() =>
