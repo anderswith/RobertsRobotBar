@@ -20,6 +20,8 @@ namespace RobotBarApp.ViewModels
         private readonly Guid? _ingredientId;
         public bool IsEditMode => _ingredientId.HasValue;
 
+        public string PageTitle => IsEditMode ? "Rediger ingrediens" : "Tilføj ingrediens";
+
         // Holder positions (used by UI + save)
         public ObservableCollection<int> Holders { get; } = new();
 
@@ -353,8 +355,8 @@ namespace RobotBarApp.ViewModels
 
         public class ColorOption
         {
-            public string Name { get; set; }   // "Red", "Blue", etc.
-            public string Hex { get; set; }    // "#FF0000"
+            public string Name { get; set; } = "";   // "Red", "Blue", etc.
+            public string Hex { get; set; } = "";    // "#FF0000"
         }
         public ObservableCollection<ColorOption> AvailableColors { get; } =
             new()

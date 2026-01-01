@@ -28,6 +28,9 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
+
+        <!-- Shared vertical spacing to make the form breathe -->
+        <Thickness x:Key="RowMargin">0,10,0,10</Thickness>
     </UserControl.Resources>
 
     <Border HorizontalAlignment="Center"
@@ -68,7 +71,7 @@
 
             <!-- Title -->
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
-                       Text="Tilføj drink"
+                       Text="{Binding PageTitle}"
                        FontSize="26"
                        FontWeight="SemiBold" />
 
@@ -81,7 +84,8 @@
             <TextBlock Grid.Row="4" Grid.Column="0"
                        Text="Navn:"/>
 
-            <Grid Grid.Row="4" Grid.Column="2" Margin="0,0,0,10">
+            <!-- Row 0 content grid -->
+            <Grid Grid.Row="4" Grid.Column="2" Margin="{StaticResource RowMargin}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="40"/>
@@ -134,9 +138,10 @@
                        VerticalAlignment="Top"
                        Text="Billed:"/>
 
+            <!-- Billed row image selection -->
             <StackPanel Grid.Row="6" Grid.Column="2"
                         Orientation="Horizontal"
-                        Margin="0,0,0,15"
+                        Margin="{StaticResource RowMargin}"
                         HorizontalAlignment="Left">
                 <Border Width="80" Height="44"
                         BorderBrush="Black"
@@ -164,7 +169,7 @@
 
             <!-- Revert Alkohol section back to original 4-slot single-row layout -->
             <Grid Grid.Row="8" Grid.Column="2"
-                  Margin="0,0,0,5"
+                  Margin="{StaticResource RowMargin}"
                   HorizontalAlignment="Left">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol1"/>
@@ -235,7 +240,7 @@
 
             <!-- Revert Syrup ComboBoxes to original sizes (Width=150) -->
             <Grid Grid.Row="10" Grid.Column="2"
-                  Margin="0,0,0,5"
+                  Margin="{StaticResource RowMargin}"
                   HorizontalAlignment="Left">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol1"/>
@@ -284,7 +289,7 @@
 
             <!-- Revert Soda ComboBoxes to original sizes (Width=150) -->
             <Grid Grid.Row="12" Grid.Column="2"
-                  Margin="0,0,0,5"
+                  Margin="{StaticResource RowMargin}"
                   HorizontalAlignment="Left">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol1"/>
@@ -322,7 +327,7 @@
                     Content="Guide"
                     Width="100"
                     Height="44"
-                    Margin="0,20,0,0"
+                    Margin="0,24,0,0"
                     Background="#FFB0B0B0"
                     BorderBrush="#FF888888"
                     Command="{Binding GuideCommand}" />
@@ -330,7 +335,7 @@
             <StackPanel Grid.Row="14" Grid.Column="2"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right"
-                        Margin="0,20,0,0">
+                        Margin="0,24,0,0">
                 <Button Content="Annullér"
                         Width="110"
                         Height="44"

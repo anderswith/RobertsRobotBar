@@ -109,7 +109,7 @@
 
                 <!-- Title -->
                 <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
-                           Text="Tilføj ingrediens"
+                           Text="{Binding PageTitle}"
                            FontSize="26"
                            FontWeight="SemiBold" />
 
@@ -179,11 +179,11 @@
                                 </Style>
                             </ComboBox.ItemContainerStyle>
 
-                            <!-- Replace the invalid MultiBinding with a normal Binding using HexToBrushConverter -->
+                            <!-- Color swatch item template: use a simple binding that design-time can resolve -->
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <Border Height="26"
-                                            Background="{Binding Hex, Converter={StaticResource HexToBrushConverter}}"
+                                            Background="{Binding}" 
                                             BorderBrush="Black"
                                             BorderThickness="1"
                                             Margin="2"/>

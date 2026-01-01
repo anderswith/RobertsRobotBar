@@ -25,6 +25,8 @@ namespace RobotBarApp.ViewModels
         private readonly Guid? _drinkId;
         public bool IsEditMode => _drinkId.HasValue;
 
+        public string PageTitle => IsEditMode ? "Rediger drink" : "Tilføj drink";
+
         // Guard so setting IsMocktail during initial edit-load doesn't clear selections
         private bool _isInitializing;
 
