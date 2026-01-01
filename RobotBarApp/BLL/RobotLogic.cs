@@ -42,36 +42,48 @@ public class RobotLogic : IRobotLogic
         _scriptRunner.QueueScripts(scripts);
     }
 
-    public void RunIngredientScript(List<Guid> ingredientIds)
+    public void RunMixSelvScripts(List<(Guid IngredientId, int Cl)> order)
     {
-        if(ingredientIds == null || ingredientIds.Count == 0)
+        if (order == null || order.Count == 0)
         {
-            throw new ArgumentException("Ingredient IDs cannot be null or empty.");
+            throw new ArgumentException("Order cannot be null or empty.");
         }
+            
         
-        var ingredients = _ingredientLogic.GetIngredientsWithScripts(ingredientIds);
-        if(ingredients == null || ingredients.Count() == 0)
-        {
-            throw new ArgumentException("No ingredients found with the provided IDs.");
-        }
+        var ingredientIds = order.Select(o => o.IngredientId).Distinct().ToList();
 
-        var eventId = _eventSession.CurrentEventId!.Value;
-        foreach(var ingredientId in ingredientIds)
-        {
-            _ingredientUseCountLogic.AddIngredientUseCount(ingredientId, eventId);
-        }
+        var ingredients = _ingredientLogic
+            .GetIngredientsWithScripts(ingredientIds)
+            .ToDictionary(i => i.IngredientId);
 
         var scripts = new List<string>();
+        var eventId = _eventSession.CurrentEventId!.Value;
 
-        foreach (var ing in ingredients)
+        foreach (var (ingredientId, cl) in order)
         {
-            foreach (var script in ing.SingleScripts.OrderBy(s => s.Number))
+            if (!ingredients.TryGetValue(ingredientId, out var ingredient))
             {
-                scripts.Add(script.UrScript);
+                throw new InvalidOperationException($"Ingredient not found: {ingredientId}");
             }
-            foreach (var script in ing.DoubleScripts.OrderBy(s => s.Number))
+                
+
+            _ingredientUseCountLogic.AddIngredientUseCount(ingredientId, eventId);
+
+            if (cl == 2)
             {
-                scripts.Add(script.UrScript);
+                foreach (var script in ingredient.SingleScripts.OrderBy(s => s.Number))
+                    scripts.Add(script.UrScript);
+            }
+            else if (cl == 4)
+            {
+                foreach (var script in ingredient.DoubleScripts.OrderBy(s => s.Number))
+                    scripts.Add(script.UrScript);
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    $"Unsupported cl value {cl} for ingredient {ingredient.Name}"
+                );
             }
         }
 
