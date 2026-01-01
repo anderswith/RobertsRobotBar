@@ -355,8 +355,8 @@ namespace RobotBarApp.ViewModels
 
         public class ColorOption
         {
-            public string Name { get; set; } = "";   // "Red", "Blue", etc.
-            public string Hex { get; set; } = "";    // "#FF0000"
+            public string Name { get; set; }   // "Red", "Blue", etc.
+            public string Hex { get; set; }    // "#FF0000"
         }
         public ObservableCollection<ColorOption> AvailableColors { get; } =
             new()

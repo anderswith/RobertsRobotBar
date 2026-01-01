@@ -179,11 +179,11 @@
                                 </Style>
                             </ComboBox.ItemContainerStyle>
 
-                            <!-- Color swatch item template: use a simple binding that design-time can resolve -->
+                            <!-- Replace the invalid MultiBinding with a normal Binding using HexToBrushConverter -->
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <Border Height="26"
-                                            Background="{Binding}" 
+                                            Background="{Binding Hex, Converter={StaticResource HexToBrushConverter}}"
                                             BorderBrush="Black"
                                             BorderThickness="1"
                                             Margin="2"/>
