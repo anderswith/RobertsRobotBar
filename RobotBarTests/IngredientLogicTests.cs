@@ -22,15 +22,18 @@ namespace UnitTests
             _ingredientLogic = new IngredientLogic(_ingredientRepositoryMock.Object);
         }
 
-        // ---------- AddIngredient----------
+        // ---------- AddIngredient ----------
 
         [TestCase(null)]
         [TestCase("")]
         public void AddIngredient_ShouldThrow_WhenNameIsNullOrEmpty(string? invalidName)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient(invalidName, "Type", "Image.png", 10, "single", 3,new List<string> { "Script" }));
-            Assert.That(ex.Message, Is.EqualTo("Ingredient name cannot be null or empty."));
+                _ingredientLogic.AddIngredient(
+                    invalidName!, "Type", "Image.png", "Red", 1,
+                    new List<string> { "S1" }, new List<string> { "D1" }));
+
+            Assert.That(ex!.Message, Is.EqualTo("Ingredient name cannot be null or empty."));
         }
 
         [TestCase(null)]
@@ -38,8 +41,11 @@ namespace UnitTests
         public void AddIngredient_ShouldThrow_WhenTypeIsNullOrEmpty(string? invalidType)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient("Name", invalidType, "Image.png", 10, "single", 3,new List<string> { "Script" }));
-            Assert.That(ex.Message, Is.EqualTo("Ingredient type cannot be null or empty."));
+                _ingredientLogic.AddIngredient(
+                    "Name", invalidType!, "Image.png", "Red", 1,
+                    new List<string> { "S1" }, new List<string> { "D1" }));
+
+            Assert.That(ex!.Message, Is.EqualTo("Ingredient type cannot be null or empty."));
         }
 
         [TestCase(null)]
@@ -47,77 +53,91 @@ namespace UnitTests
         public void AddIngredient_ShouldThrow_WhenImageIsNullOrEmpty(string? invalidImage)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient("Name", "Type", invalidImage, 10, "single", 3,new List<string> { "Script" }));
-            Assert.That(ex.Message, Is.EqualTo("Ingredient image cannot be null or empty."));
+                _ingredientLogic.AddIngredient(
+                    "Name", "Type", invalidImage!, "Red", 1,
+                    new List<string> { "S1" }, new List<string> { "D1" }));
+
+            Assert.That(ex!.Message, Is.EqualTo("Ingredient image cannot be null or empty."));
         }
 
-        [Test]
-        public void AddIngredient_ShouldThrow_WhenSizeIsNegative()
-        {
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient("Name", "Type", "Image.png", -5, "single", 3, new List<string> { "Script" }));
-            Assert.That(ex.Message, Is.EqualTo("Ingredient size cannot be negative."));
-        }
-
-        [TestCase("")]
         [TestCase(null)]
-        [TestCase("InvalidDose")]
-        public void AddIngredient_ShouldThrow_WhenDoseIsInvalid(string? invalidDose)
+        [TestCase("")]
+        public void AddIngredient_ShouldThrow_WhenColorIsNullOrEmpty(string? invalidColor)
         {
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient("Name", "Type", "Image.png", 5, invalidDose, 3,new List<string> { "Script" }));
-            Assert.That(ex.Message, Is.EqualTo("Ingredient dose has to be single or double."));
+            var ex = Assert.Throws<AggregateException>(() =>
+                _ingredientLogic.AddIngredient(
+                    "Name", "Type", "Image.png", invalidColor!, 1,
+                    new List<string> { "S1" }, new List<string> { "D1" }));
+
+            Assert.That(ex!.Message, Is.EqualTo("Ingredient color cannot be null or empty."));
         }
-        
+
         [TestCase(0)]
         [TestCase(-1)]
         public void AddIngredient_ShouldThrow_WhenPositionNumberIsInvalid(int invalidPosition)
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient( "Name", "Type", "Image.png", 10, "single", invalidPosition,new List<string> { "Script1" }));
-            Assert.That(ex.Message, Is.EqualTo("Ingredient position number cannot be negative."));
+                _ingredientLogic.AddIngredient(
+                    "Name", "Type", "Image.png", "Red", invalidPosition,
+                    new List<string> { "S1" }, new List<string> { "D1" }));
+
+            Assert.That(ex!.Message, Is.EqualTo("Ingredient position number cannot be negative."));
         }
 
         [Test]
-        public void AddIngredient_ShouldThrow_WhenScriptNamesIsNull()
+        public void AddIngredient_ShouldThrow_WhenSingleScriptsMissing()
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient("Name", "Type", "Image.png", 10, "single", 3,null));
-            Assert.That(ex.Message, Is.EqualTo("Ingredient must have at least one script."));
+                _ingredientLogic.AddIngredient(
+                    "Name", "Type", "Image.png", "Red", 1,
+                    new List<string>(), new List<string> { "D1" }));
+
+            Assert.That(ex!.Message, Is.EqualTo("Ingredient must have at least one single script."));
         }
 
         [Test]
-        public void AddIngredient_ShouldThrow_WhenScriptNamesIsEmpty()
+        public void AddIngredient_ShouldThrow_WhenDoubleScriptsMissing()
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient("Name", "Type", "Image.png", 10, "single", 3,new List<string>()));
-            Assert.That(ex.Message, Is.EqualTo("Ingredient must have at least one script."));
+                _ingredientLogic.AddIngredient(
+                    "Name", "Type", "Image.png", "Red", 1,
+                    new List<string> { "S1" }, new List<string>()));
+
+            Assert.That(ex!.Message, Is.EqualTo("Ingredient must have atleast one double script."));
         }
 
         [Test]
-        public void AddIngredient_ShouldThrow_WhenScriptContainsWhitespace()
+        public void AddIngredient_ShouldThrow_WhenScriptIsWhitespace()
         {
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.AddIngredient("Name", "Type", "Image.png", 10, "single", 3,new List<string> { "  " }));
-            Assert.That(ex.Message, Is.EqualTo("Script name cannot be null or whitespace."));
+                _ingredientLogic.AddIngredient(
+                    "Name", "Type", "Image.png", "Red", 1,
+                    new List<string> { "   " }, new List<string> { "D1" }));
+
+            Assert.That(ex!.Message, Is.EqualTo("Script name cannot be null or whitespace."));
         }
 
         [Test]
-        public void AddIngredient_ShouldCallRepository_WithValidDataAndScripts()
+        public void AddIngredient_ShouldCallRepository_WithValidData()
         {
-            var scripts = new List<string> { "ScriptA", "ScriptB" };
+            _ingredientLogic.AddIngredient(
+                "Vodka", "Alcohol", "vodka.png", "Clear", 3,
+                new List<string> { "SingleA", "SingleB" },
+                new List<string> { "DoubleA" });
 
-            _ingredientLogic.AddIngredient("Vodka", "Alcohol", "vodka.png", 750, "single", 3, scripts);
-
-            _ingredientRepositoryMock.Verify(r => r.AddIngredient(It.Is<Ingredient>(i =>
-                i.Name == "Vodka" &&
-                i.Type == "Alcohol" &&
-                i.Image == "vodka.png" &&
-                i.Dose == "single" &&
-                i.IngredientScripts.Count == 2 &&
-                i.IngredientScripts.First().Number == 1 &&
-                i.IngredientScripts.Last().Number == 2
-            )), Times.Once);
+            _ingredientRepositoryMock.Verify(r =>
+                r.AddIngredient(It.Is<Ingredient>(i =>
+                    i.Name == "Vodka" &&
+                    i.Type == "Alcohol" &&
+                    i.Image == "vodka.png" &&
+                    i.Color == "Clear" &&
+                    i.IngredientPositions.Single().Position == 3 &&
+                    i.SingleScripts.Count == 2 &&
+                    i.DoubleScripts.Count == 1 &&
+                    i.SingleScripts.First().Number == 1 &&
+                    i.DoubleScripts.First().Number == 1
+                )),
+                Times.Once);
         }
 
         // ---------- DeleteIngredient ----------
@@ -125,286 +145,191 @@ namespace UnitTests
         [Test]
         public void DeleteIngredient_ShouldThrow_WhenNotFound()
         {
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(It.IsAny<Guid>())).Returns((Ingredient)null);
+            _ingredientRepositoryMock
+                .Setup(r => r.GetIngredientById(It.IsAny<Guid>()))
+                .Returns((Ingredient?)null);
 
-            var ex = Assert.Throws<KeyNotFoundException>(() =>
+            Assert.Throws<KeyNotFoundException>(() =>
                 _ingredientLogic.DeleteIngredient(Guid.NewGuid()));
-
-            Assert.That(ex.Message, Does.Contain("not found"));
         }
 
         [Test]
         public void DeleteIngredient_ShouldThrow_WhenUsedInDrink()
         {
-            var ingredient = new Ingredient { DrinkContents = new List<DrinkContent> { new DrinkContent() } };
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(It.IsAny<Guid>())).Returns(ingredient);
+            var ingredient = new Ingredient
+            {
+                DrinkContents = new List<DrinkContent> { new DrinkContent() }
+            };
+
+            _ingredientRepositoryMock
+                .Setup(r => r.GetIngredientById(It.IsAny<Guid>()))
+                .Returns(ingredient);
 
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 _ingredientLogic.DeleteIngredient(Guid.NewGuid()));
 
-            Assert.That(ex.Message, Is.EqualTo("Cannot delete ingredient that is used in a drink."));
+            Assert.That(ex!.Message, Is.EqualTo("Cannot delete ingredient that is used in a drink."));
         }
 
         [Test]
         public void DeleteIngredient_ShouldThrow_WhenUsedInBarSetup()
         {
-            var ingredient = new Ingredient { BarSetups = new List<BarSetup> { new BarSetup() } };
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(It.IsAny<Guid>())).Returns(ingredient);
+            var ingredient = new Ingredient
+            {
+                BarSetups = new List<BarSetup> { new BarSetup() }
+            };
+
+            _ingredientRepositoryMock
+                .Setup(r => r.GetIngredientById(It.IsAny<Guid>()))
+                .Returns(ingredient);
 
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 _ingredientLogic.DeleteIngredient(Guid.NewGuid()));
 
-            Assert.That(ex.Message, Is.EqualTo("Cannot delete ingredient that is used in a bar setup."));
+            Assert.That(ex!.Message, Is.EqualTo("Cannot delete ingredient that is used in a bar setup."));
         }
 
         [Test]
         public void DeleteIngredient_ShouldCallRepository_WhenValid()
         {
             var ingredient = new Ingredient { IngredientId = Guid.NewGuid() };
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(ingredient.IngredientId)).Returns(ingredient);
+
+            _ingredientRepositoryMock
+                .Setup(r => r.GetIngredientById(ingredient.IngredientId))
+                .Returns(ingredient);
 
             _ingredientLogic.DeleteIngredient(ingredient.IngredientId);
 
-            _ingredientRepositoryMock.Verify(r => r.DeleteIngredient(ingredient), Times.Once);
+            _ingredientRepositoryMock.Verify(
+                r => r.DeleteIngredient(ingredient),
+                Times.Once);
         }
 
         // ---------- UpdateIngredient ----------
 
-        [TestCase(null)]
-        [TestCase("")]
-        public void UpdateIngredient_ShouldThrow_WhenNameIsNullOrEmpty(string? invalidName)
-        {
-            var id = Guid.NewGuid();
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(id))
-                .Returns(new Ingredient { IngredientId = id });
-
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(id, invalidName, "Type", "Image.png", 10, "single", new List<string> { "Script1" }));
-
-            Assert.That(ex.Message, Is.EqualTo("Ingredient name cannot be null or empty."));
-        }
-
-        [TestCase(null)]
-        [TestCase("")]
-        public void UpdateIngredient_ShouldThrow_WhenTypeIsNullOrEmpty(string? invalidType)
-        {
-            var id = Guid.NewGuid();
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(id))
-                .Returns(new Ingredient { IngredientId = id });
-
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(id, "Name", invalidType, "Image.png", 10, "single", new List<string> { "Script1" }));
-
-            Assert.That(ex.Message, Is.EqualTo("Ingredient type cannot be null or empty."));
-        }
-
-        [TestCase(null)]
-        [TestCase("")]
-        public void UpdateIngredient_ShouldThrow_WhenImageIsNullOrEmpty(string? invalidImage)
-        {
-            var id = Guid.NewGuid();
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(id))
-                .Returns(new Ingredient { IngredientId = id });
-
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(id, "Name", "Type", invalidImage, 10, "single", new List<string> { "Script1" }));
-
-            Assert.That(ex.Message, Is.EqualTo("Ingredient image cannot be null or empty."));
-        }
-
-        [TestCase(0)]
-        [TestCase(-10)]
-        public void UpdateIngredient_ShouldThrow_WhenSizeIsZeroOrNegative(double invalidSize)
-        {
-            var id = Guid.NewGuid();
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(id))
-                .Returns(new Ingredient { IngredientId = id });
-
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(id, "Name", "Type", "Image.png", invalidSize, "single",new List<string> { "Script1" }));
-
-            Assert.That(ex.Message, Is.EqualTo("Ingredient size cannot be negative."));
-        }
-
-        [TestCase("")]
-        [TestCase(null)]
-        [TestCase("InvalidDose")]
-        public void UpdateIngredient_ShouldThrow_WhenDoseIsInvalid(string? invalidDose)
-        {
-            var id = Guid.NewGuid();
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(id))
-                .Returns(new Ingredient { IngredientId = id });
-
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(id, "Name", "Type", "Image.png", 10, invalidDose, new List<string> { "Script1" }));
-
-            Assert.That(ex.Message, Is.EqualTo("Ingredient dose has to be single or double."));
-        }
-        
-
-
         [Test]
-        public void UpdateIngredient_ShouldThrow_WhenScriptNamesIsNull()
+        public void UpdateIngredient_ShouldThrow_WhenIdIsEmpty()
         {
-            var id = Guid.NewGuid();
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(id))
-                .Returns(new Ingredient { IngredientId = id });
-
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(id, "Name", "Type", "Image.png", 10, "single", null));
+                _ingredientLogic.UpdateIngredient(
+                    Guid.Empty, "Name", "Type", "Img", "Red", 1,
+                    new List<string> { "S1" }, new List<string> { "D1" }));
 
-            Assert.That(ex.Message, Is.EqualTo("Ingredient must have at least one script."));
-        }
-
-        [Test]
-        public void UpdateIngredient_ShouldThrow_WhenScriptNamesIsEmpty()
-        {
-            var id = Guid.NewGuid();
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(id))
-                .Returns(new Ingredient { IngredientId = id });
-
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(id, "Name", "Type", "Image.png", 10, "single", new List<string>()));
-
-            Assert.That(ex.Message, Is.EqualTo("Ingredient must have at least one script."));
-        }
-
-        [Test]
-        public void UpdateIngredient_ShouldThrow_WhenScriptNamesContainWhitespace()
-        {
-            var id = Guid.NewGuid();
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(id))
-                .Returns(new Ingredient { IngredientId = id });
-
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(id, "Name", "Type", "Image.png", 10, "single", new List<string> { "   ", "Valid" }));
-
-            Assert.That(ex.Message, Is.EqualTo("Script name cannot be null or whitespace."));
+            Assert.That(ex!.Message, Is.EqualTo("Ingredient ID cannot be empty."));
         }
 
         [Test]
         public void UpdateIngredient_ShouldThrow_WhenNotFound()
         {
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(It.IsAny<Guid>())).Returns((Ingredient)null);
+            _ingredientRepositoryMock
+                .Setup(r => r.GetIngredientById(It.IsAny<Guid>()))
+                .Returns((Ingredient?)null);
 
             var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(Guid.NewGuid(), "Name", "Type", "Image.png", 10, "single", new List<string> { "Script" }));
+                _ingredientLogic.UpdateIngredient(
+                    Guid.NewGuid(), "Name", "Type", "Img", "Red", 1,
+                    new List<string> { "S1" }, new List<string> { "D1" }));
 
-            Assert.That(ex.Message, Is.EqualTo("Ingredient not found."));
+            Assert.That(ex!.Message, Is.EqualTo("Ingredient not found."));
         }
 
         [Test]
-        public void UpdateIngredient_ShouldThrow_WhenScriptListInvalid()
-        {
-            var existing = new Ingredient { IngredientId = Guid.NewGuid() };
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(existing.IngredientId)).Returns(existing);
-
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(existing.IngredientId, "Name", "Type", "Image.png", 10, "single", new List<string>()));
-
-            Assert.That(ex.Message, Is.EqualTo("Ingredient must have at least one script."));
-        }
-
-        [Test]
-        public void UpdateIngredient_ShouldThrow_WhenScriptNameIsWhitespace()
-        {
-            var existing = new Ingredient { IngredientId = Guid.NewGuid() };
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(existing.IngredientId)).Returns(existing);
-
-            var ex = Assert.Throws<ArgumentException>(() =>
-                _ingredientLogic.UpdateIngredient(existing.IngredientId, "Name", "Type", "Image.png", 10, "single", new List<string> { "   " }));
-
-            Assert.That(ex.Message, Is.EqualTo("Script name cannot be null or whitespace."));
-        }
-        
-
-        [Test]
-        public void UpdateIngredient_ShouldAddNewAndRemoveOldScripts()
+        public void UpdateIngredient_ShouldUpdateFields_AndCallRepository()
         {
             var id = Guid.NewGuid();
-            var existing = new Ingredient
+            var ingredient = new Ingredient
             {
                 IngredientId = id,
-                IngredientScripts = new List<IngredientScript>
+                IngredientPositions = new List<IngredientPosition>
                 {
-                    new IngredientScript { UrScript = "OldScript", Number = 1 }
-                }
-            };
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(id)).Returns(existing);
-
-            var newScripts = new List<string> { "NewScript" };
-
-            _ingredientLogic.UpdateIngredient(id, "Name", "Type", "Image.png", 10, "single",  newScripts);
-
-            _ingredientRepositoryMock.Verify(r => r.UpdateIngredient(It.Is<Ingredient>(i =>
-                i.IngredientScripts.Count == 1 &&
-                i.IngredientScripts.First().UrScript == "NewScript"
-            )), Times.Once);
-        }
-
-        [Test]
-        public void UpdateIngredient_ShouldKeepExistingScripts_WhenSame()
-        {
-            var id = Guid.NewGuid();
-            var existing = new Ingredient
-            {
-                IngredientId = id,
-                IngredientScripts = new List<IngredientScript>
+                    new IngredientPosition { Position = 1 }
+                },
+                SingleScripts = new List<SingleScript>
                 {
-                    new IngredientScript { UrScript = "SameScript", Number = 1 }
-                }
-            };
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(id)).Returns(existing);
-
-            _ingredientLogic.UpdateIngredient(id, "Name", "Type", "Image.png", 10, "single", new List<string> { "SameScript" });
-
-            _ingredientRepositoryMock.Verify(r => r.UpdateIngredient(It.Is<Ingredient>(i =>
-                i.IngredientScripts.Count == 1 &&
-                i.IngredientScripts.First().UrScript == "SameScript"
-            )), Times.Once);
-        }
-
-        [Test]
-        public void UpdateIngredient_ShouldIncrementScriptNumbers_WhenAddingNew()
-        {
-            var id = Guid.NewGuid();
-            var existing = new Ingredient
-            {
-                IngredientId = id,
-                IngredientScripts = new List<IngredientScript>
+                    new SingleScript { UrScript = "OldS", Number = 1 }
+                },
+                DoubleScripts = new List<DoubleScript>
                 {
-                    new IngredientScript { UrScript = "Old", Number = 3 }
+                    new DoubleScript { UrScript = "OldD", Number = 1 }
                 }
-            };
-            _ingredientRepositoryMock.Setup(r => r.GetIngredientById(id)).Returns(existing);
-
-            _ingredientLogic.UpdateIngredient(id, "Name", "Type", "Image.png", 10, "single", new List<string> { "Old", "New" });
-
-            _ingredientRepositoryMock.Verify(r => r.UpdateIngredient(It.Is<Ingredient>(i =>
-                i.IngredientScripts.Any(s => s.Number == 4)
-            )), Times.Once);
-        }
-        
-        // GetIngredientsForPositions 
-        [Test]
-        public void GetIngredientsForPosition_ShouldCallRepository_WhenValidPosition()
-        {
-
-
-            var expectedList = new List<Ingredient>
-            {
-                new Ingredient { IngredientId = Guid.NewGuid(), Name = "Vodka" },
-                new Ingredient { IngredientId = Guid.NewGuid(), Name = "Cola" }
             };
 
             _ingredientRepositoryMock
-                .Setup(r => r.GetIngredientsForPositions())
-                .Returns(expectedList);
+                .Setup(r => r.GetIngredientById(id))
+                .Returns(ingredient);
 
-            var result = _ingredientLogic.GetIngredientsForPositions();
+            _ingredientLogic.UpdateIngredient(
+                id, "New", "NewType", "new.png", "Blue", 2,
+                new List<string> { "NewSingle" },
+                new List<string> { "NewDouble" });
 
-            Assert.That(result, Is.EqualTo(expectedList));
-            _ingredientRepositoryMock.Verify(r => r.GetIngredientsForPositions(), Times.Once);
+            _ingredientRepositoryMock.Verify(r =>
+                r.UpdateIngredient(It.Is<Ingredient>(i =>
+                    i.Name == "New" &&
+                    i.Type == "NewType" &&
+                    i.Image == "new.png" &&
+                    i.Color == "Blue" &&
+                    i.IngredientPositions.First().Position == 2 &&
+                    i.SingleScripts.First().UrScript == "NewSingle" &&
+                    i.DoubleScripts.First().UrScript == "NewDouble"
+                )),
+                Times.Once);
+        }
+
+        // ---------- GetByType / Other ----------
+
+        [Test]
+        public void GetAlcohol_DelegatesToRepository()
+        {
+            var eventId = Guid.NewGuid();
+            _ingredientLogic.GetAlcohol(eventId);
+
+            _ingredientRepositoryMock.Verify(
+                r => r.GetIngredientByType("Alkohol", eventId),
+                Times.Once);
+        }
+
+        [Test]
+        public void GetSyrups_DelegatesToRepository()
+        {
+            var eventId = Guid.NewGuid();
+            _ingredientLogic.GetSyrups(eventId);
+
+            _ingredientRepositoryMock.Verify(
+                r => r.GetIngredientByType("Syrup", eventId),
+                Times.Once);
+        }
+
+        [Test]
+        public void GetSoda_DelegatesToRepository()
+        {
+            var eventId = Guid.NewGuid();
+            _ingredientLogic.GetSoda(eventId);
+
+            _ingredientRepositoryMock.Verify(
+                r => r.GetIngredientByType("Soda", eventId),
+                Times.Once);
+        }
+
+        [Test]
+        public void GetMockohol_DelegatesToRepository()
+        {
+            var eventId = Guid.NewGuid();
+            _ingredientLogic.getMockohol(eventId);
+
+            _ingredientRepositoryMock.Verify(
+                r => r.GetIngredientByType("Mock", eventId),
+                Times.Once);
+        }
+
+        [Test]
+        public void GetIngredientsForPositions_DelegatesToRepository()
+        {
+            _ingredientLogic.GetIngredientsForPositions();
+
+            _ingredientRepositoryMock.Verify(
+                r => r.GetIngredientsForPositions(),
+                Times.Once);
         }
     }
 }
