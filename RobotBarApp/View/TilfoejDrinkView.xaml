@@ -177,6 +177,8 @@
                     <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol2"/>
                     <ColumnDefinition Width="20"/>
                     <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol3"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol4"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Slot 1 -->
@@ -229,6 +231,23 @@
                               ItemsSource="{Binding DoseOptions}"
                               SelectedItem="{Binding AlcoholDose3}" />
                 </StackPanel>
+
+                <!-- Slot 4 -->
+                <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <ComboBox Width="150"
+                              Height="35"
+                              FontSize="14"
+                              HorizontalAlignment="Left"
+                              ItemsSource="{Binding AlcoholOptions}"
+                              DisplayMemberPath="Name"
+                              SelectedItem="{Binding SelectedAlcohol4}" />
+
+                    <ComboBox Width="70"
+                              Height="35"
+                              Margin="8,0,0,0"
+                              ItemsSource="{Binding DoseOptions}"
+                              SelectedItem="{Binding AlcoholDose4}" />
+                </StackPanel>
             </Grid>
 
 
@@ -252,32 +271,73 @@
                     <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol4"/>
                 </Grid.ColumnDefinitions>
 
-                <ComboBox Grid.Column="0"
-                          Width="150"
-                          Height="35"
-                          FontSize="14"
-                          HorizontalAlignment="Left"
-                          ItemsSource="{Binding SyrupOptions}"
-                          DisplayMemberPath="Name"
-                          SelectedItem="{Binding SelectedSyrup1}" />
+                <!-- Syrup 1 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <ComboBox Width="150"
+                              Height="35"
+                              FontSize="14"
+                              HorizontalAlignment="Left"
+                              ItemsSource="{Binding SyrupOptions}"
+                              DisplayMemberPath="Name"
+                              SelectedItem="{Binding SelectedSyrup1}" />
 
-                <ComboBox Grid.Column="2"
-                          Width="150"
-                          Height="35"
-                          FontSize="14"
-                          HorizontalAlignment="Left"
-                          ItemsSource="{Binding SyrupOptions}"
-                          DisplayMemberPath="Name"
-                          SelectedItem="{Binding SelectedSyrup2}" />
+                    <ComboBox Width="70"
+                              Height="35"
+                              Margin="8,0,0,0"
+                              ItemsSource="{Binding DoseOptions}"
+                              SelectedItem="{Binding SyrupDose1}" />
+                </StackPanel>
 
-                <ComboBox Grid.Column="4"
-                          Width="150"
-                          Height="35"
-                          FontSize="14"
-                          HorizontalAlignment="Left"
-                          ItemsSource="{Binding SyrupOptions}"
-                          DisplayMemberPath="Name"
-                          SelectedItem="{Binding SelectedSyrup3}" />
+                <!-- Syrup 2 -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <ComboBox Width="150"
+                              Height="35"
+                              FontSize="14"
+                              HorizontalAlignment="Left"
+                              ItemsSource="{Binding SyrupOptions}"
+                              DisplayMemberPath="Name"
+                              SelectedItem="{Binding SelectedSyrup2}" />
+
+                    <ComboBox Width="70"
+                              Height="35"
+                              Margin="8,0,0,0"
+                              ItemsSource="{Binding DoseOptions}"
+                              SelectedItem="{Binding SyrupDose2}" />
+                </StackPanel>
+
+                <!-- Syrup 3 -->
+                <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <ComboBox Width="150"
+                              Height="35"
+                              FontSize="14"
+                              HorizontalAlignment="Left"
+                              ItemsSource="{Binding SyrupOptions}"
+                              DisplayMemberPath="Name"
+                              SelectedItem="{Binding SelectedSyrup3}" />
+
+                    <ComboBox Width="70"
+                              Height="35"
+                              Margin="8,0,0,0"
+                              ItemsSource="{Binding DoseOptions}"
+                              SelectedItem="{Binding SyrupDose3}" />
+                </StackPanel>
+
+                <!-- Syrup 4 -->
+                <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <ComboBox Width="150"
+                              Height="35"
+                              FontSize="14"
+                              HorizontalAlignment="Left"
+                              ItemsSource="{Binding SyrupOptions}"
+                              DisplayMemberPath="Name"
+                              SelectedItem="{Binding SelectedSyrup4}" />
+
+                    <ComboBox Width="70"
+                              Height="35"
+                              Margin="8,0,0,0"
+                              ItemsSource="{Binding DoseOptions}"
+                              SelectedItem="{Binding SyrupDose4}" />
+                </StackPanel>
             </Grid>
 
 
