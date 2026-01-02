@@ -4,6 +4,18 @@
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              Background="#FFE5E5E5">
 
+    <UserControl.Resources>
+        <!-- Keep the top filter controls aligned and the same height as the Opdater button -->
+        <Style x:Key="StatsFilterComboBox" TargetType="ComboBox">
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="StatsFilterDatePicker" TargetType="DatePicker">
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Resources>
+
     <Grid Margin="30">
 
         <Grid.RowDefinitions>
@@ -21,7 +33,8 @@
                 <ComboBox ItemsSource="{Binding Events}"
                           SelectedItem="{Binding SelectedEvent}"
                           DisplayMemberPath="Name"
-                          Width="200"/>
+                          Width="200"
+                          Style="{StaticResource StatsFilterComboBox}"/>
             </StackPanel>
 
             <!-- START DATE + TIME -->
@@ -36,12 +49,14 @@
                     </Grid.ColumnDefinitions>
 
                     <DatePicker Grid.Column="0"
-                                SelectedDate="{Binding StartDate}"/>
+                                SelectedDate="{Binding StartDate}"
+                                Style="{StaticResource StatsFilterDatePicker}"/>
 
                     <!-- TIME PICKER -->
                     <ComboBox Grid.Column="2"
                               ItemsSource="{Binding TimeOptions}"
-                              SelectedItem="{Binding StartTime}"/>
+                              SelectedItem="{Binding StartTime}"
+                              Style="{StaticResource StatsFilterComboBox}"/>
                 </Grid>
             </StackPanel>
 
@@ -57,19 +72,21 @@
                     </Grid.ColumnDefinitions>
 
                     <DatePicker Grid.Column="0"
-                                SelectedDate="{Binding EndDate}"/>
+                                SelectedDate="{Binding EndDate}"
+                                Style="{StaticResource StatsFilterDatePicker}"/>
 
-                
                     <ComboBox Grid.Column="2"
                               ItemsSource="{Binding TimeOptions}"
-                              SelectedItem="{Binding EndTime}"/>
+                              SelectedItem="{Binding EndTime}"
+                              Style="{StaticResource StatsFilterComboBox}"/>
                 </Grid>
             </StackPanel>
 
             <Button Content="Opdater"
                     Command="{Binding RefreshStatisticsCommand}"
                     Width="120" Height="35"
-                    Margin="10,20,0,0"/>
+                    Margin="10,0,0,0"
+                    VerticalAlignment="Bottom"/>
         </StackPanel>
 
         <!-- DRINKS PIE CHART -->
