@@ -22,13 +22,13 @@ namespace UnitTests
             _logic = new DrinkUseCountLogic(_repoMock.Object);
         }
 
-        // AddDrinkUseCount
+        // ---------- AddDrinkUseCount ----------
+
         [Test]
         public void AddDrinkUseCount_CreatesCorrectEntity_AndCallsRepository()
         {
-            // Arrange
-            Guid drinkId = Guid.NewGuid();
-            Guid eventId = Guid.NewGuid();
+            var drinkId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
 
             DrinkUseCount? captured = null;
 
@@ -36,40 +36,22 @@ namespace UnitTests
                 .Setup(r => r.AddDrinkUseCount(It.IsAny<DrinkUseCount>()))
                 .Callback<DrinkUseCount>(duc => captured = duc);
 
-            var logic = new DrinkUseCountLogic(_repoMock.Object);
+            _logic.AddDrinkUseCount(drinkId, eventId);
 
-            // Act
-            logic.AddDrinkUseCount(drinkId, eventId);
-
-            // Assert
             _repoMock.Verify(r => r.AddDrinkUseCount(It.IsAny<DrinkUseCount>()), Times.Once);
 
             Assert.That(captured, Is.Not.Null);
-            Assert.That(captured!.DrinkId, Is.EqualTo(drinkId));
-            Assert.That(captured.EventId, Is.EqualTo(eventId));        // NEW ASSERT
-            Assert.That(captured.UseCountId, Is.Not.EqualTo(Guid.Empty));
-            Assert.That(captured.TimeStamp, Is.Not.EqualTo(default(DateTime)));
-        }
-
-
-        // GetAllDrinkUseCounts
-        [Test]
-        public void GetAllDrinkUseCounts_ReturnsRepositoryValue()
-        {
-            var fakeList = new List<DrinkUseCount>
+            Assert.Multiple(() =>
             {
-                new DrinkUseCount { DrinkId = Guid.NewGuid() }
-            };
-
-            _repoMock.Setup(r => r.GetAllDrinkUseCounts()).Returns(fakeList);
-
-            var result = _logic.GetAllDrinkUseCounts();
-
-            Assert.That(result, Is.EqualTo(fakeList));
+                Assert.That(captured!.DrinkId, Is.EqualTo(drinkId));
+                Assert.That(captured.EventId, Is.EqualTo(eventId));
+                Assert.That(captured.UseCountId, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(captured.TimeStamp, Is.Not.EqualTo(default(DateTime)));
+            });
         }
 
+        // ---------- GetAllDrinksUseCountForEvent ----------
 
-        // GetAllDrinksUseCountForEvent
         [Test]
         public void GetAllDrinksUseCountForEvent_Throws_WhenEventIdIsEmpty()
         {
@@ -78,11 +60,25 @@ namespace UnitTests
         }
 
         [Test]
-        public void GetAllDrinksUseCountForEvent_ReturnsGroupedCounts()
+        public void GetAllDrinksUseCountForEvent_ReturnsEmpty_WhenNoDrinks()
         {
-            Guid eventId = Guid.NewGuid();
-            Guid drinkA = Guid.NewGuid();
-            Guid drinkB = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
+
+            _repoMock
+                .Setup(r => r.GetAllDrinksUseCountForEvent(eventId))
+                .Returns((new List<Drink>(), new List<DrinkUseCount>()));
+
+            var result = _logic.GetAllDrinksUseCountForEvent(eventId);
+
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public void GetAllDrinksUseCountForEvent_ReturnsGroupedAndOrderedCounts()
+        {
+            var eventId = Guid.NewGuid();
+            var drinkA = Guid.NewGuid();
+            var drinkB = Guid.NewGuid();
 
             var drinks = new List<Drink>
             {
@@ -97,65 +93,89 @@ namespace UnitTests
                 new DrinkUseCount { DrinkId = drinkB }
             };
 
-            _repoMock.Setup(r => r.GetAllDrinksUseCountForEvent(eventId))
+            _repoMock
+                .Setup(r => r.GetAllDrinksUseCountForEvent(eventId))
                 .Returns((drinks, uses));
 
             var result = _logic.GetAllDrinksUseCountForEvent(eventId).ToList();
 
             Assert.That(result.Count, Is.EqualTo(2));
-            Assert.That(result[0].DrinkName, Is.EqualTo("Mojito"));
-            Assert.That(result[0].TotalUseCount, Is.EqualTo(2));
-            Assert.That(result[1].DrinkName, Is.EqualTo("Cola"));
-            Assert.That(result[1].TotalUseCount, Is.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result[0].DrinkName, Is.EqualTo("Mojito"));
+                Assert.That(result[0].TotalUseCount, Is.EqualTo(2));
+                Assert.That(result[1].DrinkName, Is.EqualTo("Cola"));
+                Assert.That(result[1].TotalUseCount, Is.EqualTo(1));
+            });
         }
 
+        // ---------- GetAllDrinkUseCountByTimeFrame ----------
 
-        // GetAllDrinkUseCountByTimeFrame
         [Test]
         public void GetAllDrinkUseCountByTimeFrame_Throws_WhenEventIdIsEmpty()
         {
             Assert.Throws<ArgumentException>(() =>
-                _logic.GetAllDrinkUseCountByTimeFrame(Guid.Empty, DateTime.Now, DateTime.Now.AddHours(1)));
+                _logic.GetAllDrinkUseCountByTimeFrame(
+                    Guid.Empty, DateTime.Now.AddHours(-1), DateTime.Now));
         }
 
         [Test]
         public void GetAllDrinkUseCountByTimeFrame_Throws_WhenStartIsAfterOrEqualToEnd()
         {
-            Guid eventId = Guid.NewGuid();
-            DateTime start = DateTime.Now;
-            DateTime end = start;
+            var eventId = Guid.NewGuid();
+            var time = DateTime.Now;
 
             Assert.Throws<ArgumentException>(() =>
-                _logic.GetAllDrinkUseCountByTimeFrame(eventId, start, end));
+                _logic.GetAllDrinkUseCountByTimeFrame(eventId, time, time));
         }
 
         [Test]
         public void GetAllDrinkUseCountByTimeFrame_Throws_WhenDatesAreDefault()
         {
-            Guid eventId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
 
             Assert.Throws<ArgumentException>(() =>
-                _logic.GetAllDrinkUseCountByTimeFrame(eventId, default, DateTime.Now));
+                _logic.GetAllDrinkUseCountByTimeFrame(
+                    eventId, default, DateTime.Now));
         }
 
         [Test]
-        public void GetAllDrinkUseCountByTimeFrame_Throws_WhenNoResults()
+        public void GetAllDrinkUseCountByTimeFrame_ReturnsEmpty_WhenNoResultsInTimeFrame()
         {
-            Guid eventId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
+            var now = DateTime.Now;
 
-            _repoMock.Setup(r => r.GetAllDrinksUseCountForEvent(eventId))
-                .Returns((new List<Drink>(), new List<DrinkUseCount>()));
+            var drinks = new List<Drink>
+            {
+                new Drink { DrinkId = Guid.NewGuid(), Name = "Mojito" }
+            };
 
-            Assert.Throws<InvalidOperationException>(() =>
-                _logic.GetAllDrinkUseCountByTimeFrame(eventId, DateTime.Now.AddHours(-1), DateTime.Now));
+            var uses = new List<DrinkUseCount>
+            {
+                new DrinkUseCount
+                {
+                    DrinkId = drinks[0].DrinkId,
+                    TimeStamp = now.AddHours(-5)
+                }
+            };
+
+            _repoMock
+                .Setup(r => r.GetAllDrinksUseCountForEvent(eventId))
+                .Returns((drinks, uses));
+
+            var result = _logic.GetAllDrinkUseCountByTimeFrame(
+                eventId, now.AddHours(-1), now);
+
+            Assert.That(result, Is.Empty);
         }
 
         [Test]
-        public void GetAllDrinkUseCountByTimeFrame_ReturnsCorrectFilteredCounts()
+        public void GetAllDrinkUseCountByTimeFrame_ReturnsFilteredGroupedCounts()
         {
-            Guid eventId = Guid.NewGuid();
-            Guid drinkA = Guid.NewGuid();
-            Guid drinkB = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
+            var drinkA = Guid.NewGuid();
+            var drinkB = Guid.NewGuid();
+            var now = DateTime.Now;
 
             var drinks = new List<Drink>
             {
@@ -163,16 +183,15 @@ namespace UnitTests
                 new Drink { DrinkId = drinkB, Name = "Cola" }
             };
 
-            var now = DateTime.Now;
-
             var uses = new List<DrinkUseCount>
             {
                 new DrinkUseCount { DrinkId = drinkA, TimeStamp = now.AddMinutes(-30) },
                 new DrinkUseCount { DrinkId = drinkA, TimeStamp = now.AddMinutes(-20) },
-                new DrinkUseCount { DrinkId = drinkB, TimeStamp = now.AddHours(-3) } 
+                new DrinkUseCount { DrinkId = drinkB, TimeStamp = now.AddHours(-3) }
             };
 
-            _repoMock.Setup(r => r.GetAllDrinksUseCountForEvent(eventId))
+            _repoMock
+                .Setup(r => r.GetAllDrinksUseCountForEvent(eventId))
                 .Returns((drinks, uses));
 
             var result = _logic
@@ -180,8 +199,11 @@ namespace UnitTests
                 .ToList();
 
             Assert.That(result.Count, Is.EqualTo(1));
-            Assert.That(result[0].DrinkName, Is.EqualTo("Mojito"));
-            Assert.That(result[0].TotalUseCount, Is.EqualTo(2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result[0].DrinkName, Is.EqualTo("Mojito"));
+                Assert.That(result[0].TotalUseCount, Is.EqualTo(2));
+            });
         }
     }
 }

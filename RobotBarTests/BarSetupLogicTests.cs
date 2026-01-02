@@ -32,6 +32,31 @@ namespace UnitTests
 
             Assert.That(ex.Message, Is.EqualTo("Position number must be greater than zero."));
         }
+        
+        [Test]
+        public void AddBarSetup_ShouldStillUpdate_WhenIngredientIsSame()
+        {
+            var eventId = Guid.NewGuid();
+            var ingredientId = Guid.NewGuid();
+
+            var existing = new BarSetup
+            {
+                EventBarSetupId = Guid.NewGuid(),
+                PositionNumber = 1,
+                IngredientId = ingredientId,
+                EventId = eventId
+            };
+
+            _barSetupRepositoryMock
+                .Setup(r => r.GetBarSetupEventAndPosition(eventId, 1))
+                .Returns(existing);
+
+            _barSetupLogic.AddBarSetup(1, ingredientId, eventId);
+
+            _barSetupRepositoryMock.Verify(
+                r => r.updateBarSetup(existing),
+                Times.Once);
+        }
 
         [Test]
         public void AddBarSetup_ShouldThrow_WhenIngredientIdIsEmpty()
@@ -121,6 +146,22 @@ namespace UnitTests
 
             Assert.That(ex.Message, Is.EqualTo("No bar setup found for the given event and position."));
         }
+        [Test]
+        public void DeleteBarSetup_ShouldLookupBeforeDelete()
+        {
+            var eventId = Guid.NewGuid();
+            var setup = new BarSetup { EventId = eventId, PositionNumber = 1 };
+
+            _barSetupRepositoryMock
+                .Setup(r => r.GetBarSetupEventAndPosition(eventId, 1))
+                .Returns(setup);
+
+            _barSetupLogic.DeleteBarSetup(eventId, 1);
+
+            _barSetupRepositoryMock.Verify(
+                r => r.GetBarSetupEventAndPosition(eventId, 1),
+                Times.Once);
+        }
 
         [Test]
         public void DeleteBarSetup_ShouldCallRepository_WhenSetupExists()
@@ -145,6 +186,21 @@ namespace UnitTests
                 _barSetupLogic.GetBarSetupForEvent(Guid.Empty));
 
             Assert.That(ex.Message, Is.EqualTo("Event ID cannot be empty."));
+        }
+        
+        [Test]
+        public void GetBarSetupsForEvent_ShouldReturnEmpty_WhenNoSetupsExist()
+        {
+            var eventId = Guid.NewGuid();
+            var empty = new List<BarSetup>();
+
+            _barSetupRepositoryMock
+                .Setup(r => r.GetBarSetupForEvent(eventId))
+                .Returns(empty);
+
+            var result = _barSetupLogic.GetBarSetupForEvent(eventId);
+
+            Assert.That(result, Is.Empty);
         }
 
         [Test]

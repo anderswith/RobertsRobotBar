@@ -33,6 +33,7 @@ public class RobotComms : IRobotComms
 
     private async Task SendDashboardCommand(string cmd)
     {
+        // tcp implements IDisposable, automatically closes the connection
         using var client = new TcpClient();
         await client.ConnectAsync(_ip, 29999);
 
@@ -40,7 +41,5 @@ public class RobotComms : IRobotComms
         var writer = new StreamWriter(stream, Encoding.ASCII) { AutoFlush = true };
 
         await writer.WriteLineAsync(cmd);
-
-        Console.WriteLine($">> {cmd}");
     }
 }

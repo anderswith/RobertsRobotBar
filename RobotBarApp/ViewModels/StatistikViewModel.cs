@@ -169,9 +169,17 @@ namespace RobotBarApp.ViewModels
                 var logs = useTimeFrame
                     ? _logLogic.GetLogsInTimeFrame(eventId, start, end)
                     : _logLogic.GetLogsForEvent(eventId);
-
+                
                 foreach (var log in logs)
                     Logs.Add(log);
+                
+                var commLogs = useTimeFrame
+                    ? _logLogic.GetCommunicationLogsInTimeFrame(start, end)
+                    :  _logLogic.getAllCommunicationLogs();
+                
+                foreach (var log in commLogs)
+                    Logs.Add(log);
+                
                 
                 BuildCharts();
 

@@ -30,7 +30,7 @@ namespace UnitTests
             var ex = Assert.Throws<ArgumentException>(() =>
                 _eventLogic.AddEvent(invalidName!, "image.png"));
 
-            Assert.That(ex.Message, Is.EqualTo("Event name cannot be null or empty"));
+            Assert.That(ex!.Message, Is.EqualTo("Event name cannot be null or empty"));
         }
 
         [TestCase(null)]
@@ -40,20 +40,33 @@ namespace UnitTests
             var ex = Assert.Throws<ArgumentException>(() =>
                 _eventLogic.AddEvent("Event Name", invalidImage!));
 
-            Assert.That(ex.Message, Is.EqualTo("Event image URL cannot be null or empty"));
+            Assert.That(ex!.Message, Is.EqualTo("Event image URL cannot be null or empty"));
         }
-        
 
         [Test]
-        public void AddEvent_ShouldCallRepository_WhenDataIsValid()
+        public void AddEvent_ShouldCreateEventWithMenu_AndCallRepository()
         {
-            _eventLogic.AddEvent("New Event", "image.png");
+            Event? captured = null;
+
+            _eventRepositoryMock
+                .Setup(r => r.AddEvent(It.IsAny<Event>()))
+                .Callback<Event>(e => captured = e);
+
+            var resultId = _eventLogic.AddEvent("New Event", "image.png");
 
             _eventRepositoryMock.Verify(r =>
-                r.AddEvent(It.Is<Event>(e =>
-                    e.Name == "New Event" &&
-                    e.Image == "image.png"
-                )), Times.Once);
+                r.AddEvent(It.IsAny<Event>()), Times.Once);
+
+            Assert.That(captured, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(resultId, Is.EqualTo(captured!.EventId));
+                Assert.That(captured.Name, Is.EqualTo("New Event"));
+                Assert.That(captured.Image, Is.EqualTo("image.png"));
+                Assert.That(captured.Menu, Is.Not.Null);
+                Assert.That(captured.Menu!.MenuId, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(captured.Menu.Name, Is.EqualTo("New Event Menu"));
+            });
         }
 
         // ---------- GetAllEvents ----------
@@ -67,7 +80,9 @@ namespace UnitTests
                 new Event { Name = "Event 2" }
             };
 
-            _eventRepositoryMock.Setup(r => r.GetAllEvents()).Returns(events);
+            _eventRepositoryMock
+                .Setup(r => r.GetAllEvents())
+                .Returns(events);
 
             var result = _eventLogic.GetAllEvents();
 
@@ -82,7 +97,7 @@ namespace UnitTests
             var ex = Assert.Throws<ArgumentException>(() =>
                 _eventLogic.GetEventById(Guid.Empty));
 
-            Assert.That(ex.Message, Is.EqualTo("Event ID cannot be empty"));
+            Assert.That(ex!.Message, Is.EqualTo("Event ID cannot be empty"));
         }
 
         [Test]
@@ -91,7 +106,9 @@ namespace UnitTests
             var eventId = Guid.NewGuid();
             var evt = new Event { EventId = eventId };
 
-            _eventRepositoryMock.Setup(r => r.GetEventById(eventId)).Returns(evt);
+            _eventRepositoryMock
+                .Setup(r => r.GetEventById(eventId))
+                .Returns(evt);
 
             var result = _eventLogic.GetEventById(eventId);
 
@@ -106,7 +123,7 @@ namespace UnitTests
             var ex = Assert.Throws<ArgumentException>(() =>
                 _eventLogic.DeleteEvent(Guid.Empty));
 
-            Assert.That(ex.Message, Is.EqualTo("Event ID cannot be empty"));
+            Assert.That(ex!.Message, Is.EqualTo("Event ID cannot be empty"));
         }
 
         [Test]
@@ -114,13 +131,14 @@ namespace UnitTests
         {
             var eventId = Guid.NewGuid();
 
-            _eventRepositoryMock.Setup(r => r.GetEventById(eventId))
+            _eventRepositoryMock
+                .Setup(r => r.GetEventById(eventId))
                 .Returns((Event?)null);
 
             var ex = Assert.Throws<ArgumentException>(() =>
                 _eventLogic.DeleteEvent(eventId));
 
-            Assert.That(ex.Message, Is.EqualTo("Event not found"));
+            Assert.That(ex!.Message, Is.EqualTo("Event not found"));
         }
 
         [Test]
@@ -128,11 +146,15 @@ namespace UnitTests
         {
             var evt = new Event { EventId = Guid.NewGuid() };
 
-            _eventRepositoryMock.Setup(r => r.GetEventById(evt.EventId)).Returns(evt);
+            _eventRepositoryMock
+                .Setup(r => r.GetEventById(evt.EventId))
+                .Returns(evt);
 
             _eventLogic.DeleteEvent(evt.EventId);
 
-            _eventRepositoryMock.Verify(r => r.DeleteEvent(evt), Times.Once);
+            _eventRepositoryMock.Verify(
+                r => r.DeleteEvent(evt),
+                Times.Once);
         }
 
         // ---------- UpdateEvent ----------
@@ -143,7 +165,7 @@ namespace UnitTests
             var ex = Assert.Throws<ArgumentException>(() =>
                 _eventLogic.UpdateEvent(Guid.Empty, "Name", "image.png", Guid.NewGuid()));
 
-            Assert.That(ex.Message, Is.EqualTo("Event ID cannot be empty"));
+            Assert.That(ex!.Message, Is.EqualTo("Event ID cannot be empty"));
         }
 
         [TestCase(null)]
@@ -153,7 +175,7 @@ namespace UnitTests
             var ex = Assert.Throws<ArgumentException>(() =>
                 _eventLogic.UpdateEvent(Guid.NewGuid(), invalidName!, "image.png", Guid.NewGuid()));
 
-            Assert.That(ex.Message, Is.EqualTo("Event name cannot be null or empty"));
+            Assert.That(ex!.Message, Is.EqualTo("Event name cannot be null or empty"));
         }
 
         [TestCase(null)]
@@ -163,7 +185,7 @@ namespace UnitTests
             var ex = Assert.Throws<ArgumentException>(() =>
                 _eventLogic.UpdateEvent(Guid.NewGuid(), "Event Name", invalidImage!, Guid.NewGuid()));
 
-            Assert.That(ex.Message, Is.EqualTo("Event image URL cannot be null or empty"));
+            Assert.That(ex!.Message, Is.EqualTo("Event image URL cannot be null or empty"));
         }
 
         [Test]
@@ -172,7 +194,7 @@ namespace UnitTests
             var ex = Assert.Throws<ArgumentException>(() =>
                 _eventLogic.UpdateEvent(Guid.NewGuid(), "Event Name", "image.png", Guid.Empty));
 
-            Assert.That(ex.Message, Is.EqualTo("Menu ID cannot be empty"));
+            Assert.That(ex!.Message, Is.EqualTo("Menu ID cannot be empty"));
         }
 
         [Test]
@@ -180,17 +202,18 @@ namespace UnitTests
         {
             var eventId = Guid.NewGuid();
 
-            _eventRepositoryMock.Setup(r => r.GetEventById(eventId))
+            _eventRepositoryMock
+                .Setup(r => r.GetEventById(eventId))
                 .Returns((Event?)null);
 
             var ex = Assert.Throws<ArgumentException>(() =>
                 _eventLogic.UpdateEvent(eventId, "Name", "image.png", Guid.NewGuid()));
 
-            Assert.That(ex.Message, Is.EqualTo("Event not found"));
+            Assert.That(ex!.Message, Is.EqualTo("Event not found"));
         }
 
         [Test]
-        public void UpdateEvent_ShouldCallRepository_WhenEventExists()
+        public void UpdateEvent_ShouldUpdateFields_AndCallRepository()
         {
             var eventId = Guid.NewGuid();
             var evt = new Event
@@ -201,7 +224,9 @@ namespace UnitTests
                 MenuId = Guid.NewGuid()
             };
 
-            _eventRepositoryMock.Setup(r => r.GetEventById(eventId)).Returns(evt);
+            _eventRepositoryMock
+                .Setup(r => r.GetEventById(eventId))
+                .Returns(evt);
 
             var newMenuId = Guid.NewGuid();
 
@@ -213,7 +238,28 @@ namespace UnitTests
                     e.Name == "New Name" &&
                     e.Image == "new.png" &&
                     e.MenuId == newMenuId
-                )), Times.Once);
+                )),
+                Times.Once);
+        }
+
+        // ---------- GetEventIdForDrink ----------
+
+        [Test]
+        public void GetEventIdForDrink_DelegatesToRepository()
+        {
+            var drinkId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
+
+            _eventRepositoryMock
+                .Setup(r => r.GetEventIdByDrinkId(drinkId))
+                .Returns(eventId);
+
+            var result = _eventLogic.GetEventIdForDrink(drinkId);
+
+            Assert.That(result, Is.EqualTo(eventId));
+            _eventRepositoryMock.Verify(
+                r => r.GetEventIdByDrinkId(drinkId),
+                Times.Once);
         }
     }
 }

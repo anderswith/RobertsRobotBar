@@ -22,22 +22,22 @@ namespace UnitTests
             _logic = new IngredientUseCountLogic(_repoMock.Object);
         }
 
-        // AddIngredientUseCount
+        // ---------- AddIngredientUseCount ----------
+
         [Test]
         public void AddIngredientUseCount_Throws_WhenIngredientIdIsEmpty()
         {
-            var ingredientId = Guid.Empty;
-            var eventSessionId = Guid.NewGuid();
-            Assert.Throws<ArgumentException>(() =>
-                _logic.AddIngredientUseCount(ingredientId, eventSessionId));
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _logic.AddIngredientUseCount(Guid.Empty, Guid.NewGuid()));
+
+            Assert.That(ex!.Message, Is.EqualTo("Ingredient ID must be a valid GUID."));
         }
 
         [Test]
-        public void AddIngredientUseCount_CreatesCorrectEntity_AndCallsRepository()
+        public void AddIngredientUseCount_CreatesEntity_AndCallsRepository()
         {
-            // Arrange
-            Guid ingredientId = Guid.NewGuid();
-            Guid eventId = Guid.NewGuid();
+            var ingredientId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
 
             IngredientUseCount? captured = null;
 
@@ -45,51 +45,39 @@ namespace UnitTests
                 .Setup(r => r.AddIngredientUseCount(It.IsAny<IngredientUseCount>()))
                 .Callback<IngredientUseCount>(iuc => captured = iuc);
 
-            var logic = new IngredientUseCountLogic(_repoMock.Object);
+            _logic.AddIngredientUseCount(ingredientId, eventId);
 
-            // Act
-            logic.AddIngredientUseCount(ingredientId, eventId);
-
-            // Assert
-            _repoMock.Verify(r => r.AddIngredientUseCount(It.IsAny<IngredientUseCount>()), Times.Once);
+            _repoMock.Verify(
+                r => r.AddIngredientUseCount(It.IsAny<IngredientUseCount>()),
+                Times.Once);
 
             Assert.That(captured, Is.Not.Null);
-            Assert.That(captured!.IngredientId, Is.EqualTo(ingredientId));
-            Assert.That(captured.EventId, Is.EqualTo(eventId));          // NEW ASSERT
-            Assert.That(captured.UseCountId, Is.Not.EqualTo(Guid.Empty));
-            Assert.That(captured.TimeStamp, Is.Not.EqualTo(default(DateTime)));
-        }
-
-        // GetAllIngredientUseCounts
-        [Test]
-        public void GetAllIngredientUseCounts_ReturnsRepositoryValue()
-        {
-            var mockList = new List<IngredientUseCount>
+            Assert.Multiple(() =>
             {
-                new IngredientUseCount { IngredientId = Guid.NewGuid() }
-            };
-
-            _repoMock.Setup(r => r.GetAllIngredientUseCounts()).Returns(mockList);
-
-            var result = _logic.GetAllIngredientUseCounts();
-
-            Assert.That(result, Is.EqualTo(mockList));
+                Assert.That(captured!.IngredientId, Is.EqualTo(ingredientId));
+                Assert.That(captured.EventId, Is.EqualTo(eventId));
+                Assert.That(captured.UseCountId, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(captured.TimeStamp, Is.Not.EqualTo(default(DateTime)));
+            });
         }
 
-        // GetAllIngredientsUseCountForEvent
+        // ---------- GetAllIngredientsUseCountForEvent ----------
+
         [Test]
         public void GetAllIngredientsUseCountForEvent_Throws_WhenEventIdIsEmpty()
         {
-            Assert.Throws<ArgumentException>(() =>
+            var ex = Assert.Throws<ArgumentException>(() =>
                 _logic.GetAllIngredientsUseCountForEvent(Guid.Empty));
+
+            Assert.That(ex!.Message, Is.EqualTo("Event ID must be a valid GUID."));
         }
 
         [Test]
-        public void GetAllIngredientsUseCountForEvent_ReturnsGroupedCounts()
+        public void GetAllIngredientsUseCountForEvent_ReturnsGroupedAndOrderedCounts()
         {
-            Guid eventId = Guid.NewGuid();
-            Guid ingA = Guid.NewGuid();
-            Guid ingB = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
+            var ingA = Guid.NewGuid();
+            var ingB = Guid.NewGuid();
 
             var ingredients = new List<Ingredient>
             {
@@ -99,56 +87,87 @@ namespace UnitTests
 
             var uses = new List<IngredientUseCount>
             {
+                new IngredientUseCount { IngredientId = ingB },
                 new IngredientUseCount { IngredientId = ingA },
-                new IngredientUseCount { IngredientId = ingA },
-                new IngredientUseCount { IngredientId = ingB }
+                new IngredientUseCount { IngredientId = ingA }
             };
 
-            _repoMock.Setup(r => r.GetIngredientUseCountForEvent(eventId))
+            _repoMock
+                .Setup(r => r.GetIngredientUseCountForEvent(eventId))
                 .Returns((ingredients, uses));
 
-            var result = _logic.GetAllIngredientsUseCountForEvent(eventId).ToList();
+            var result = _logic
+                .GetAllIngredientsUseCountForEvent(eventId)
+                .ToList();
 
             Assert.That(result.Count, Is.EqualTo(2));
-            Assert.That(result[0].IngredientName, Is.EqualTo("Vodka"));
-            Assert.That(result[0].TotalUseCount, Is.EqualTo(2));
-            Assert.That(result[1].IngredientName, Is.EqualTo("Lime"));
-            Assert.That(result[1].TotalUseCount, Is.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result[0].IngredientName, Is.EqualTo("Vodka"));
+                Assert.That(result[0].TotalUseCount, Is.EqualTo(2));
+                Assert.That(result[1].IngredientName, Is.EqualTo("Lime"));
+                Assert.That(result[1].TotalUseCount, Is.EqualTo(1));
+            });
         }
 
-        // GetIngredientUseCountByTimeFrame
+        // ---------- GetIngredientUseCountByTimeFrame ----------
+
         [Test]
         public void GetIngredientUseCountByTimeFrame_Throws_WhenEventIdIsEmpty()
         {
-            Assert.Throws<ArgumentException>(() =>
-                _logic.GetIngredientUseCountByTimeFrame(Guid.Empty, DateTime.Now, DateTime.Now.AddHours(1)));
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _logic.GetIngredientUseCountByTimeFrame(
+                    Guid.Empty, DateTime.Now.AddHours(-1), DateTime.Now));
+
+            Assert.That(ex!.Message, Is.EqualTo("Event ID must be a valid GUID."));
         }
 
         [Test]
         public void GetIngredientUseCountByTimeFrame_Throws_WhenStartIsAfterOrEqualEnd()
         {
-            Guid eventId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
             var t = DateTime.Now;
 
-            Assert.Throws<ArgumentException>(() =>
+            var ex = Assert.Throws<ArgumentException>(() =>
                 _logic.GetIngredientUseCountByTimeFrame(eventId, t, t));
+
+            Assert.That(ex!.Message, Is.EqualTo("Start time must be earlier than end time."));
         }
 
         [Test]
         public void GetIngredientUseCountByTimeFrame_Throws_WhenDatesAreDefault()
         {
-            Guid eventId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
 
-            Assert.Throws<ArgumentException>(() =>
-                _logic.GetIngredientUseCountByTimeFrame(eventId, default, DateTime.Now));
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _logic.GetIngredientUseCountByTimeFrame(
+                    eventId, default, DateTime.Now));
+
+            Assert.That(ex!.Message, Is.EqualTo("Start time and end time must be valid dates."));
+        }
+
+        [Test]
+        public void GetIngredientUseCountByTimeFrame_ReturnsEmpty_WhenRepositoryReturnsNull()
+        {
+            var eventId = Guid.NewGuid();
+
+            _repoMock
+                .Setup(r => r.GetIngredientUseCountForEvent(eventId))
+                .Returns((null, null));
+
+            var result = _logic.GetIngredientUseCountByTimeFrame(
+                eventId, DateTime.Now.AddHours(-1), DateTime.Now);
+
+            Assert.That(result, Is.Empty);
         }
 
         [Test]
         public void GetIngredientUseCountByTimeFrame_ReturnsFilteredGroupedCounts()
         {
-            Guid eventId = Guid.NewGuid();
-            Guid ingA = Guid.NewGuid();
-            Guid ingB = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
+            var ingA = Guid.NewGuid();
+            var ingB = Guid.NewGuid();
+            var now = DateTime.Now;
 
             var ingredients = new List<Ingredient>
             {
@@ -156,16 +175,15 @@ namespace UnitTests
                 new Ingredient { IngredientId = ingB, Name = "Lime" }
             };
 
-            var now = DateTime.Now;
-
             var uses = new List<IngredientUseCount>
             {
                 new IngredientUseCount { IngredientId = ingA, TimeStamp = now.AddMinutes(-20) },
                 new IngredientUseCount { IngredientId = ingA, TimeStamp = now.AddMinutes(-30) },
-                new IngredientUseCount { IngredientId = ingB, TimeStamp = now.AddHours(-3) } // outside range
+                new IngredientUseCount { IngredientId = ingB, TimeStamp = now.AddHours(-3) }
             };
 
-            _repoMock.Setup(r => r.GetIngredientUseCountForEvent(eventId))
+            _repoMock
+                .Setup(r => r.GetIngredientUseCountForEvent(eventId))
                 .Returns((ingredients, uses));
 
             var result = _logic
@@ -173,8 +191,11 @@ namespace UnitTests
                 .ToList();
 
             Assert.That(result.Count, Is.EqualTo(1));
-            Assert.That(result[0].IngredientName, Is.EqualTo("Vodka"));
-            Assert.That(result[0].TotalUseCount, Is.EqualTo(2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result[0].IngredientName, Is.EqualTo("Vodka"));
+                Assert.That(result[0].TotalUseCount, Is.EqualTo(2));
+            });
         }
     }
 }

@@ -12,11 +12,17 @@ public class RobotLogic : IRobotLogic
     private readonly IDrinkUseCountLogic _drinkUseCountLogic;
     private readonly IIngredientUseCountLogic _ingredientUseCountLogic;
     private readonly IEventSessionService _eventSession;
+    private readonly IRobotDashboardStreamReader _robotDashboardStreamReader;
+    
     public event Action? DrinkFinished;
     public event Action<int, int>? ScriptFinished;
     public event Action<int>? ScriptsStarted;
+    public event Action? ConnectionFailed;
+    private bool _connectionFailed;
+    public bool ConnectionFailedAlready => _connectionFailed;
     
-    public RobotLogic(IRobotScriptRunner scriptRunner, 
+    public RobotLogic(IRobotScriptRunner scriptRunner,
+        IRobotDashboardStreamReader dashboardReader, 
         IIngredientLogic ingredientLogic, 
         IDrinkLogic drinkLogic,
         IIngredientUseCountLogic ingredientUseCountLogic, 
@@ -35,6 +41,12 @@ public class RobotLogic : IRobotLogic
         scriptRunner.DrinkFinished += () => DrinkFinished?.Invoke();
         _scriptRunner.ScriptFinished += (f, t) =>
             ScriptFinished?.Invoke(f, t);
+        dashboardReader.ConnectionFailed += () =>
+        {
+            _connectionFailed = true;
+            Console.WriteLine("Connection Failed Received in RobotLogic");
+            ConnectionFailed?.Invoke();
+        };
     }
     
     public void RunRobotScripts(IEnumerable<string> scripts)
@@ -126,59 +138,7 @@ public class RobotLogic : IRobotLogic
         }
         _scriptRunner.QueueScripts(scripts);
     }
-
-    public void RunMixSelvScripts(IEnumerable<(Guid IngredientId, int Cl)> ingredients)
-    {
-        if (ingredients == null)
-            throw new ArgumentNullException(nameof(ingredients));
-
-        var items = ingredients
-            .Where(x => x.IngredientId != Guid.Empty)
-            .ToList();
-
-        if (items.Count == 0)
-            throw new ArgumentException("No ingredients provided.", nameof(ingredients));
-
-        // Fetch full ingredient data (including scripts)
-        var ids = items.Select(i => i.IngredientId).Distinct().ToList();
-        var ingredientsWithScripts = _ingredientLogic.GetIngredientsWithScripts(ids)
-            .ToDictionary(i => i.IngredientId);
-
-        var scripts = new List<string>();
-
-        var eventId = _eventSession.CurrentEventId!.Value;
-
-        foreach (var (ingredientId, cl) in items)
-        {
-            if (!ingredientsWithScripts.TryGetValue(ingredientId, out var ing))
-                throw new ArgumentException($"Ingredient not found for id {ingredientId}.");
-
-            // Dose selection rule:
-            // 2cl => single
-            // 4cl or more => double
-            var useDouble = cl >= 4;
-
-            // Use-count logic mirrors drink logic: double counts as 2 uses.
-            var useCount = useDouble ? 2 : 1;
-            for (var i = 0; i < useCount; i++)
-                _ingredientUseCountLogic.AddIngredientUseCount(ingredientId, eventId);
-
-            if (useDouble)
-            {
-                foreach (var script in ing.DoubleScripts.OrderBy(s => s.Number))
-                    scripts.Add(script.UrScript);
-            }
-            else
-            {
-                foreach (var script in ing.SingleScripts.OrderBy(s => s.Number))
-                    scripts.Add(script.UrScript);
-            }
-        }
-
-        _scriptRunner.QueueScripts(scripts);
-    }
-
-        
+    
     
 }
     

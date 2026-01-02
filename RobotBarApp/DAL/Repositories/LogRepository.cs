@@ -22,11 +22,12 @@ public class LogRepository: ILogRepository
     {
         return _context.Logs.ToList();
     }
-    
-    public IEnumerable<Log> GetLogsByType(string type)
+
+    public IEnumerable<Log> GetCommunicationLogsInTimeFrame(DateTime startTime, DateTime endTime)
     {
-        return _context.Logs
-            .Where(l => l.Type == type)
+        return _context.Logs.
+            Where(l => l.TimeStamp >= startTime && 
+                            l.TimeStamp <= endTime)
             .ToList();
     }
     
@@ -39,15 +40,6 @@ public class LogRepository: ILogRepository
             .ToList();
     }
     
-    public IEnumerable<Log> GetLogsByTypeInTimeFrame(Guid eventId, string type, DateTime start, DateTime end)
-    {
-        return _context.Logs
-            .Where(l => l.EventId == eventId &&
-                        l.TimeStamp >= start &&
-                        l.TimeStamp <= end)
-            .OrderBy(l => l.TimeStamp)
-            .ToList();
-    }
     public List<Log> GetLogsForEvent(Guid eventId)
     {
         return _context.Logs

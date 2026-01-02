@@ -38,7 +38,6 @@ public partial class App : Application
                 services.AddScoped<IIngredientRepository, IngredientRepository>();
                 services.AddScoped<ILogRepository, LogRepository>();
                 services.AddScoped<IMenuRepository, MenuRepository>();
-                services.AddScoped<ISopRepository, SopRepository>();
                 services.AddScoped<IIngredientUseCountRepository, IngredientUseCountRepository>();
                 services.AddScoped<IDrinkUseCountRepository, DrinkUseCountRepository>();
 
@@ -49,7 +48,6 @@ public partial class App : Application
                 services.AddScoped<IIngredientLogic, IngredientLogic>();
                 services.AddScoped<ILogLogic, LogLogic>();
                 services.AddScoped<IMenuLogic, MenuLogic>();
-                services.AddScoped<ISopLogic, SopLogic>();
                 services.AddScoped<IRobotLogic, RobotLogic>();
                 services.AddScoped<IIngredientUseCountLogic, IngredientUseCountLogic>();
                 services.AddScoped<IDrinkUseCountLogic, DrinkUseCountLogic>();
@@ -134,6 +132,8 @@ public partial class App : Application
         
         try
         {
+            // construct robotlogic on startup to trigger ConnectionFailed action event
+            _ = AppHost.Services.GetRequiredService<IRobotLogic>();
             var monitor = AppHost?.Services.GetRequiredService<IRobotDashboardStreamReader>();
             if (monitor != null)
                 await monitor.StartAsync();

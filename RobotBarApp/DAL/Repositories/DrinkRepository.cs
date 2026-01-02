@@ -35,34 +35,6 @@ public class DrinkRepository : IDrinkRepository
             .FirstOrDefault(d => d.DrinkId == drinkId);
     }
     
-
-    public IEnumerable<Ingredient> GetAvailableIngredientsForDrink(Guid drinkId)
-    {
-        // Get eventId via menu
-        var eventId =
-            _context.MenuContents
-                .Where(mc => mc.DrinkId == drinkId)
-                .Join(_context.Menus,
-                    mc => mc.MenuId,
-                    m => m.MenuId,
-                    (mc, m) => m)
-                .Join(_context.Events,
-                    m => m.MenuId,
-                    e => e.MenuId,
-                    (m, e) => e.EventId)
-                .FirstOrDefault();
-
-        if (eventId == Guid.Empty)
-            return new List<Ingredient>();
-
-        // Get ingredients from BarSetup
-        return _context.BarSetups
-            .Where(bs => bs.EventId == eventId)
-            .Select(bs => bs.Ingredient)
-            .Distinct()
-            .ToList();
-    }
-    
     public IEnumerable<Drink> GetDrinksByIds(IEnumerable<Guid> drinkIds)
     {
         return _context.Drinks
@@ -89,13 +61,7 @@ public class DrinkRepository : IDrinkRepository
             .Include(d => d.DrinkScripts)
             .FirstOrDefault(d => d.DrinkId == drinkId);
     }
-
-    public IEnumerable<Drink> GetAllDrinksWithContent()
-    {
-        return _context.Drinks
-            .Include(d => d.DrinkContents)
-            .ToList();
-    }
+    
     public bool Exists(Guid drinkId)
     {
         return _context.Drinks.Any(d => d.DrinkId == drinkId);

@@ -18,6 +18,8 @@ namespace RobotBarApp.DAL
             optionsBuilder.UseSqlite($"Data Source={dbPath}");
 
             return new RobotBarContext(optionsBuilder.Options);
+            
+            
         }
     }
 }

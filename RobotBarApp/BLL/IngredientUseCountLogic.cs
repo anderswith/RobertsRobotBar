@@ -29,11 +29,7 @@ public class IngredientUseCountLogic : IIngredientUseCountLogic
         _ingredientUseCountRepository.AddIngredientUseCount(ingredientUseCount);
 
     }
-
-    public IEnumerable<IngredientUseCount> GetAllIngredientUseCounts()
-    {
-        return _ingredientUseCountRepository.GetAllIngredientUseCounts();
-    }
+    
     public IEnumerable<(string IngredientName, int TotalUseCount)>
         GetAllIngredientsUseCountForEvent(Guid eventId)
     {

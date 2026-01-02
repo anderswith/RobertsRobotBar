@@ -22,13 +22,6 @@ public class DrinkUseCountLogic : IDrinkUseCountLogic
         };
         _drinkUseCountRepository.AddDrinkUseCount(drinkUseCount);
     }
-
-    public IEnumerable<DrinkUseCount> GetAllDrinkUseCounts()
-    {
-        return _drinkUseCountRepository.GetAllDrinkUseCounts();
-    }
-
-
     public IEnumerable<(string DrinkName, int TotalUseCount)> GetAllDrinksUseCountForEvent(Guid eventId)
     {
         if (eventId == Guid.Empty)
