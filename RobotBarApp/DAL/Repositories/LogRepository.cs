@@ -29,6 +29,14 @@ public class LogRepository: ILogRepository
             .Where(l => l.Type == type)
             .ToList();
     }
+
+    public IEnumerable<Log> GetCommunicationLogsInTimeFrame(DateTime startTime, DateTime endTime)
+    {
+        return _context.Logs.
+            Where(l => l.TimeStamp >= startTime && 
+                            l.TimeStamp <= endTime)
+            .ToList();
+    }
     
     public IEnumerable<Log> GetLogsInTimeFrame(Guid eventId, DateTime start, DateTime end)
     {

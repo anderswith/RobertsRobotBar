@@ -70,9 +70,9 @@ public class LogLogic : ILogLogic
         _logRepository.AddLog(log);
     }
     
-    public IEnumerable<Log> GetAllLogs()
+    public IEnumerable<Log> getAllCommunicationLogs()
     {
-        return _logRepository.GetAllLogs();
+        return _logRepository.GetAllLogs().Where(Log => Log.EventId == null);
     }
     public IEnumerable<Log> GetLogsByType(string type)
     {
@@ -82,6 +82,19 @@ public class LogLogic : ILogLogic
         }
 
         return _logRepository.GetLogsByType(type);
+    }
+
+    public IEnumerable<Log> GetCommunicationLogsInTimeFrame(DateTime startTime, DateTime endTime)
+    {
+        if (startTime == default || endTime == default)
+        {
+            throw new ArgumentException("Start and end times must be specified");
+        }
+        if (startTime > endTime)
+        {
+            throw new ArgumentException("Start time must be earlier than end time");
+        }
+        return _logRepository.GetCommunicationLogsInTimeFrame(startTime, endTime);
     }
     public IEnumerable<Log> GetLogsInTimeFrame(Guid eventId,DateTime start, DateTime end)
     {
