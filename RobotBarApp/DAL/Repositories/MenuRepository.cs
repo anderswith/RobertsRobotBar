@@ -13,57 +13,14 @@ public class MenuRepository : IMenuRepository
         _context = context;
     }
 
-    public void AddMenu(Menu menu)
-    {
-        _context.Add(menu);
-        _context.SaveChanges();
-    }
-    
-    public IEnumerable<Menu> GetAllMenus()
-    {
-        return _context.Menus.ToList();
-    }
-    
-    public Menu? GetMenuById(Guid menuId)
-    {
-        return _context.Menus.FirstOrDefault(m => m.MenuId == menuId);
-    }
-    
-    public void DeleteMenu(Menu menu)
-    {
-        _context.Menus.Remove(menu);
-        _context.SaveChanges();
-    }
+
     public void UpdateMenu(Menu menu)
     {
         _context.Menus.Update(menu);
         _context.SaveChanges();
     }
     
-    public Menu? GetMenuWithDrinksAndIngredients(Guid menuId)
-    {
-        return _context.Menus
-            .Where(m => m.MenuId == menuId)
-            .Include(m => m.MenuContents)
-            .ThenInclude(mc => mc.Drink)
-            .ThenInclude(d => d.DrinkContents)
-            .ThenInclude(dc => dc.Ingredient)
-            .FirstOrDefault();
-    }
-
-    public Menu? GetMenuByEventId(Guid eventId)
-    {
-        var menuId = _context.Events
-            .Where(e => e.EventId == eventId)
-            .Select(e => e.MenuId)
-            .FirstOrDefault();
-
-        if (menuId == Guid.Empty)
-            return null;
-
-        return _context.Menus
-            .FirstOrDefault(m => m.MenuId == menuId);
-    }
+   
     public Menu? GetMenuWithContentByEventId(Guid eventId)
     {
         var menuId = _context.Events
