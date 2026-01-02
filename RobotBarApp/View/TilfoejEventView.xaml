@@ -49,9 +49,17 @@
                         <TextBlock Text="Navn:" FontSize="26" Foreground="Gray" Margin="0,0,0,10"
                                    HorizontalAlignment="Center" />
                         <Border Width="400" Height="50" Background="White" CornerRadius="20">
-                            <TextBox Text="{Binding EventName}" FontSize="24" Padding="10"
+                            <TextBox Text="{Binding EventName}"
+                                     MaxLength="30"
+                                     FontSize="24"
+                                     Padding="10"
                                      Background="Transparent" BorderThickness="0" />
                         </Border>
+                        <TextBlock Text="(maks. 30 tegn)"
+                                   FontSize="14"
+                                   Foreground="#FF666666"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,6,0,0" />
                     </StackPanel>
 
                     <!-- Image -->

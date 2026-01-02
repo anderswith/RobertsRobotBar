@@ -20,6 +20,13 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
+        <!-- Bigger/clearer text inputs (prevents p/q from being clipped) -->
+        <Style x:Key="FormTextBoxStyle" TargetType="TextBox">
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
         <!-- Shared spacing so the form feels less cramped -->
         <Thickness x:Key="RowMargin">0,8,0,18</Thickness>
 
@@ -139,12 +146,26 @@
                         <ColumnDefinition Width="90" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBox Grid.Column="0"
-                             Height="35"
-                             FontSize="18"
-                             Padding="6"
-                             HorizontalAlignment="Stretch"
-                             Text="{Binding IngredientName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBox Grid.Row="0"
+                                 Style="{StaticResource FormTextBoxStyle}"
+                                 Height="40"
+                                 FontSize="18"
+                                 HorizontalAlignment="Stretch"
+                                 MaxLength="30"
+                                 Text="{Binding IngredientName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Grid.Row="1"
+                                   Margin="2,2,0,0"
+                                   FontSize="12"
+                                   Foreground="#FF666666"
+                                   Text="(maks. 30 tegn)" />
+                    </Grid>
 
                     <TextBlock Grid.Column="2"
                                VerticalAlignment="Center"
@@ -267,9 +288,9 @@
                            Text="SingleScript:"/>
 
                 <TextBox Grid.Row="10" Grid.Column="2"
-                         Height="35"
+                         Style="{StaticResource FormTextBoxStyle}"
+                         Height="40"
                          FontSize="18"
-                         Padding="6"
                          Margin="{StaticResource RowMargin}"
                          HorizontalAlignment="Stretch"
                          Text="{Binding SingleScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -282,9 +303,9 @@
                            Visibility="{Binding ShowDoubleScript, Converter={StaticResource BoolToVis}}"/>
 
                 <TextBox Grid.Row="12" Grid.Column="2"
-                         Height="35"
+                         Style="{StaticResource FormTextBoxStyle}"
+                         Height="40"
                          FontSize="18"
-                         Padding="6"
                          Margin="{StaticResource RowMargin}"
                          HorizontalAlignment="Stretch"
                          Text="{Binding DoubleScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

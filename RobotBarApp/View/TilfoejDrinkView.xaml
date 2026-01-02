@@ -18,6 +18,13 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
+        <!-- Bigger/clearer text inputs (prevents p/q from being clipped) -->
+        <Style x:Key="FormTextBoxStyle" TargetType="TextBox">
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
         <!-- Slightly smaller button text (matches TilfoejIngrediensView) -->
         <Style TargetType="Button">
             <Setter Property="FontSize" Value="16"/>
@@ -98,14 +105,28 @@
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Navn -->
-                <TextBox Grid.Column="0"
-                         Height="35"
-                         Width="250"
-                         FontSize="18"
-                         Padding="6"
-                         HorizontalAlignment="Left"
-                         Text="{Binding DrinkName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Navn -->
+                    <TextBox Grid.Row="0"
+                             Style="{StaticResource FormTextBoxStyle}"
+                             Height="40"
+                             Width="250"
+                             FontSize="18"
+                             HorizontalAlignment="Left"
+                             MaxLength="30"
+                             Text="{Binding DrinkName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Grid.Row="1"
+                               Margin="2,2,0,0"
+                               FontSize="12"
+                               Foreground="#FF666666"
+                               Text="(maks. 30 tegn)" />
+                </Grid>
 
                 <!-- Mocktail? -->
                 <TextBlock Grid.Column="2"
@@ -124,10 +145,10 @@
                            Text="Script:"/>
 
                 <TextBox Grid.Column="8"
-                         Height="35"
+                         Style="{StaticResource FormTextBoxStyle}"
+                         Height="40"
                          Width="320"
                          FontSize="18"
-                         Padding="6"
                          HorizontalAlignment="Left"
                          Text="{Binding ScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
