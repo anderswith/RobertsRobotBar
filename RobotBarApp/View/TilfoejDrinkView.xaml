@@ -1,4 +1,5 @@
 <UserControl x:Class="RobotBarApp.View.TilfoejDrinkView"
+             x:Name="Root"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -150,6 +151,8 @@
                          Width="320"
                          FontSize="18"
                          HorizontalAlignment="Left"
+                         PreviewTextInput="ScriptTextBox_PreviewTextInput"
+                         DataObject.Pasting="ScriptTextBox_Pasting"
                          Text="{Binding ScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
 

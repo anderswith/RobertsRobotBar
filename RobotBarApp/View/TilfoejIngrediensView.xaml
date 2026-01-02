@@ -293,6 +293,8 @@
                          FontSize="18"
                          Margin="{StaticResource RowMargin}"
                          HorizontalAlignment="Stretch"
+                         PreviewTextInput="ScriptTextBox_PreviewTextInput"
+                         DataObject.Pasting="ScriptTextBox_Pasting"
                          Text="{Binding SingleScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <!-- Row 8: DoubleScript -->
@@ -308,6 +310,9 @@
                          FontSize="18"
                          Margin="{StaticResource RowMargin}"
                          HorizontalAlignment="Stretch"
+                         MaxLength="40"
+                         PreviewTextInput="ScriptTextBox_PreviewTextInput"
+                         DataObject.Pasting="ScriptTextBox_Pasting"
                          Text="{Binding DoubleScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Visibility="{Binding ShowDoubleScript, Converter={StaticResource BoolToVis}}" />
 
