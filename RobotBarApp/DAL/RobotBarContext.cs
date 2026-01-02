@@ -15,8 +15,6 @@ public class RobotBarContext : DbContext
     public DbSet<MenuContent> MenuContents { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<BarSetup> BarSetups { get; set; }
-    public DbSet<Sop> Sops { get; set; }
-    public DbSet<SopStep> SopSteps { get; set; }
     public DbSet<Log> Logs { get; set; }
     public DbSet<SingleScript> SingleScripts { get; set; }
     public DbSet<DoubleScript> DoubleScripts { get; set; }
@@ -47,34 +45,23 @@ public class RobotBarContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Each Sop has many SopSteps
-        modelBuilder.Entity<Sop>()
-            .HasMany(s => s.SopSteps)
-            .WithOne(s => s.Sop)
-            .HasForeignKey(s => s.SopId)
-            .OnDelete(DeleteBehavior.Cascade); //delete all SopSteps if Sop is deleted
-        
-        // DRINK → DRINKCONTENT (1-to-many)
         modelBuilder.Entity<Drink>()
             .HasMany(d => d.DrinkContents)
             .WithOne(dc => dc.Drink)
             .HasForeignKey(dc => dc.DrinkId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        // INGREDIENT → DRINKCONTENT (1-to-many)
+        
         modelBuilder.Entity<Ingredient>()
             .HasMany(i => i.DrinkContents)
             .WithOne(dc => dc.Ingredient)
             .HasForeignKey(dc => dc.IngredientId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // DRINK → DRINKSCRIPT (1-to-many)
         modelBuilder.Entity<Drink>()
             .HasMany(d => d.DrinkScripts)
             .WithOne(ds => ds.Drink)
             .HasForeignKey(ds => ds.DrinkId)
             .OnDelete(DeleteBehavior.Cascade);
-        
         
         modelBuilder.Entity<Menu>()
             .HasMany(m => m.MenuContents)

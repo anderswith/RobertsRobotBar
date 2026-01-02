@@ -17,4 +17,6 @@ public interface IRobotLogic
 
     event Action<int, int>? ScriptFinished;
     event Action<int>? ScriptsStarted;
+    event Action? ConnectionFailed;
+    bool ConnectionFailedAlready { get; }
 }

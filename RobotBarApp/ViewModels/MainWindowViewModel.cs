@@ -1,4 +1,6 @@
+using System.Windows;
 using System.Windows.Input;
+using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.Services.Interfaces;
 
 namespace RobotBarApp.ViewModels
@@ -6,6 +8,8 @@ namespace RobotBarApp.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly INavigationService _navigationService;
+        private readonly IRobotLogic _robotLogic;
+        
 
         public ViewModelBase CurrentViewModel => _navigationService.CurrentViewModel;
 
@@ -17,9 +21,15 @@ namespace RobotBarApp.ViewModels
         public ICommand NavigateTilfoejEventCommand { get; }
         public ICommand NavigateCalibrationCommand { get; }
 
-        public MainWindowViewModel(INavigationService navigationService)
+        public MainWindowViewModel(INavigationService navigationService, IRobotLogic robotLogic)
         {
             _navigationService = navigationService;
+            _robotLogic = robotLogic;
+            _robotLogic.ConnectionFailed += OnRobotConnectionFailed;
+            if (_robotLogic.ConnectionFailedAlready)
+            {
+                OnRobotConnectionFailed();
+            }
 
             // Reager på ViewModel-skift i NavigationService
             _navigationService.OnViewModelChanged += () =>
@@ -51,6 +61,23 @@ namespace RobotBarApp.ViewModels
 
             // Set default view
             _navigationService.NavigateTo<EventListViewModel>();
+        }
+        private void OnRobotConnectionFailed()
+        {
+            _ = ShowRobotConnectionFailedAsync();
+        }
+
+        private async Task ShowRobotConnectionFailedAsync()
+        {
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                MessageBox.Show(
+                    "Could not connect to the robot.\nThe application will continue without robot connection.",
+                    "Robot connection failed",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning
+                );
+            });
         }
     }
 }

@@ -12,11 +12,17 @@ public class RobotLogic : IRobotLogic
     private readonly IDrinkUseCountLogic _drinkUseCountLogic;
     private readonly IIngredientUseCountLogic _ingredientUseCountLogic;
     private readonly IEventSessionService _eventSession;
+    private readonly IRobotDashboardStreamReader _robotDashboardStreamReader;
+    
     public event Action? DrinkFinished;
     public event Action<int, int>? ScriptFinished;
     public event Action<int>? ScriptsStarted;
+    public event Action? ConnectionFailed;
+    private bool _connectionFailed;
+    public bool ConnectionFailedAlready => _connectionFailed;
     
-    public RobotLogic(IRobotScriptRunner scriptRunner, 
+    public RobotLogic(IRobotScriptRunner scriptRunner,
+        IRobotDashboardStreamReader dashboardReader, 
         IIngredientLogic ingredientLogic, 
         IDrinkLogic drinkLogic,
         IIngredientUseCountLogic ingredientUseCountLogic, 
@@ -35,6 +41,12 @@ public class RobotLogic : IRobotLogic
         scriptRunner.DrinkFinished += () => DrinkFinished?.Invoke();
         _scriptRunner.ScriptFinished += (f, t) =>
             ScriptFinished?.Invoke(f, t);
+        dashboardReader.ConnectionFailed += () =>
+        {
+            _connectionFailed = true;
+            Console.WriteLine("Connection Failed Received in RobotLogic");
+            ConnectionFailed?.Invoke();
+        };
     }
     
     public void RunRobotScripts(IEnumerable<string> scripts)

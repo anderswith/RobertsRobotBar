@@ -10,10 +10,12 @@ public class RobotDashboardStreamReader : IRobotDashboardStreamReader
 
     public event Action<string>? OnRobotError;
     public event Action? ProgramFinished;
+    public event Action? ConnectionFailed;
     public event Action<string>? OnRobotMessage;
 
     private TcpClient? _client;
     private CancellationTokenSource? _cts;
+    
 
     public RobotDashboardStreamReader(string robotIp, ILogLogic log)
     {
@@ -36,7 +38,9 @@ public class RobotDashboardStreamReader : IRobotDashboardStreamReader
 
             if (result == timeoutTask)
             {
+
                 _log.AddLog("Robot dashboard timeout — starting without connection.", "RobotWarning");
+                ConnectionFailed?.Invoke();
                 return;
             }
 
