@@ -18,11 +18,6 @@ public class IngredientUseCountRepository : IIngredientUseCountRepository
         _context.SaveChanges();
     }
     
-    public IEnumerable<IngredientUseCount> GetAllIngredientUseCounts()
-    {
-        return _context.IngredientUseCounts.ToList();
-    }
-    
     public (List<Ingredient> Ingredients, List<IngredientUseCount> IngredientUses)
         GetIngredientUseCountForEvent(Guid eventId)
     {
