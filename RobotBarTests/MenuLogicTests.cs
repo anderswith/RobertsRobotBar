@@ -8,7 +8,7 @@ using RobotBarApp.BLL;
 using RobotBarApp.DAL.Repositories.Interfaces;
 using RobotBarApp.Services.Application.Interfaces;
 
-namespace RobotBarApp.Tests.BLL
+namespace UnitTests
 {
     [TestFixture]
     public class MenuLogicTests
