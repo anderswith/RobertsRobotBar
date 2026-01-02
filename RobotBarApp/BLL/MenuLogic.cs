@@ -28,13 +28,18 @@ public class MenuLogic : IMenuLogic
         }
         
         var menu = _menuRepository.GetMenuWithContentByEventId(eventId);
-        var menuId = menu.MenuId;
-        Console.WriteLine("Resolved menu ID: " + menuId);
-        if (menuId == null || menuId == Guid.Empty)
+
+        if (menu == null)
         {
             throw new KeyNotFoundException("Menu not found for the event.");
         }
-        _menuRepository.AddDrinksToMenu(menuId, drinkIds);
+
+        if (menu.MenuId == Guid.Empty)
+        {
+            throw new KeyNotFoundException("Menu not found for the event.");
+        }
+        
+        _menuRepository.AddDrinksToMenu(menu.MenuId, drinkIds);
 
         Console.WriteLine("Added " + drinkIds.Count + " drinks to menu.");
     }
