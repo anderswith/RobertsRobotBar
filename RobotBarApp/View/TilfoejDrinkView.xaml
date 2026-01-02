@@ -177,6 +177,8 @@
                     <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol2"/>
                     <ColumnDefinition Width="20"/>
                     <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol3"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="*" SharedSizeGroup="DrinkCol4"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Slot 1 -->
@@ -228,6 +230,23 @@
                               Margin="8,0,0,0"
                               ItemsSource="{Binding DoseOptions}"
                               SelectedItem="{Binding AlcoholDose3}" />
+                </StackPanel>
+
+                <!-- Slot 4 -->
+                <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <ComboBox Width="150"
+                              Height="35"
+                              FontSize="14"
+                              HorizontalAlignment="Left"
+                              ItemsSource="{Binding AlcoholOptions}"
+                              DisplayMemberPath="Name"
+                              SelectedItem="{Binding SelectedAlcohol4}" />
+
+                    <ComboBox Width="70"
+                              Height="35"
+                              Margin="8,0,0,0"
+                              ItemsSource="{Binding DoseOptions}"
+                              SelectedItem="{Binding AlcoholDose4}" />
                 </StackPanel>
             </Grid>
 
