@@ -74,15 +74,6 @@ public class LogLogic : ILogLogic
     {
         return _logRepository.GetAllLogs().Where(Log => Log.EventId == null);
     }
-    public IEnumerable<Log> GetLogsByType(string type)
-    {
-        if (string.IsNullOrEmpty(type))
-        {
-            throw new ArgumentException("Log type cannot be null or empty");
-        }
-
-        return _logRepository.GetLogsByType(type);
-    }
 
     public IEnumerable<Log> GetCommunicationLogsInTimeFrame(DateTime startTime, DateTime endTime)
     {
@@ -113,27 +104,6 @@ public class LogLogic : ILogLogic
 
         return _logRepository.GetLogsInTimeFrame(eventId, start, end);
     }
-    public IEnumerable<Log> GetLogsByTypeInTimeFrame(Guid eventId, string type, DateTime start, DateTime end)
-    {
-        if (string.IsNullOrEmpty(type))
-        {
-            throw new ArgumentException("Log type cannot be null or empty");
-        }
-        if(Guid.Empty == eventId)
-        {
-            throw new ArgumentException("Event ID must be specified");
-        }
-        if(start == default || end == default)
-        {
-            throw new ArgumentException("Start and end times must be specified");
-        }
-        if (start > end)
-        {
-            throw new ArgumentException("Start time must be earlier than end time");
-        }
-
-        return _logRepository.GetLogsByTypeInTimeFrame(eventId, type, start, end);
-    }
     
     public IEnumerable<Log> GetLogsForEvent(Guid eventId)
     {
@@ -141,7 +111,6 @@ public class LogLogic : ILogLogic
         {
             throw new ArgumentException("Event ID must be specified");
         }
-
         return _logRepository.GetLogsForEvent(eventId);
     }
    
