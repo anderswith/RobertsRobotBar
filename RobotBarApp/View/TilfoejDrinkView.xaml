@@ -297,6 +297,15 @@
                           ItemsSource="{Binding SyrupOptions}"
                           DisplayMemberPath="Name"
                           SelectedItem="{Binding SelectedSyrup3}" />
+
+                <ComboBox Grid.Column="6"
+                          Width="150"
+                          Height="35"
+                          FontSize="14"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding SyrupOptions}"
+                          DisplayMemberPath="Name"
+                          SelectedItem="{Binding SelectedSyrup4}" />
             </Grid>
 
 

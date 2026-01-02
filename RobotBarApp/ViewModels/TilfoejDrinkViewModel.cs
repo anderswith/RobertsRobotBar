@@ -139,6 +139,10 @@ namespace RobotBarApp.ViewModels
                     .Where(dc => dc.Ingredient.Type == "Syrup")
                     .Skip(2).FirstOrDefault()?.Ingredient;
 
+                SelectedSyrup4 = drink.DrinkContents
+                    .Where(dc => dc.Ingredient.Type == "Syrup")
+                    .Skip(3).FirstOrDefault()?.Ingredient;
+
                 SelectedSoda1 = drink.DrinkContents
                     .FirstOrDefault(dc => dc.Ingredient.Type == "Soda")?.Ingredient;
 
@@ -329,6 +333,13 @@ namespace RobotBarApp.ViewModels
             get => _selectedSyrup3;
             set => SetProperty(ref _selectedSyrup3, value);
         }
+
+        private Ingredient? _selectedSyrup4;
+        public Ingredient? SelectedSyrup4
+        {
+            get => _selectedSyrup4;
+            set => SetProperty(ref _selectedSyrup4, value);
+        }
         
 
         private Ingredient? _selectedSoda1;
@@ -412,10 +423,11 @@ namespace RobotBarApp.ViewModels
         AddAlcohol(SelectedAlcohol3, AlcoholDose3);
         AddAlcohol(SelectedAlcohol4, AlcoholDose4);
 
-        // Syrups & sodas (always single)
-        AddSingle(SelectedSyrup1);
-        AddSingle(SelectedSyrup2);
-        AddSingle(SelectedSyrup3);
+                // Syrups & sodas (always single)
+                AddSingle(SelectedSyrup1);
+                AddSingle(SelectedSyrup2);
+                AddSingle(SelectedSyrup3);
+                AddSingle(SelectedSyrup4);
 
         AddSingle(SelectedSoda1);
         AddSingle(SelectedSoda2);
