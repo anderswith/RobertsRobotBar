@@ -1,12 +1,14 @@
+using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace RobotBarApp.View
 {
-    public partial class TilfoejDrinkView
+    public partial class TilfoejDrinkView : UserControl
     {
-        private static readonly char[] DisallowedScriptChars = { 'æ', 'ø', 'å', 'Æ', 'Ø', 'Å' };
+        private static readonly char[] _disallowedScriptChars = { 'æ', 'ø', 'å', 'Æ', 'Ø', 'Å' };
 
         public TilfoejDrinkView()
         {
@@ -18,7 +20,7 @@ namespace RobotBarApp.View
             if (string.IsNullOrEmpty(text))
                 return false;
 
-            return text.IndexOfAny(DisallowedScriptChars) >= 0;
+            return text.IndexOfAny(_disallowedScriptChars) >= 0;
         }
 
         private void ScriptTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
