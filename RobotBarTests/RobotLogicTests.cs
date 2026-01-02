@@ -9,7 +9,7 @@ using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.Services.Application.Interfaces;
 using RobotBarApp.Services.Robot.Interfaces;
 
-namespace RobotBarApp.Tests.BLL
+namespace UnitTests
 {
     [TestFixture]
     public class RobotLogicTests
