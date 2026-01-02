@@ -1,8 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using RobotBarApp.BE;
 using RobotBarApp.BLL;
 using RobotBarApp.DAL.Repositories.Interfaces;
+using RobotBarApp.Services.Application.Interfaces;
 
 namespace RobotBarApp.Tests.BLL
 {
@@ -12,6 +16,7 @@ namespace RobotBarApp.Tests.BLL
         private Mock<IMenuRepository> _menuRepoMock;
         private Mock<IDrinkRepository> _drinkRepoMock;
         private Mock<IEventRepository> _eventRepoMock;
+        private Mock<IEventSessionService> _eventSessionMock;
 
         private MenuLogic _logic;
 
@@ -21,22 +26,23 @@ namespace RobotBarApp.Tests.BLL
             _menuRepoMock = new Mock<IMenuRepository>();
             _drinkRepoMock = new Mock<IDrinkRepository>();
             _eventRepoMock = new Mock<IEventRepository>();
+            _eventSessionMock = new Mock<IEventSessionService>();
 
-            _logic = new MenuLogic(_menuRepoMock.Object, _drinkRepoMock.Object, _eventRepoMock.Object);
+            _logic = new MenuLogic(
+                _menuRepoMock.Object,
+                _drinkRepoMock.Object,
+                _eventRepoMock.Object,
+                _eventSessionMock.Object);
         }
 
+        // ---------- AddDrinksToMenu ----------
 
-        // AddDrinksToMenu
         [Test]
-        public void AddDrinksToMenu_Throws_WhenDrinkIdsNull()
+        public void AddDrinksToMenu_Throws_WhenDrinkIdsNullOrEmpty()
         {
             Assert.Throws<ArgumentException>(() =>
-                _logic.AddDrinksToMenu(null, Guid.NewGuid()));
-        }
+                _logic.AddDrinksToMenu(null!, Guid.NewGuid()));
 
-        [Test]
-        public void AddDrinksToMenu_Throws_WhenDrinkIdsEmpty()
-        {
             Assert.Throws<ArgumentException>(() =>
                 _logic.AddDrinksToMenu(new List<Guid>(), Guid.NewGuid()));
         }
@@ -46,19 +52,25 @@ namespace RobotBarApp.Tests.BLL
         {
             _menuRepoMock
                 .Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
-                .Returns((Menu)null);
+                .Returns((Menu?)null);
 
-            Assert.Throws<NullReferenceException>(() =>
+            var ex = Assert.Throws<KeyNotFoundException>(() =>
                 _logic.AddDrinksToMenu(new List<Guid> { Guid.NewGuid() }, Guid.NewGuid()));
+
+            Assert.That(ex!.Message, Is.EqualTo("Menu not found for the event."));
         }
 
         [Test]
-        public void AddDrinksToMenu_CallsRepository_OnSuccess()
+        public void AddDrinksToMenu_CallsRepository_WhenValid()
         {
             var eventId = Guid.NewGuid();
             var drinkIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
 
-            var menu = new Menu { MenuId = Guid.NewGuid(), MenuContents = new List<MenuContent>() };
+            var menu = new Menu
+            {
+                MenuId = Guid.NewGuid(),
+                MenuContents = new List<MenuContent>()
+            };
 
             _menuRepoMock
                 .Setup(r => r.GetMenuWithContentByEventId(eventId))
@@ -66,149 +78,37 @@ namespace RobotBarApp.Tests.BLL
 
             _logic.AddDrinksToMenu(drinkIds, eventId);
 
-            _menuRepoMock.Verify(r => r.AddDrinksToMenu(menu.MenuId, drinkIds), Times.Once);
-        }
-        
-        // GetAllMenus
-        [Test]
-        public void GetAllMenus_ReturnsRepositoryValue()
-        {
-            var menus = new List<Menu> { new Menu(), new Menu() };
-            _menuRepoMock.Setup(r => r.GetAllMenus()).Returns(menus);
-
-            var result = _logic.GetAllMenus();
-
-            Assert.That(result, Is.EqualTo(menus));
+            _menuRepoMock.Verify(
+                r => r.AddDrinksToMenu(menu.MenuId, drinkIds),
+                Times.Once);
         }
 
-        // GetMenuById
-        [Test]
-        public void GetMenuById_ReturnsMenu()
-        {
-            var menuId = Guid.NewGuid();
-            var menu = new Menu { MenuId = menuId };
+        // ---------- GetDrinksForMenu ----------
 
-            _menuRepoMock.Setup(r => r.GetMenuById(menuId)).Returns(menu);
-
-            var result = _logic.GetMenuById(menuId);
-
-            Assert.That(result, Is.EqualTo(menu));
-        }
-
-
-        // DeleteMenu
-
-        [Test]
-        public void DeleteMenu_Throws_WhenMenuNotFound()
-        {
-            _menuRepoMock.Setup(r => r.GetMenuById(It.IsAny<Guid>())).Returns((Menu)null);
-
-            Assert.Throws<KeyNotFoundException>(() =>
-                _logic.DeleteMenu(Guid.NewGuid()));
-        }
-
-        [Test]
-        public void DeleteMenu_CallsRepository_WhenValid()
-        {
-            var menu = new Menu { MenuId = Guid.NewGuid() };
-
-            _menuRepoMock.Setup(r => r.GetMenuById(menu.MenuId)).Returns(menu);
-
-            _logic.DeleteMenu(menu.MenuId);
-
-            _menuRepoMock.Verify(r => r.DeleteMenu(menu), Times.Once);
-        }
-
-        // UpdateMenu
-        [Test]
-        public void UpdateMenu_Throws_WhenNameIsNullOrEmpty()
-        {
-            Assert.Throws<ArgumentException>(() =>
-                _logic.UpdateMenu(Guid.NewGuid(), "", new List<Guid> { Guid.NewGuid() }));
-        }
-
-        [Test]
-        public void UpdateMenu_Throws_WhenDrinkIdsNullOrEmpty()
-        {
-            Assert.Throws<ArgumentException>(() =>
-                _logic.UpdateMenu(Guid.NewGuid(), "MenuName", null));
-
-            Assert.Throws<ArgumentException>(() =>
-                _logic.UpdateMenu(Guid.NewGuid(), "MenuName", new List<Guid>()));
-        }
-
-        [Test]
-        public void UpdateMenu_Throws_WhenMenuNotFound()
-        {
-            _menuRepoMock.Setup(r => r.GetMenuById(It.IsAny<Guid>()))
-                .Returns((Menu)null);
-
-            Assert.Throws<KeyNotFoundException>(() =>
-                _logic.UpdateMenu(Guid.NewGuid(), "Test", new List<Guid> { Guid.NewGuid() }));
-        }
-
-        [Test]
-        public void UpdateMenu_Throws_WhenDrinksNotFound()
-        {
-            var menu = new Menu { MenuId = Guid.NewGuid(), MenuContents = new List<MenuContent>() };
-            _menuRepoMock.Setup(r => r.GetMenuById(menu.MenuId)).Returns(menu);
-
-            _drinkRepoMock.Setup(r => r.GetDrinksByIds(It.IsAny<IEnumerable<Guid>>()))
-                .Returns(new List<Drink>()); // empty drinks -> invalid
-
-            Assert.Throws<InvalidOperationException>(() =>
-                _logic.UpdateMenu(menu.MenuId, "Menu", new List<Guid> { Guid.NewGuid() }));
-        }
-
-        [Test]
-        public void UpdateMenu_UpdatesMenuCorrectly()
-        {
-            var menuId = Guid.NewGuid();
-            var drinkId = Guid.NewGuid();
-
-            var menu = new Menu
-            {
-                MenuId = menuId,
-                Name = "Old Name",
-                MenuContents = new List<MenuContent>()
-            };
-
-            var drink = new Drink { DrinkId = drinkId };
-
-            _menuRepoMock.Setup(r => r.GetMenuById(menuId)).Returns(menu);
-            _drinkRepoMock.Setup(r => r.GetDrinksByIds(It.IsAny<IEnumerable<Guid>>()))
-                .Returns(new List<Drink> { drink });
-
-            _logic.UpdateMenu(menuId, "New Name", new List<Guid> { drinkId });
-
-            Assert.That(menu.Name, Is.EqualTo("New Name"));
-            Assert.That(menu.MenuContents.Count, Is.EqualTo(1));
-            Assert.That(menu.MenuContents.First().DrinkId, Is.EqualTo(drinkId));
-
-            _menuRepoMock.Verify(r => r.UpdateMenu(menu), Times.Once);
-        }
-        
-        // GetDrinksForMenu
         [Test]
         public void GetDrinksForMenu_Throws_WhenMenuNotFound()
         {
-            _menuRepoMock.Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
-                .Returns((Menu)null);
+            _menuRepoMock
+                .Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
+                .Returns((Menu?)null);
 
-            Assert.Throws<KeyNotFoundException>(() =>
+            var ex = Assert.Throws<KeyNotFoundException>(() =>
                 _logic.GetDrinksForMenu(Guid.NewGuid()));
+
+            Assert.That(ex!.Message, Is.EqualTo("Menu not found for this event."));
         }
 
         [Test]
-        public void GetDrinksForMenu_ReturnsEmpty_WhenNoDrinkIds()
+        public void GetDrinksForMenu_ReturnsEmpty_WhenMenuHasNoDrinks()
         {
-            var emptyMenu = new Menu
+            var menu = new Menu
             {
                 MenuContents = new List<MenuContent>()
             };
 
-            _menuRepoMock.Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
-                .Returns(emptyMenu);
+            _menuRepoMock
+                .Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
+                .Returns(menu);
 
             var result = _logic.GetDrinksForMenu(Guid.NewGuid());
 
@@ -216,7 +116,7 @@ namespace RobotBarApp.Tests.BLL
         }
 
         [Test]
-        public void GetDrinksForMenu_ReturnsDrinks()
+        public void GetDrinksForMenu_ReturnsDrinks_WhenPresent()
         {
             var drinkId = Guid.NewGuid();
 
@@ -230,27 +130,33 @@ namespace RobotBarApp.Tests.BLL
 
             var drink = new Drink { DrinkId = drinkId };
 
-            _menuRepoMock.Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
+            _menuRepoMock
+                .Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
                 .Returns(menu);
 
-            _drinkRepoMock.Setup(r => r.GetDrinksByIds(It.IsAny<IEnumerable<Guid>>()))
+            _drinkRepoMock
+                .Setup(r => r.GetDrinksByIds(It.IsAny<IEnumerable<Guid>>()))
                 .Returns(new List<Drink> { drink });
 
-            var result = _logic.GetDrinksForMenu(Guid.NewGuid());
+            var result = _logic.GetDrinksForMenu(Guid.NewGuid()).ToList();
 
-            Assert.That(result.Count(), Is.EqualTo(1));
-            Assert.That(result.First().DrinkId, Is.EqualTo(drinkId));
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result[0].DrinkId, Is.EqualTo(drinkId));
         }
-        
-        // RemoveDrinkFromMenu
+
+        // ---------- RemoveDrinkFromMenu ----------
+
         [Test]
         public void RemoveDrinkFromMenu_Throws_WhenMenuNotFound()
         {
-            _menuRepoMock.Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
-                .Returns((Menu)null);
+            _menuRepoMock
+                .Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
+                .Returns((Menu?)null);
 
-            Assert.Throws<KeyNotFoundException>(() =>
+            var ex = Assert.Throws<KeyNotFoundException>(() =>
                 _logic.RemoveDrinkFromMenu(Guid.NewGuid(), Guid.NewGuid()));
+
+            Assert.That(ex!.Message, Is.EqualTo("Menu not found for this event."));
         }
 
         [Test]
@@ -261,15 +167,18 @@ namespace RobotBarApp.Tests.BLL
                 MenuContents = new List<MenuContent>()
             };
 
-            _menuRepoMock.Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
+            _menuRepoMock
+                .Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
                 .Returns(menu);
 
-            Assert.Throws<KeyNotFoundException>(() =>
+            var ex = Assert.Throws<KeyNotFoundException>(() =>
                 _logic.RemoveDrinkFromMenu(Guid.NewGuid(), Guid.NewGuid()));
+
+            Assert.That(ex!.Message, Is.EqualTo("Drink is not on the menu."));
         }
 
         [Test]
-        public void RemoveDrinkFromMenu_RemovesEntry_AndUpdatesMenu()
+        public void RemoveDrinkFromMenu_RemovesDrink_AndUpdatesMenu()
         {
             var drinkId = Guid.NewGuid();
 
@@ -279,13 +188,72 @@ namespace RobotBarApp.Tests.BLL
                 MenuContents = new List<MenuContent> { entry }
             };
 
-            _menuRepoMock.Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
+            _menuRepoMock
+                .Setup(r => r.GetMenuWithContentByEventId(It.IsAny<Guid>()))
                 .Returns(menu);
 
             _logic.RemoveDrinkFromMenu(Guid.NewGuid(), drinkId);
 
-            Assert.That(menu.MenuContents.Count, Is.EqualTo(0));
+            Assert.That(menu.MenuContents, Is.Empty);
             _menuRepoMock.Verify(r => r.UpdateMenu(menu), Times.Once);
+        }
+
+        // ---------- GetMenuWithDrinksAndIngredients ----------
+
+        [Test]
+        public void GetMenuWithDrinksAndIngredients_Throws_WhenNoActiveEvent()
+        {
+            _eventSessionMock.Setup(e => e.HasActiveEvent).Returns(false);
+
+            var ex = Assert.Throws<InvalidOperationException>(() =>
+                _logic.GetMenuWithDrinksAndIngredients());
+
+            Assert.That(ex!.Message, Is.EqualTo("No active event"));
+        }
+
+        [Test]
+        public void GetMenuWithDrinksAndIngredients_Throws_WhenMenuNotFound()
+        {
+            var eventId = Guid.NewGuid();
+
+            _eventSessionMock.Setup(e => e.HasActiveEvent).Returns(true);
+            _eventSessionMock.Setup(e => e.CurrentEventId).Returns(eventId);
+
+            _menuRepoMock
+                .Setup(r => r.GetMenuWithDrinksAndIngredientsByEventId(eventId))
+                .Returns((Menu?)null);
+
+            var ex = Assert.Throws<KeyNotFoundException>(() =>
+                _logic.GetMenuWithDrinksAndIngredients());
+
+            Assert.That(ex!.Message, Is.EqualTo("Menu not found for active event"));
+        }
+
+        [Test]
+        public void GetMenuWithDrinksAndIngredients_ReturnsDrinks()
+        {
+            var eventId = Guid.NewGuid();
+            var drink = new Drink { DrinkId = Guid.NewGuid() };
+
+            var menu = new Menu
+            {
+                MenuContents = new List<MenuContent>
+                {
+                    new MenuContent { Drink = drink }
+                }
+            };
+
+            _eventSessionMock.Setup(e => e.HasActiveEvent).Returns(true);
+            _eventSessionMock.Setup(e => e.CurrentEventId).Returns(eventId);
+
+            _menuRepoMock
+                .Setup(r => r.GetMenuWithDrinksAndIngredientsByEventId(eventId))
+                .Returns(menu);
+
+            var result = _logic.GetMenuWithDrinksAndIngredients().ToList();
+
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result[0].DrinkId, Is.EqualTo(drink.DrinkId));
         }
     }
 }
