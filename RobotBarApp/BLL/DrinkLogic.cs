@@ -191,14 +191,7 @@ public class DrinkLogic : IDrinkLogic
         return _drinkRepository.GetDrinkWithScripts(drinkId);
     }
     
-    public IEnumerable<Ingredient> GetAvailableIngredientsForDrink(Guid drinkId)
-    {
-        if(drinkId == Guid.Empty)
-        {
-            throw new ArgumentException("Invalid drink ID.");
-        }
-        return _drinkRepository.GetAvailableIngredientsForDrink(drinkId);
-    }
+
     public bool Exists(Guid drinkId)
     {
         if (drinkId == Guid.Empty)
