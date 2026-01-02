@@ -163,7 +163,6 @@ namespace RobotBarApp.ViewModels
             GuideCommand = new RelayCommand(_ => ShowGuide());
             CancelCommand = new RelayCommand(_ => Cancel());
             SaveCommand = new RelayCommand(_ => Save());
-            RunTestScriptCommand = new RelayCommand(_ => RunTestScripts());
             if (IsEditMode)
             {
                 LoadIngredient();
@@ -205,16 +204,7 @@ namespace RobotBarApp.ViewModels
         }
         
 
-        public void RunTestScripts()
-        {
-            var testScripts = new List<string>
-            {
-                "test.urp",
-                "test.urp"
-            };
 
-            _robotLogic.RunRobotScripts(testScripts);
-        }
         private void ChooseImage()
         {
             var dlg = new OpenFileDialog
