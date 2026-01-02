@@ -103,6 +103,7 @@ public class LogLogic : ILogLogic
         }
 
         return _logRepository.GetLogsInTimeFrame(eventId, start, end);
+        
     }
     
     public IEnumerable<Log> GetLogsForEvent(Guid eventId)
