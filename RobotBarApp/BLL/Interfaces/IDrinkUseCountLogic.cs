@@ -6,7 +6,7 @@ public interface IDrinkUseCountLogic
 {
 
     void AddDrinkUseCount(Guid drinkId, Guid eventId);
-    IEnumerable<DrinkUseCount> GetAllDrinkUseCounts();
+ 
 
     IEnumerable<(string DrinkName, int TotalUseCount)> GetAllDrinkUseCountByTimeFrame(Guid eventId,
         DateTime start, DateTime end);

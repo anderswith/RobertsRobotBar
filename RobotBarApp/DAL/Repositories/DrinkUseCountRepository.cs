@@ -19,23 +19,17 @@ public class DrinkUseCountRepository : IDrinkUseCountRepository
         _context.SaveChanges();
     }
     
-    public IEnumerable<DrinkUseCount> GetAllDrinkUseCounts()
-    {
-        return _context.DrinkUseCounts.ToList();
-    }
     
     public (List<Drink> Drinks, List<DrinkUseCount> DrinkUses)
         GetAllDrinksUseCountForEvent(Guid eventId)
     {
-        // 1) Fetch all usecounts for this event
         var drinkUses = _context.DrinkUseCounts
             .Where(duc => duc.EventId == eventId)
             .ToList();
 
         if (!drinkUses.Any())
             return (new(), new());
-
-        // 2) Fetch drinks that match those usecounts
+        
         var drinkIds = drinkUses.Select(uc => uc.DrinkId).Distinct().ToList();
 
         var drinks = _context.Drinks
