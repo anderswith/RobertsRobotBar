@@ -48,6 +48,19 @@
                              From="0" To="1"
                              Duration="0:0:0.6" />
         </Storyboard>
+
+        <!-- Liquid look helpers (same as KundeMixSelvView) -->
+        <LinearGradientBrush x:Key="LiquidHighlightBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#55FFFFFF" Offset="0"/>
+            <GradientStop Color="#11FFFFFF" Offset="0.35"/>
+            <GradientStop Color="#00FFFFFF" Offset="1"/>
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="LiquidShineBrush" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#00FFFFFF" Offset="0"/>
+            <GradientStop Color="#22FFFFFF" Offset="0.35"/>
+            <GradientStop Color="#00FFFFFF" Offset="1"/>
+        </LinearGradientBrush>
     </UserControl.Resources>
 
     <Grid>
@@ -120,21 +133,36 @@
                                         Height="260"
                                         Background="Transparent">
 
-                                    <ItemsControl ItemsSource="{Binding LiquidSegments}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel Orientation="Vertical" VerticalAlignment="Bottom"/>
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Rectangle Height="12"
-                                                           Width="185"
-                                                           Opacity="0.85"
-                                                           Fill="{Binding ColorHex, Converter={StaticResource HexToBrushConverter}}"/>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
+                                    <Grid>
+                                        <ItemsControl ItemsSource="{Binding LiquidSegments}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Vertical" VerticalAlignment="Bottom"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <!-- Nicer liquid segment: rounded + subtle top highlight -->
+                                                    <Border Height="12"
+                                                            Width="185"
+                                                            CornerRadius="2">
+                                                        <Grid>
+                                                            <Border Background="{Binding ColorHex, Converter={StaticResource HexToBrushConverter}}"
+                                                                Opacity="0.88"/>
+                                                            <Border Background="{StaticResource LiquidHighlightBrush}"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <!-- Optional global shine overlay (gives a 'wet' feel) -->
+                                        <Border Width="40"
+                                                HorizontalAlignment="Left"
+                                                Margin="18,0,0,0"
+                                                Background="{StaticResource LiquidShineBrush}"
+                                                Opacity="0.35"/>
+                                    </Grid>
                                 </Border>
                             </Canvas>
                         </Grid>
