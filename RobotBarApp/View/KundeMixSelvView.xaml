@@ -22,36 +22,21 @@
         <converters:ClToRemoveGlyphConverter x:Key="ClToRemoveGlyphConverter"/>
 
         <DataTemplate x:Key="IngredientCardTemplate">
-            <!-- Size is computed from popup's ActualWidth/ActualHeight so overlay never gets oversized. -->
-            <Grid x:Name="OverlayCardSlot"
+            <!-- Match KundeMenuView: fixed-size slot from CarouselSizingSettings -->
+            <Grid Width="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardWidth}"
+                  Height="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardHeight}"
+                  Margin="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardMargin}"
                   ClipToBounds="True">
-                <Grid.Width>
-                    <MultiBinding Converter="{StaticResource OverlayIngredientCardSize}" ConverterParameter="W">
-                        <Binding ElementName="OverlayPopup" Path="ActualWidth"/>
-                        <Binding ElementName="OverlayPopup" Path="ActualHeight"/>
-                    </MultiBinding>
-                </Grid.Width>
-                <Grid.Height>
-                    <MultiBinding Converter="{StaticResource OverlayIngredientCardSize}" ConverterParameter="H">
-                        <Binding ElementName="OverlayPopup" Path="ActualWidth"/>
-                        <Binding ElementName="OverlayPopup" Path="ActualHeight"/>
-                    </MultiBinding>
-                </Grid.Height>
-                <Grid.Margin>
-                    <MultiBinding Converter="{StaticResource OverlayIngredientCardMargin}">
-                        <Binding ElementName="OverlayPopup" Path="ActualWidth"/>
-                    </MultiBinding>
-                </Grid.Margin>
 
-                <view:KundeIngredientCard
-                    Width="{Binding ActualWidth, ElementName=OverlayCardSlot}"
-                    Height="{Binding ActualHeight, ElementName=OverlayCardSlot}"
-                    Title="{Binding Name}"
-                    ImagePath="{Binding ImagePath}"
-                    IsEnabled="{Binding IsSelectable}"
-                    Opacity="{Binding IsSelectable, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"
-                    Command="{Binding DataContext.SelectIngredientCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    CommandParameter="{Binding}"/>
+                <view:KundeIngredientCard x:Name="CardRoot"
+                                         Width="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardWidth}"
+                                         Height="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardHeight}"
+                                         Title="{Binding Name}"
+                                         ImagePath="{Binding ImagePath}"
+                                         IsEnabled="{Binding IsSelectable}"
+                                         Opacity="{Binding IsSelectable, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"
+                                         Command="{Binding DataContext.SelectIngredientCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                         CommandParameter="{Binding}"/>
             </Grid>
         </DataTemplate>
 
@@ -305,9 +290,10 @@
                                               IsManipulationEnabled="True"
                                               CanContentScroll="False"
                                               behaviors:CenteredSnapCarouselBehavior.IsEnabled="True"
-                                              behaviors:CenteredSnapCarouselBehavior.HighlightScale="1.12"
+                                              behaviors:CenteredSnapCarouselBehavior.ItemTemplateRootName="CardRoot"
+                                              behaviors:CenteredSnapCarouselBehavior.HighlightScale="1.15"
                                               behaviors:CenteredSnapCarouselBehavior.SnapDebounceMs="220"
-                                              behaviors:CenteredSnapCarouselBehavior.SnapAnimationMs="240"
+                                              behaviors:CenteredSnapCarouselBehavior.SnapAnimationMs="260"
                                               behaviors:CenteredSnapCarouselBehavior.TapCommand="{Binding SelectIngredientCommand}">
                                     <ItemsControl ItemsSource="{Binding OverlayIngredients}"
                                                   ItemTemplate="{StaticResource IngredientCardTemplate}">
