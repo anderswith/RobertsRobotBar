@@ -55,5 +55,12 @@
             <Setter Property="Foreground" Value="White"/>
         </Style>
 
+        <!-- Side menu option buttons (MainWindow side menu) -->
+        <Style x:Key="SideMenuOptionButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+
     </Application.Resources>
 </Application>

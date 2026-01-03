@@ -10,6 +10,16 @@
 
     <UserControl.Resources>
         <conv:PathToImageConverter x:Key="PathToImageConverter" />
+
+        <!-- Make buttons on this page feel clickable -->
+        <Style TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- Make the two ListBox 'tables' feel clickable/selectable -->
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
     </UserControl.Resources>
 
     <Grid Margin="40">

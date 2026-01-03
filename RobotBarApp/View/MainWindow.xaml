@@ -166,32 +166,27 @@
                                Margin="0,0,0,20"/>
 
                     <Button Content="Opstart"
-                            Height="35"
-                            Margin="0,0,0,10"
+                            Style="{StaticResource SideMenuOptionButtonStyle}"
                             Command="{Binding NavigateHomeCommand}"
                             Click="MenuOption_Click"/>
 
                     <Button Content="Statistik"
-                            Height="35"
-                            Margin="0,0,0,10"
+                            Style="{StaticResource SideMenuOptionButtonStyle}"
                             Command="{Binding NavigateStatistikCommand}"
                             Click="MenuOption_Click"/>
 
                     <Button Content="Katalog"
-                            Height="35"
-                            Margin="0,0,0,10"
+                            Style="{StaticResource SideMenuOptionButtonStyle}"
                             Command="{Binding NavigateKatalogCommand}"
                             Click="MenuOption_Click"/>
 
                     <Button Content="Tilføj Ingrediens"
-                            Height="35"
-                            Margin="0,0,0,10"
+                            Style="{StaticResource SideMenuOptionButtonStyle}"
                             Command="{Binding NavigateTilfoejIngrediensCommand}"
                             Click="MenuOption_Click"/>
 
                     <Button Content="Tilføj Event"
-                            Height="35"
-                            Margin="0,0,0,10"
+                            Style="{StaticResource SideMenuOptionButtonStyle}"
                             Command="{Binding NavigateTilfoejEventCommand}"
                             Click="MenuOption_Click"/>
 

@@ -81,6 +81,7 @@
                     Content="Luk"
                     Padding="14,8"
                     MinWidth="90"
+                    Cursor="Hand"
                     Command="{Binding CloseCommand}" />
 
             <Button Grid.Column="2"
@@ -88,6 +89,7 @@
                     Padding="14,8"
                     MinWidth="110"
                     Margin="0,0,10,0"
+                    Cursor="Hand"
                     Command="{Binding PreviousCommand}" />
 
             <Button Grid.Column="3"
@@ -95,12 +97,14 @@
                     Padding="14,8"
                     MinWidth="110"
                     Margin="0,0,10,0"
+                    Cursor="Hand"
                     Command="{Binding RunStepCommand}" />
 
             <Button Grid.Column="4"
                     Content="Næste"
                     Padding="14,8"
                     MinWidth="110"
+                    Cursor="Hand"
                     Command="{Binding NextCommand}" />
         </Grid>
     </Grid>
