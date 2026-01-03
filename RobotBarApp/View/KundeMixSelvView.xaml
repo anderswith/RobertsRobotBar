@@ -150,17 +150,6 @@
                                 </Border>
                             </Canvas>
                         </Grid>
-
-                        <!-- Connector line -->
-                        <Rectangle x:Name="ConnectorLine"
-                                   Panel.ZIndex="20"
-                                   Width="240"
-                                   Height="2"
-                                   Fill="#2F4A3B"
-                                   Visibility="{Binding SelectedIngredientName, Converter={StaticResource StringNotEmptyToVisibility}}"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Top"
-                                   Margin="410,412,0,0"/>
                     </Grid>
                 </Viewbox>
             </Grid>
@@ -215,19 +204,27 @@
 
                 <Button Content="Alkohol" Height="86" FontSize="30" Margin="0,0,0,26"
                         Cursor="Hand" Background="#F7F4EE" BorderBrush="#2F4A3B" BorderThickness="2"
-                        Command="{Binding SelectCategoryCommand}" CommandParameter="Alkohol"/>
+                        Command="{Binding SelectCategoryCommand}" CommandParameter="Alkohol"
+                        IsEnabled="{Binding CanSelectAlcoholCategory}"
+                        Opacity="{Binding CanSelectAlcoholCategory, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"/>
 
                 <Button Content="Mockohol" Height="86" FontSize="30" Margin="0,0,0,26"
                         Cursor="Hand" Background="#F7F4EE" BorderBrush="#2F4A3B" BorderThickness="2"
-                        Command="{Binding SelectCategoryCommand}" CommandParameter="Mockohol"/>
+                        Command="{Binding SelectCategoryCommand}" CommandParameter="Mockohol"
+                        IsEnabled="{Binding CanSelectMockoholCategory}"
+                        Opacity="{Binding CanSelectMockoholCategory, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"/>
 
                 <Button Content="Sirup" Height="86" FontSize="30" Margin="0,0,0,26"
                         Cursor="Hand" Background="#F7F4EE" BorderBrush="#2F4A3B" BorderThickness="2"
-                        Command="{Binding SelectCategoryCommand}" CommandParameter="Sirup"/>
+                        Command="{Binding SelectCategoryCommand}" CommandParameter="Sirup"
+                        IsEnabled="{Binding CanSelectSirupCategory}"
+                        Opacity="{Binding CanSelectSirupCategory, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"/>
 
                 <Button Content="Sodavand" Height="86" FontSize="30" Margin="0,0,0,26"
                         Cursor="Hand" Background="#F7F4EE" BorderBrush="#2F4A3B" BorderThickness="2"
-                        Command="{Binding SelectCategoryCommand}" CommandParameter="Sodavand"/>
+                        Command="{Binding SelectCategoryCommand}" CommandParameter="Sodavand"
+                        IsEnabled="{Binding CanSelectSodavandCategory}"
+                        Opacity="{Binding CanSelectSodavandCategory, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"/>
             </StackPanel>
 
             <!-- OVERLAY -->
