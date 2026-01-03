@@ -2,11 +2,65 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:RobotBarApp.Converters"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              Background="#F2EEE6">
 
     <UserControl.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
         <converters:HexToBrushConverter x:Key="HexToBrushConverter"/>
+
+        <!-- Spinner sizing: tweak here if needed -->
+        <sys:Double x:Key="SpinnerSize">256</sys:Double>
+        <sys:Double x:Key="SpinnerStroke">13</sys:Double>
+        <Thickness x:Key="SpinnerInnerPadding">42</Thickness>
+
+        <!-- ===== Spinner storyboards ===== -->
+        <Storyboard x:Key="OuterSpinStoryboard" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="OuterRotate"
+                             Storyboard.TargetProperty="Angle"
+                             From="0" To="360"
+                             Duration="0:0:3" />
+        </Storyboard>
+
+        <Storyboard x:Key="InnerSpinStoryboard" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="InnerRotate"
+                             Storyboard.TargetProperty="Angle"
+                             From="0" To="-360"
+                             Duration="0:0:2" />
+        </Storyboard>
+
+        <!-- Pulse subtitle (same behavior as KundeValgtDrinkView) -->
+        <Storyboard x:Key="PulseStoryboard" RepeatBehavior="Forever" AutoReverse="True">
+            <DoubleAnimation Storyboard.TargetName="SubMessageText"
+                             Storyboard.TargetProperty="Opacity"
+                             From="1.0" To="0.5"
+                             Duration="0:0:1" />
+        </Storyboard>
+
+        <!-- Slide-in effect (same behavior as KundeValgtDrinkView) -->
+        <Storyboard x:Key="SlideInStoryboard">
+            <DoubleAnimation Storyboard.TargetName="ContentTranslate"
+                             Storyboard.TargetProperty="Y"
+                             From="20" To="0"
+                             Duration="0:0:0.6" />
+            <DoubleAnimation Storyboard.TargetName="OrderingContentRoot"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0" To="1"
+                             Duration="0:0:0.6" />
+        </Storyboard>
+
+        <!-- Liquid look helpers (same as KundeMixSelvView) -->
+        <LinearGradientBrush x:Key="LiquidHighlightBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#55FFFFFF" Offset="0"/>
+            <GradientStop Color="#11FFFFFF" Offset="0.35"/>
+            <GradientStop Color="#00FFFFFF" Offset="1"/>
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="LiquidShineBrush" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#00FFFFFF" Offset="0"/>
+            <GradientStop Color="#22FFFFFF" Offset="0.35"/>
+            <GradientStop Color="#00FFFFFF" Offset="1"/>
+        </LinearGradientBrush>
     </UserControl.Resources>
 
     <Grid>
@@ -79,21 +133,36 @@
                                         Height="260"
                                         Background="Transparent">
 
-                                    <ItemsControl ItemsSource="{Binding LiquidSegments}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel Orientation="Vertical" VerticalAlignment="Bottom"/>
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Rectangle Height="12"
-                                                           Width="185"
-                                                           Opacity="0.85"
-                                                           Fill="{Binding ColorHex, Converter={StaticResource HexToBrushConverter}}"/>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
+                                    <Grid>
+                                        <ItemsControl ItemsSource="{Binding LiquidSegments}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Vertical" VerticalAlignment="Bottom"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <!-- Nicer liquid segment: rounded + subtle top highlight -->
+                                                    <Border Height="12"
+                                                            Width="185"
+                                                            CornerRadius="2">
+                                                        <Grid>
+                                                            <Border Background="{Binding ColorHex, Converter={StaticResource HexToBrushConverter}}"
+                                                                Opacity="0.88"/>
+                                                            <Border Background="{StaticResource LiquidHighlightBrush}"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <!-- Optional global shine overlay (gives a 'wet' feel) -->
+                                        <Border Width="40"
+                                                HorizontalAlignment="Left"
+                                                Margin="18,0,0,0"
+                                                Background="{StaticResource LiquidShineBrush}"
+                                                Opacity="0.35"/>
+                                    </Grid>
                                 </Border>
                             </Canvas>
                         </Grid>
@@ -121,34 +190,114 @@
             </Grid>
             
 
-            <!-- RIGHT: progress bar, placed ~1/3 up from bottom -->
+            <!-- RIGHT: replace progress bar with spinner, placed ~1/3 up from bottom -->
             <Grid Grid.Column="2">
-                <StackPanel HorizontalAlignment="Center"
+                <!-- Wrapper so we can animate opacity/translate like KundeValgtDrinkView -->
+                <StackPanel x:Name="OrderingContentRoot"
+                            HorizontalAlignment="Center"
                             VerticalAlignment="Bottom"
-                            Margin="0,0,0,220">
+                            Margin="0,0,100,220"
+                            Opacity="0">
 
-                    <!-- Step counter -->
-                    <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Center"
-                                Margin="0,0,0,10">
-                        <TextBlock Text="Step "
-                                   FontSize="16"/>
-                        <TextBlock Text="{Binding CurrentStep}"
-                                   FontSize="16"
-                                   FontWeight="Bold"/>
-                        <TextBlock Text=" / "
-                                   FontSize="16"/>
-                        <TextBlock Text="{Binding TotalSteps}"
-                                   FontSize="16"
-                                   FontWeight="Bold"/>
-                    </StackPanel>
+                    <!-- Slide-in effect -->
+                    <StackPanel.RenderTransform>
+                        <TranslateTransform x:Name="ContentTranslate" Y="20" />
+                    </StackPanel.RenderTransform>
 
-                    <!-- Progress bar -->
-                    <ProgressBar Height="44"
-                                 Width="360"
-                                 Value="{Binding PourProgress}"
-                                 Minimum="0"
-                                 Maximum="100"/>
+                    <StackPanel.Triggers>
+                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                            <BeginStoryboard Storyboard="{StaticResource SlideInStoryboard}" />
+                        </EventTrigger>
+                    </StackPanel.Triggers>
+
+                    <!-- Icon above spinner (same as KundeValgtDrinkView) -->
+                    <Image Source="/Resources/Icons/robot_hoved_logo.png"
+                           Height="192"
+                           Margin="0,0,0,48"
+                           HorizontalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality" />
+
+                    <!-- ===== Spinner: two semi-circles, scalable ===== -->
+                    <Grid Margin="0,0,0,30"
+                          Width="{StaticResource SpinnerSize}"
+                          Height="{StaticResource SpinnerSize}">
+
+                        <Grid.Triggers>
+                            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                <BeginStoryboard Storyboard="{StaticResource OuterSpinStoryboard}" />
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                <BeginStoryboard Storyboard="{StaticResource InnerSpinStoryboard}" />
+                            </EventTrigger>
+                        </Grid.Triggers>
+
+                        <!-- OUTER semi-circle (blue) -->
+                        <Viewbox Stretch="Fill">
+                            <Canvas Width="100" Height="100">
+                                <Path Stroke="#3b82f6"
+                                      StrokeThickness="{StaticResource SpinnerStroke}"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      Fill="Transparent"
+                                      Data="M 50,5 A 45,45 0 0 1 50,95">
+                                    <Path.RenderTransform>
+                                        <RotateTransform x:Name="OuterRotate"
+                                                         Angle="0"
+                                                         CenterX="50"
+                                                         CenterY="50" />
+                                    </Path.RenderTransform>
+                                </Path>
+                            </Canvas>
+                        </Viewbox>
+
+                        <!-- INNER semi-circle (purple), inset so it's smaller -->
+                        <Viewbox Stretch="Fill" Margin="{StaticResource SpinnerInnerPadding}">
+                            <Canvas Width="100" Height="100">
+                                <Path Stroke="#a855f7"
+                                      StrokeThickness="{StaticResource SpinnerStroke}"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      Fill="Transparent"
+                                      Data="M 50,90 A 40,40 0 0 0 50,10">
+                                    <Path.RenderTransform>
+                                        <RotateTransform x:Name="InnerRotate"
+                                                         Angle="0"
+                                                         CenterX="50"
+                                                         CenterY="50" />
+                                    </Path.RenderTransform>
+                                </Path>
+                            </Canvas>
+                        </Viewbox>
+
+                        <!-- Center: step counter (3/10) -->
+                        <TextBlock Text="{Binding StepCounterText}"
+                                   FontSize="54"
+                                   FontWeight="SemiBold"
+                                   Foreground="#2F4A3B"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Grid>
+
+                    <!-- Text -->
+                    <TextBlock Text="Hælder din drink"
+                               FontSize="54"
+                               FontWeight="SemiBold"
+                               Foreground="#2F4A3B"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,16"/>
+
+                    <!-- Pulsing subtitle -->
+                    <TextBlock x:Name="SubMessageText"
+                               Text="Vent venligst..."
+                               FontSize="38"
+                               Foreground="#2F4A3B"
+                               HorizontalAlignment="Center">
+                        <TextBlock.Triggers>
+                            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                <BeginStoryboard Storyboard="{StaticResource PulseStoryboard}" />
+                            </EventTrigger>
+                        </TextBlock.Triggers>
+                    </TextBlock>
                 </StackPanel>
             </Grid>
         </Grid>

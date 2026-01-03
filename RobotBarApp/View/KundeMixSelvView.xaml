@@ -22,36 +22,21 @@
         <converters:ClToRemoveGlyphConverter x:Key="ClToRemoveGlyphConverter"/>
 
         <DataTemplate x:Key="IngredientCardTemplate">
-            <!-- Size is computed from popup's ActualWidth/ActualHeight so overlay never gets oversized. -->
-            <Grid x:Name="OverlayCardSlot"
+            <!-- Match KundeMenuView: fixed-size slot from CarouselSizingSettings -->
+            <Grid Width="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardWidth}"
+                  Height="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardHeight}"
+                  Margin="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardMargin}"
                   ClipToBounds="True">
-                <Grid.Width>
-                    <MultiBinding Converter="{StaticResource OverlayIngredientCardSize}" ConverterParameter="W">
-                        <Binding ElementName="OverlayPopup" Path="ActualWidth"/>
-                        <Binding ElementName="OverlayPopup" Path="ActualHeight"/>
-                    </MultiBinding>
-                </Grid.Width>
-                <Grid.Height>
-                    <MultiBinding Converter="{StaticResource OverlayIngredientCardSize}" ConverterParameter="H">
-                        <Binding ElementName="OverlayPopup" Path="ActualWidth"/>
-                        <Binding ElementName="OverlayPopup" Path="ActualHeight"/>
-                    </MultiBinding>
-                </Grid.Height>
-                <Grid.Margin>
-                    <MultiBinding Converter="{StaticResource OverlayIngredientCardMargin}">
-                        <Binding ElementName="OverlayPopup" Path="ActualWidth"/>
-                    </MultiBinding>
-                </Grid.Margin>
 
-                <view:KundeIngredientCard
-                    Width="{Binding ActualWidth, ElementName=OverlayCardSlot}"
-                    Height="{Binding ActualHeight, ElementName=OverlayCardSlot}"
-                    Title="{Binding Name}"
-                    ImagePath="{Binding ImagePath}"
-                    IsEnabled="{Binding IsSelectable}"
-                    Opacity="{Binding IsSelectable, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"
-                    Command="{Binding DataContext.SelectIngredientCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    CommandParameter="{Binding}"/>
+                <view:KundeIngredientCard x:Name="CardRoot"
+                                         Width="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardWidth}"
+                                         Height="{Binding Source={StaticResource CarouselSizing}, Path=IngredientCardHeight}"
+                                         Title="{Binding Name}"
+                                         ImagePath="{Binding ImagePath}"
+                                         IsEnabled="{Binding IsSelectable}"
+                                         Opacity="{Binding IsSelectable, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"
+                                         Command="{Binding DataContext.SelectIngredientCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                         CommandParameter="{Binding}"/>
             </Grid>
         </DataTemplate>
 
@@ -65,6 +50,19 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
+
+        <!-- Liquid look helpers -->
+        <LinearGradientBrush x:Key="LiquidHighlightBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#55FFFFFF" Offset="0"/>
+            <GradientStop Color="#11FFFFFF" Offset="0.35"/>
+            <GradientStop Color="#00FFFFFF" Offset="1"/>
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="LiquidShineBrush" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#00FFFFFF" Offset="0"/>
+            <GradientStop Color="#22FFFFFF" Offset="0.35"/>
+            <GradientStop Color="#00FFFFFF" Offset="1"/>
+        </LinearGradientBrush>
     </UserControl.Resources>
 
     <Grid x:Name="Root">
@@ -145,37 +143,45 @@
                                         Height="260"
                                         Background="Transparent">
 
-                                    <!-- Simple vertical stack: 15 segments, bottom aligned -->
-                                    <ItemsControl ItemsSource="{Binding LiquidSegments}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel Orientation="Vertical" VerticalAlignment="Bottom"/>
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
+                                    <Grid>
+                                        <!-- Simple vertical stack: 15 segments, bottom aligned -->
+                                        <ItemsControl ItemsSource="{Binding LiquidSegments}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Vertical" VerticalAlignment="Bottom"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
 
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Rectangle Height="12"
-                                                           Width="185"
-                                                           Opacity="0.85"
-                                                           Fill="{Binding ColorHex, Converter={StaticResource HexToBrushConverter}}"/>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <!-- Nicer liquid segment: rounded + subtle top highlight -->
+                                                    <Border Height="12"
+                                                            Width="185"
+                                                            CornerRadius="2"
+                                                            Margin="0,0,0,0">
+                                                        <Grid>
+                                                            <!-- Base color -->
+                                                            <Border Background="{Binding ColorHex, Converter={StaticResource HexToBrushConverter}}"
+                                                                    Opacity="0.88"/>
+
+                                                            <!-- Vertical highlight to simulate depth -->
+                                                            <Border Background="{StaticResource LiquidHighlightBrush}"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <!-- Optional global shine overlay (gives a 'wet' feel) -->
+                                        <Border Width="40"
+                                                HorizontalAlignment="Left"
+                                                Margin="18,0,0,0"
+                                                Background="{StaticResource LiquidShineBrush}"
+                                                Opacity="0.35"/>
+                                    </Grid>
                                 </Border>
                             </Canvas>
                         </Grid>
-
-                        <!-- Connector line -->
-                        <Rectangle x:Name="ConnectorLine"
-                                   Panel.ZIndex="20"
-                                   Width="240"
-                                   Height="2"
-                                   Fill="#2F4A3B"
-                                   Visibility="{Binding SelectedIngredientName, Converter={StaticResource StringNotEmptyToVisibility}}"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Top"
-                                   Margin="410,412,0,0"/>
                     </Grid>
                 </Viewbox>
             </Grid>
@@ -230,19 +236,27 @@
 
                 <Button Content="Alkohol" Height="86" FontSize="30" Margin="0,0,0,26"
                         Cursor="Hand" Background="#F7F4EE" BorderBrush="#2F4A3B" BorderThickness="2"
-                        Command="{Binding SelectCategoryCommand}" CommandParameter="Alkohol"/>
+                        Command="{Binding SelectCategoryCommand}" CommandParameter="Alkohol"
+                        IsEnabled="{Binding CanSelectAlcoholCategory}"
+                        Opacity="{Binding CanSelectAlcoholCategory, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"/>
 
                 <Button Content="Mockohol" Height="86" FontSize="30" Margin="0,0,0,26"
                         Cursor="Hand" Background="#F7F4EE" BorderBrush="#2F4A3B" BorderThickness="2"
-                        Command="{Binding SelectCategoryCommand}" CommandParameter="Mockohol"/>
+                        Command="{Binding SelectCategoryCommand}" CommandParameter="Mockohol"
+                        IsEnabled="{Binding CanSelectMockoholCategory}"
+                        Opacity="{Binding CanSelectMockoholCategory, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"/>
 
                 <Button Content="Sirup" Height="86" FontSize="30" Margin="0,0,0,26"
                         Cursor="Hand" Background="#F7F4EE" BorderBrush="#2F4A3B" BorderThickness="2"
-                        Command="{Binding SelectCategoryCommand}" CommandParameter="Sirup"/>
+                        Command="{Binding SelectCategoryCommand}" CommandParameter="Sirup"
+                        IsEnabled="{Binding CanSelectSirupCategory}"
+                        Opacity="{Binding CanSelectSirupCategory, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"/>
 
                 <Button Content="Sodavand" Height="86" FontSize="30" Margin="0,0,0,26"
                         Cursor="Hand" Background="#F7F4EE" BorderBrush="#2F4A3B" BorderThickness="2"
-                        Command="{Binding SelectCategoryCommand}" CommandParameter="Sodavand"/>
+                        Command="{Binding SelectCategoryCommand}" CommandParameter="Sodavand"
+                        IsEnabled="{Binding CanSelectSodavandCategory}"
+                        Opacity="{Binding CanSelectSodavandCategory, Converter={StaticResource InverseBoolConverter}, ConverterParameter=opacity}"/>
             </StackPanel>
 
             <!-- OVERLAY -->
@@ -305,9 +319,10 @@
                                               IsManipulationEnabled="True"
                                               CanContentScroll="False"
                                               behaviors:CenteredSnapCarouselBehavior.IsEnabled="True"
-                                              behaviors:CenteredSnapCarouselBehavior.HighlightScale="1.12"
+                                              behaviors:CenteredSnapCarouselBehavior.ItemTemplateRootName="CardRoot"
+                                              behaviors:CenteredSnapCarouselBehavior.HighlightScale="1.15"
                                               behaviors:CenteredSnapCarouselBehavior.SnapDebounceMs="220"
-                                              behaviors:CenteredSnapCarouselBehavior.SnapAnimationMs="240"
+                                              behaviors:CenteredSnapCarouselBehavior.SnapAnimationMs="260"
                                               behaviors:CenteredSnapCarouselBehavior.TapCommand="{Binding SelectIngredientCommand}">
                                     <ItemsControl ItemsSource="{Binding OverlayIngredients}"
                                                   ItemTemplate="{StaticResource IngredientCardTemplate}">

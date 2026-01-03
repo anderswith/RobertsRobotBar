@@ -11,10 +11,10 @@
         <converters:BooleanToVisibilityConverter x:Key="InverseBoolToVis" Invert="True" />
 
         <!-- Spinner sizing: change these later to resize easily -->
-        <sys:Double x:Key="SpinnerSize">160</sys:Double>
-        <sys:Double x:Key="SpinnerStroke">8</sys:Double>
+        <sys:Double x:Key="SpinnerSize">256</sys:Double>
+        <sys:Double x:Key="SpinnerStroke">10</sys:Double>
         <!-- Margin expects a Thickness, not a Double -->
-        <Thickness x:Key="SpinnerInnerPadding">26</Thickness>
+        <Thickness x:Key="SpinnerInnerPadding">42</Thickness>
 
         <!-- ===== Spinner storyboards ===== -->
         <Storyboard x:Key="OuterSpinStoryboard" RepeatBehavior="Forever">
@@ -116,7 +116,7 @@
                                Margin="0,0,0,20"/>
 
                     <!-- Drink image -->
-                    <Image Source="{Binding DrinkImagePath, Converter={StaticResource PathToImageConverter}}"
+                    <Image Source="{Binding DrinkImagePath, Converter={StaticResource PathToImageConverter}, ConverterParameter=Drink}"
                            Stretch="Uniform"
                            Height="600"
                            RenderOptions.BitmapScalingMode="HighQuality"/>
@@ -242,8 +242,17 @@
                             <!-- Center icon -->
                             <TextBlock Text="🍸"
                                        FontSize="48"
+                                       Foreground="#FFFFFF"
                                        HorizontalAlignment="Center"
-                                       VerticalAlignment="Center" />
+                                       VerticalAlignment="Center">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect Color="#000000"
+                                                      BlurRadius="8"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.45"/>
+                                </TextBlock.Effect>
+                            </TextBlock>
+
                         </Grid>
 
                         <!-- Text -->

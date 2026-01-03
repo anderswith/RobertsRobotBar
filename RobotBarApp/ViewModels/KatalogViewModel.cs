@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.Services.Interfaces;
+using RobotBarApp.Services.UI;
 
 namespace RobotBarApp.ViewModels;
 
@@ -116,7 +117,7 @@ public class KatalogViewModel : ViewModelBase
         return new KatalogItemViewModel(
             id,
             name,
-            LoadImage(imagePath),
+            LoadImageOrDefault(imagePath, type),
             type,
             DeleteItem,
             EditItem);
@@ -276,6 +277,23 @@ public class KatalogViewModel : ViewModelBase
         }
     }
 
+    private ImageSource LoadImageOrDefault(string path, KatalogItemType type)
+    {
+        var img = LoadImage(path);
+        if (img != null)
+            return img;
+
+        var fallbackPath = type switch
+        {
+            KatalogItemType.Drink      => DefaultImagePaths.Drink,
+            KatalogItemType.Event      => DefaultImagePaths.Event,
+            KatalogItemType.Ingredient => DefaultImagePaths.Ingredient,
+            _                          => DefaultImagePaths.Ingredient
+        };
+
+        return LoadImage(fallbackPath);
+    }
+
     private ImageSource LoadImage(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -291,14 +309,21 @@ public class KatalogViewModel : ViewModelBase
         if (!File.Exists(absolutePath))
             return null;
 
-        var image = new BitmapImage();
-        image.BeginInit();
-        image.UriSource = new Uri(absolutePath, UriKind.Absolute);
-        image.CacheOption = BitmapCacheOption.OnLoad;
-        image.EndInit();
-        image.Freeze();
+        try
+        {
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.UriSource = new Uri(absolutePath, UriKind.Absolute);
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.EndInit();
+            image.Freeze();
 
-        return image;
+            return image;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
 

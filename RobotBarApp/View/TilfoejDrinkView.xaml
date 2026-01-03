@@ -179,7 +179,7 @@
                         BorderThickness="2"
                         Background="White"
                         Margin="0,0,10,0">
-                    <Image Source="{Binding ImagePreview, Converter={StaticResource PathToImageConverter}}"
+                    <Image Source="{Binding ImagePreview, Converter={StaticResource PathToImageConverter}, ConverterParameter=Drink}"
                            Stretch="Uniform"/>
                 </Border>
 

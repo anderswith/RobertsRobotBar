@@ -9,6 +9,10 @@
     </UserControl.Resources>
 
     <Button Background="Transparent"
+            Width="{Binding ActualWidth, ElementName=Root}"
+            Height="{Binding ActualHeight, ElementName=Root}"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
             BorderThickness="0"
             Padding="0"
             Cursor="Hand"
@@ -16,6 +20,11 @@
             CommandParameter="{Binding CommandParameter, RelativeSource={RelativeSource AncestorType=UserControl}}"
             Click="Button_Click">
         <Border CornerRadius="16"
+                Width="{Binding ActualWidth, ElementName=Root}"
+                Height="{Binding ActualHeight, ElementName=Root}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                ClipToBounds="True"
                 Background="#2F4A3B"
                 BorderBrush="#2F4A3B"
                 BorderThickness="0">
@@ -25,10 +34,16 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Image Grid.Row="0"
-                       Source="{Binding ImagePath, ElementName=Root, Converter={StaticResource PathToImageConverter}}"
-                       Stretch="Uniform"
-                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                <!-- Fixed image frame: fill available area; scale uniformly inside -->
+                <Border Grid.Row="0"
+                        Background="Transparent"
+                        ClipToBounds="True">
+                    <Image Source="{Binding ImagePath, ElementName=Root, Converter={StaticResource PathToImageConverter}, ConverterParameter=Ingredient}"
+                           Stretch="Uniform"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Border>
 
                 <TextBlock Grid.Row="1"
                            Text="{Binding Title, ElementName=Root}"

@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
@@ -34,18 +34,28 @@ namespace RobotBarApp.ViewModels
             set { _pourProgress = value; OnPropertyChanged(); }
         }
         
+        public string StepCounterText => $"{CurrentStep}/{TotalSteps}";
+
         private int _currentStep;
         public int CurrentStep
         {
             get => _currentStep;
-            set => SetProperty(ref _currentStep, value);
+            set
+            {
+                if (SetProperty(ref _currentStep, value))
+                    OnPropertyChanged(nameof(StepCounterText));
+            }
         }
 
         private int _totalSteps;
         public int TotalSteps
         {
             get => _totalSteps;
-            set => SetProperty(ref _totalSteps, value);
+            set
+            {
+                if (SetProperty(ref _totalSteps, value))
+                    OnPropertyChanged(nameof(StepCounterText));
+            }
         }
 
         public ICommand BackCommand { get; }

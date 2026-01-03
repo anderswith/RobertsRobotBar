@@ -1,4 +1,4 @@
-﻿namespace RobotBarApp.ViewModels;
+﻿﻿namespace RobotBarApp.ViewModels;
 
 using System;
 using System.Collections.ObjectModel;
@@ -404,6 +404,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
         UpdateLiquidSegments();
         UpdateLiquidVisuals();
         RaiseCanExecute();
+        RaiseCategoryAvailabilityChanged();
     }
 
     private static bool IsAlcoholOrMockType(string? type)
@@ -473,6 +474,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
         UpdateLiquidSegments();
         UpdateLiquidVisuals();
         RaiseCanExecute();
+        RaiseCategoryAvailabilityChanged();
         OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
     }
 
@@ -491,6 +493,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
                 UpdateLiquidSegments();
                 UpdateLiquidVisuals();
                 RaiseCanExecute();
+                RaiseCategoryAvailabilityChanged();
                 OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
 
                 if (IsOverlayOpen)
@@ -507,6 +510,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
             UpdateLiquidSegments();
             UpdateLiquidVisuals();
             RaiseCanExecute();
+            RaiseCategoryAvailabilityChanged();
             OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
             return;
         }
@@ -526,6 +530,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
         UpdateLiquidSegments();
         UpdateLiquidVisuals();
         RaiseCanExecute();
+        RaiseCategoryAvailabilityChanged();
         OnPropertyChanged(nameof(SelectedIngredientsForDisplay));
 
         if (IsOverlayOpen)
@@ -625,6 +630,20 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
         LiquidHighlightMargin = new Thickness(left + w * 0.2, top + h * 0.12, 0, 0);
     }
 
+    // Category button availability (driven by the same rules as ingredient selection)
+    public bool CanSelectAlcoholCategory => CanAddNewIngredient("Alkohol", MixSelvLimits.SingleShotCl);
+    public bool CanSelectMockoholCategory => CanAddNewIngredient("Mock", MixSelvLimits.SingleShotCl);
+    public bool CanSelectSirupCategory => CanAddNewIngredient("Syrup", MixSelvLimits.SingleShotCl);
+    public bool CanSelectSodavandCategory => CanAddNewIngredient("Soda", MixSelvLimits.SodaChunkCl);
+
+    private void RaiseCategoryAvailabilityChanged()
+    {
+        OnPropertyChanged(nameof(CanSelectAlcoholCategory));
+        OnPropertyChanged(nameof(CanSelectMockoholCategory));
+        OnPropertyChanged(nameof(CanSelectSirupCategory));
+        OnPropertyChanged(nameof(CanSelectSodavandCategory));
+    }
+
     private void RaiseCanExecute()
     {
         if (IncreaseClCommand is RelayCommand rc1) rc1.RaiseCanExecuteChanged();
@@ -639,5 +658,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
             var cat = OverlayTitle.Replace("Vælg ", string.Empty, StringComparison.OrdinalIgnoreCase).Trim();
             SelectCategory(string.IsNullOrWhiteSpace(cat) ? null : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(cat));
         }
+
+        RaiseCategoryAvailabilityChanged();
     }
 }

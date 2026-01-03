@@ -19,7 +19,8 @@ namespace RobotBarApp.View
 
         private static Geometry CreateBowlClipGeometry()
         {
-            var topY = 210.0;
+            // Match KundeMixSelvView clip geometry (normalized 520x520)
+            var topY = 180.0;
             var bottomY = 455.0;
 
             var topLeftX = 200.0;
@@ -42,4 +43,3 @@ namespace RobotBarApp.View
         }
     }
 }
-
