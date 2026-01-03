@@ -9,10 +9,25 @@
         <Style x:Key="StatsFilterComboBox" TargetType="ComboBox">
             <Setter Property="Height" Value="35"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
         </Style>
         <Style x:Key="StatsFilterDatePicker" TargetType="DatePicker">
             <Setter Property="Height" Value="35"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- Calendar (inside DatePicker popup) -->
+        <Style TargetType="CalendarDayButton">
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style TargetType="CalendarButton">
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- Buttons on this page -->
+        <Style x:Key="StatsButton" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
         </Style>
     </UserControl.Resources>
 
@@ -83,6 +98,7 @@
             </StackPanel>
 
             <Button Content="Opdater"
+                    Style="{StaticResource StatsButton}"
                     Command="{Binding RefreshStatisticsCommand}"
                     Width="120" Height="35"
                     Margin="10,0,0,0"

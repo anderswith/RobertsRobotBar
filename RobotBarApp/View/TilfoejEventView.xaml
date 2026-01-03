@@ -12,6 +12,11 @@
     <!-- converter registration -->
     <UserControl.Resources>
         <conv:PathToImageConverter x:Key="PathToImageConverter" />
+
+        <!-- Make buttons in this stepper feel clickable (some use RoundButton, some are template-less) -->
+        <Style TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
     </UserControl.Resources>
 
 
@@ -113,6 +118,7 @@
                                             Margin="5"
                                             BorderBrush="#DDD" BorderThickness="1">
                                         <Button
+                                            Cursor="Hand"
                                             Command="{Binding DataContext.AddIngredientCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             CommandParameter="{Binding}">
                                             <TextBlock Text="{Binding Name}" FontSize="20"
@@ -141,7 +147,8 @@
                                 <Button Command="{Binding DataContext.SelectSlotCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}"
                                         Background="Transparent"
-                                        BorderBrush="Transparent">
+                                        BorderBrush="Transparent"
+                                        Cursor="Hand">
 
                                     <StackPanel>
                                         <Image Source="{Binding Ingredient.Image, Converter={StaticResource PathToImageConverter}}"
