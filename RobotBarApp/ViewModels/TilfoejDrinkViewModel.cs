@@ -419,6 +419,38 @@ namespace RobotBarApp.ViewModels
             return Path.IsPathRooted(path) && !normalized.StartsWith("Resources/", StringComparison.OrdinalIgnoreCase);
         }
 
+        private bool EnsureImageOnCreate()
+        {
+            if (IsEditMode)
+                return true;
+
+            if (!string.IsNullOrWhiteSpace(ImagePreview))
+                return true;
+
+            var result = MessageBox.Show(
+                "Du har ikke valgt et billede til drinken.\n\n" +
+                "Ja: Vælg billede\n" +
+                "Nej: Brug standardbillede\n" +
+                "Annuller: Annullér gem",
+                "Mangler billede",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Question);
+
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    ChooseImage();
+                    return !string.IsNullOrWhiteSpace(ImagePreview);
+
+                case MessageBoxResult.No:
+                    ImagePreview = DefaultImagePaths.Drink;
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
         private void Save()
         {
             try
@@ -466,6 +498,9 @@ namespace RobotBarApp.ViewModels
                 var scripts = string.IsNullOrWhiteSpace(ScriptText)
                     ? new List<string>()
                     : new List<string> { ScriptText };
+
+                if (!EnsureImageOnCreate())
+                    return;
 
                 var imageToPersist = ImagePreview ?? "";
                 if (IsLikelyExternalPath(imageToPersist))

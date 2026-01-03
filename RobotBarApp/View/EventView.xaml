@@ -91,7 +91,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <Image Source="{Binding Ingredient.Image, Converter={StaticResource PathToImageConverter}}"
+                        <Image Source="{Binding Ingredient.Image, Converter={StaticResource PathToImageConverter}, ConverterParameter=Ingredient}"
                                Height="70" Width="70"
                                Stretch="Uniform"/>
                         <Rectangle Width="50" Height="5" Fill="Black" Margin="0,4,0,0"/>

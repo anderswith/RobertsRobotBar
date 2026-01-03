@@ -26,7 +26,7 @@
                 </Grid.RowDefinitions>
 
                 <Image Grid.Row="0"
-                       Source="{Binding ImagePath, ElementName=Root, Converter={StaticResource PathToImageConverter}}"
+                       Source="{Binding ImagePath, ElementName=Root, Converter={StaticResource PathToImageConverter}, ConverterParameter=Ingredient}"
                        Stretch="Uniform"
                        RenderOptions.BitmapScalingMode="HighQuality"/>
 

@@ -116,7 +116,7 @@
                                Margin="0,0,0,20"/>
 
                     <!-- Drink image -->
-                    <Image Source="{Binding DrinkImagePath, Converter={StaticResource PathToImageConverter}}"
+                    <Image Source="{Binding DrinkImagePath, Converter={StaticResource PathToImageConverter}, ConverterParameter=Drink}"
                            Stretch="Uniform"
                            Height="600"
                            RenderOptions.BitmapScalingMode="HighQuality"/>

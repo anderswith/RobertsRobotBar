@@ -231,7 +231,7 @@
                             BorderBrush="Black"
                             BorderThickness="2"
                             Background="White">
-                        <Image Source="{Binding ImagePreview, Converter={StaticResource PathToImageConverter}}"
+                        <Image Source="{Binding ImagePreview, Converter={StaticResource PathToImageConverter}, ConverterParameter=Ingredient}"
                                Stretch="Uniform" />
                     </Border>
 

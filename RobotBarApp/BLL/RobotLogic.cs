@@ -138,7 +138,5 @@ public class RobotLogic : IRobotLogic
         }
         _scriptRunner.QueueScripts(scripts);
     }
-    
-    
 }
     

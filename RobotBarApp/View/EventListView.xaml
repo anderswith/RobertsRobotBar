@@ -35,7 +35,7 @@
                                 Padding="0">
 
                             <Grid>
-                                <Image Source="{Binding Image, Converter={StaticResource PathToImageConverter}}"
+                                <Image Source="{Binding Image, Converter={StaticResource PathToImageConverter}, ConverterParameter=Event}"
                                        Stretch="UniformToFill"
                                        ClipToBounds="True"/>
 

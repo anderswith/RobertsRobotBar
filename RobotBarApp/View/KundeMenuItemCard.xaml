@@ -46,7 +46,7 @@
                         Background="#FFFFFF"
                         CornerRadius="10"
                         ClipToBounds="True">
-                    <Image Source="{Binding ImageSource, ElementName=Root, Converter={StaticResource PathToImageConverter}}"
+                    <Image Source="{Binding ImageSource, ElementName=Root, Converter={StaticResource PathToImageConverter}, ConverterParameter=Drink}"
                            Stretch="Uniform"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"

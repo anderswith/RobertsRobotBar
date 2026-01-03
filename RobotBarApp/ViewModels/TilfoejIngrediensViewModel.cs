@@ -6,7 +6,7 @@ using RobotBarApp.BLL.Interfaces;
 using System.IO;
 using System.Windows;
 using RobotBarApp.BE;
-
+using RobotBarApp.Services.UI;
 
 namespace RobotBarApp.ViewModels
 {
@@ -233,6 +233,39 @@ namespace RobotBarApp.ViewModels
             }
         }
 
+        private bool EnsureImageOnCreateOrThrow()
+        {
+            if (IsEditMode)
+                return true; // no prompt in edit mode
+
+            if (!string.IsNullOrWhiteSpace(ImagePreview))
+                return true;
+
+            var result = MessageBox.Show(
+                "Du har ikke valgt et billede til ingrediensen.\n\n" +
+                "Ja: Vælg billede\n" +
+                "Nej: Brug standardbillede\n" +
+                "Annuller: Annullér gem",
+                "Mangler billede",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Question);
+
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    ChooseImage();
+                    // If user cancels the file dialog, keep the save cancelled to avoid looping.
+                    return !string.IsNullOrWhiteSpace(ImagePreview);
+
+                case MessageBoxResult.No:
+                    ImagePreview = DefaultImagePaths.Ingredient;
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
         private void Save()
         {
             string type =
@@ -293,12 +326,17 @@ namespace RobotBarApp.ViewModels
 
             try
             {
+                if (!EnsureImageOnCreateOrThrow())
+                    return;
+
                 var imagePath = IsEditMode
                     ? ImagePreview
-                    : _imageStorageService.SaveImage(
-                        ImagePreview,
-                        "IngredientPics",
-                        IngredientName);
+                    : (ImagePreview.StartsWith("Resources/", StringComparison.OrdinalIgnoreCase)
+                        ? ImagePreview
+                        : _imageStorageService.SaveImage(
+                            ImagePreview,
+                            "IngredientPics",
+                            IngredientName));
 
                 if (IsEditMode)
                 {

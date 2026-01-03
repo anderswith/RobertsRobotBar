@@ -6,6 +6,7 @@ using Microsoft.Win32;
 using RobotBarApp.BE;
 using RobotBarApp.BLL.Interfaces;
 using RobotBarApp.Services.Interfaces;
+using RobotBarApp.Services.UI;
 using System.Windows;
 
 namespace RobotBarApp.ViewModels
@@ -64,6 +65,41 @@ namespace RobotBarApp.ViewModels
             }
 
         }
+        private bool EnsureImageOnCreate()
+        {
+            if (IsEditMode)
+                return true;
+
+            if (!string.IsNullOrWhiteSpace(ImagePath))
+                return true;
+
+            var result = MessageBox.Show(
+                "Du har ikke valgt et billede til eventet.\n\n" +
+                "Ja: Vælg billede\n" +
+                "Nej: Brug standardbillede\n" +
+                "Annuller: Annullér",
+                "Mangler billede",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Question);
+
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    // inline choose image (same as ChooseImageCommand)
+                    var dialog = new OpenFileDialog();
+                    if (dialog.ShowDialog() == true)
+                        ImagePath = dialog.FileName;
+                    return !string.IsNullOrWhiteSpace(ImagePath);
+
+                case MessageBoxResult.No:
+                    ImagePath = DefaultImagePaths.Event;
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
         private void GoNextStep()
         {
             try
@@ -71,9 +107,10 @@ namespace RobotBarApp.ViewModels
                 if (string.IsNullOrWhiteSpace(EventName))
                     throw new Exception("You have to enter a name");
 
-                if (string.IsNullOrWhiteSpace(ImagePath))
-                    throw new Exception("You have to select an image");
-                
+                // Only enforce image selection in create mode.
+                if (!EnsureImageOnCreate())
+                    return;
+
                 Step = 2;
             }
             catch (Exception ex)
@@ -167,10 +204,18 @@ namespace RobotBarApp.ViewModels
             {
                 var finalImagePath = ImagePath;
 
-                if (!ImagePath.StartsWith("Resources/"))
+                if (!EnsureImageOnCreate())
+                    return;
+
+                // Copy only if it's an external path (not already a Resources/ path)
+                if (string.IsNullOrWhiteSpace(finalImagePath))
+                {
+                    finalImagePath = DefaultImagePaths.Event;
+                }
+                else if (!finalImagePath.StartsWith("Resources/", StringComparison.OrdinalIgnoreCase))
                 {
                     finalImagePath = _imageStorageService.SaveImage(
-                        ImagePath,
+                        finalImagePath,
                         "EventPics",
                         EventName);
                 }
