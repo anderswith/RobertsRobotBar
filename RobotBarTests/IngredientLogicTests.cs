@@ -22,7 +22,7 @@ namespace UnitTests
             _ingredientLogic = new IngredientLogic(_ingredientRepositoryMock.Object);
         }
 
-        // ---------- AddIngredient ----------
+        //AddIngredient
 
         [TestCase(null)]
         [TestCase("")]
@@ -140,7 +140,7 @@ namespace UnitTests
                 Times.Once);
         }
 
-        // ---------- DeleteIngredient ----------
+        //DeleteIngredient
 
         [Test]
         public void DeleteIngredient_ShouldThrow_WhenNotFound()
@@ -205,7 +205,7 @@ namespace UnitTests
                 Times.Once);
         }
 
-        // ---------- UpdateIngredient ----------
+        //UpdateIngredient
 
         [Test]
         public void UpdateIngredient_ShouldThrow_WhenIdIsEmpty()
@@ -276,7 +276,7 @@ namespace UnitTests
                 Times.Once);
         }
 
-        // ---------- GetByType / Other ----------
+        //GetByType 
 
         [Test]
         public void GetAlcohol_DelegatesToRepository()

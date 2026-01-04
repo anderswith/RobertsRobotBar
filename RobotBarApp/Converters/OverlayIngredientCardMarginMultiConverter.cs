@@ -5,10 +5,8 @@ using System.Windows.Data;
 
 namespace RobotBarApp.Converters
 {
-    /// <summary>
     /// Computes horizontal margin (Thickness) for overlay ingredient cards.
     /// values[0] = overlay width
-    /// </summary>
     public sealed class OverlayIngredientCardMarginMultiConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

@@ -26,7 +26,7 @@ namespace UnitTests
             _logic = new LogLogic(_repoMock.Object, _eventSessionMock.Object);
         }
 
-        // ---------- AddLog ----------
+        //AddLog
 
         [TestCase(null)]
         [TestCase("")]
@@ -63,7 +63,7 @@ namespace UnitTests
                 Times.Once);
         }
 
-        // ---------- AddEventLog ----------
+        //AddEventLog
 
         [Test]
         public void AddEventLog_Throws_WhenNoActiveEvent()
@@ -125,7 +125,7 @@ namespace UnitTests
             });
         }
 
-        // ---------- getAllCommunicationLogs ----------
+        //getAllCommunicationLogs
 
         [Test]
         public void GetAllCommunicationLogs_ReturnsOnlyLogsWithoutEventId()
@@ -144,7 +144,7 @@ namespace UnitTests
             Assert.That(result[0].EventId, Is.Null);
         }
 
-        // ---------- GetCommunicationLogsInTimeFrame ----------
+        //GetCommunicationLogsInTimeFrame
 
         [Test]
         public void GetCommunicationLogsInTimeFrame_Throws_WhenDatesInvalid()
@@ -181,7 +181,7 @@ namespace UnitTests
             _repoMock.Verify(r => r.GetCommunicationLogsInTimeFrame(start, end), Times.Once);
         }
 
-        // ---------- GetLogsInTimeFrame ----------
+        //GetLogsInTimeFrame
 
         [Test]
         public void GetLogsInTimeFrame_Throws_WhenEventIdEmpty()
@@ -209,7 +209,7 @@ namespace UnitTests
             Assert.That(result, Is.EqualTo(logs));
         }
 
-        // ---------- GetLogsForEvent ----------
+        //GetLogsForEvent 
 
         [Test]
         public void GetLogsForEvent_Throws_WhenEventIdEmpty()

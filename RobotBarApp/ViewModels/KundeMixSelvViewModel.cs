@@ -189,8 +189,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
         get => _liquidHighlightMargin;
         private set { _liquidHighlightMargin = value; OnPropertyChanged(); }
     }
-
-    // Commands
+    
     public ICommand BackCommand { get; }
     public ICommand SelectCategoryCommand { get; }
     public ICommand SelectIngredientCommand { get; }
@@ -249,8 +248,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
         _ingredientLogic = ingredientLogic;
         _eventId = eventId;
     }
-
-    // Used by INavigationService navigation (ActivatorUtilities) to pass a single parameter object.
+    
     public KundeMixSelvViewModel(MixSelvSession session, IIngredientLogic ingredientLogic, INavigationService navigation)
         : this(ingredientLogic, session.EventId)
     {

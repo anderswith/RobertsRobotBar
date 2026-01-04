@@ -4,10 +4,8 @@ using System.Windows.Data;
 
 namespace RobotBarApp.Converters
 {
-    /// <summary>
     /// Subtracts the converter parameter from a numeric value.
     /// Supports double/int inputs. Returns double.
-    /// </summary>
     public sealed class SubtractConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

@@ -3,9 +3,7 @@ using RobotBarApp.Settings;
 
 namespace RobotBarApp.ViewModels;
 
-/// <summary>
 /// Central place for creating fresh MixSelv state (used when navigating back from the pour screen).
-/// </summary>
 public static class KundeMixSelvViewModelFactory
 {
     public static MixSelvSession CreateEmptySession()

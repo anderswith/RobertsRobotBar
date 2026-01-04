@@ -11,11 +11,5 @@ public partial class KundeValgtDrinkView : UserControl
     {
         InitializeComponent();
     }
-
-    private void Back_Click(object sender, RoutedEventArgs e)
-    {
-
-
-
-    }
+    
 }

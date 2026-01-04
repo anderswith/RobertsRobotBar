@@ -5,11 +5,9 @@ using RobotBarApp.Settings;
 
 namespace RobotBarApp.Converters
 {
-    /// <summary>
     /// Shows whether the "decrease" button should be an X (remove) or a minus (decrease).
     /// - Normal ingredients: X at minimum (2cl).
     /// - Soda/Juice (Type == "Soda"): operates in 20cl chunks, so X when less than 2 chunks remain (&lt; 40cl).
-    /// </summary>
     public sealed class ClToRemoveGlyphConverter : IValueConverter
     {
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)

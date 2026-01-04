@@ -22,7 +22,7 @@ namespace UnitTests
             _logic = new DrinkUseCountLogic(_repoMock.Object);
         }
 
-        // ---------- AddDrinkUseCount ----------
+        //AddDrinkUseCount
 
         [Test]
         public void AddDrinkUseCount_CreatesCorrectEntity_AndCallsRepository()
@@ -50,7 +50,7 @@ namespace UnitTests
             });
         }
 
-        // ---------- GetAllDrinksUseCountForEvent ----------
+        //GetAllDrinksUseCountForEvent
 
         [Test]
         public void GetAllDrinksUseCountForEvent_Throws_WhenEventIdIsEmpty()
@@ -109,7 +109,7 @@ namespace UnitTests
             });
         }
 
-        // ---------- GetAllDrinkUseCountByTimeFrame ----------
+        //GetAllDrinkUseCountByTimeFrame
 
         [Test]
         public void GetAllDrinkUseCountByTimeFrame_Throws_WhenEventIdIsEmpty()

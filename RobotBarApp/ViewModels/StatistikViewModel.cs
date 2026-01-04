@@ -244,7 +244,7 @@ namespace RobotBarApp.ViewModels
                 DataLabels = true
             });
 
-            // 🔑 SAFE axis label update (no crashes)
+            // axis label update 
             XAxes[0].Labels = IngredientStats
                 .Select(i => i.Name)
                 .ToArray();

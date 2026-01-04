@@ -8,19 +8,17 @@ using System.Windows.Threading;
 
 namespace RobotBarApp.Behaviors
 {
-    /// <summary>
+
     /// Attached behavior for a horizontal ScrollViewer hosting an ItemsControl.
-    /// 
     /// Features:
     /// - Debounced snap-to-center (after user stops scrolling)
     /// - Scales the centered item container
     /// - Two-step tap: tap off-center => center it; tap centered => executes command
-    /// 
     /// Requirements:
     /// - ScrollViewer.Content contains (or is) an ItemsControl.
     /// - ItemsPanel is horizontal (StackPanel is fine).
     /// - CanContentScroll should be false for best pixel-perfect snapping.
-    /// </summary>
+
     public static class CenteredSnapCarouselBehavior
     {
         public static readonly DependencyProperty IsEnabledProperty =
@@ -39,11 +37,9 @@ namespace RobotBarApp.Behaviors
                 typeof(string),
                 typeof(CenteredSnapCarouselBehavior),
                 new PropertyMetadata(string.Empty));
-
-        /// <summary>
+        
         /// Optional: name of the root element inside your DataTemplate to scale.
         /// If empty, the behavior scales the item container (ContentPresenter).
-        /// </summary>
         public static void SetItemTemplateRootName(DependencyObject obj, string value) => obj.SetValue(ItemTemplateRootNameProperty, value);
         public static string GetItemTemplateRootName(DependencyObject obj) => (string)obj.GetValue(ItemTemplateRootNameProperty);
 
