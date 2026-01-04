@@ -87,11 +87,7 @@ public class KundeDrinkKlarViewModel : ViewModelBase, IDisposable, INotifyProper
 
     private void NavigateBack()
     {
-        // Prevent double-navigation
-        _timer.Stop();
-        _timer.Tick -= OnTimerTick;
-        _stopwatch.Stop();
-
+        Dispose();
         _navigationService.NavigateTo<KundeStartViewModel>();
     }
 

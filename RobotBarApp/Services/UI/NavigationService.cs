@@ -20,6 +20,10 @@ namespace RobotBarApp.Services
 
         public void NavigateTo<TViewModel>() where TViewModel : ViewModelBase
         {
+            if (CurrentViewModel is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
             CurrentViewModel = _provider.GetRequiredService<TViewModel>();
             OnViewModelChanged?.Invoke();
         }
