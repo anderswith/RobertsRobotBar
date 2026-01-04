@@ -4,10 +4,8 @@ using System.Windows.Data;
 
 namespace RobotBarApp.Converters
 {
-    /// <summary>
     /// Multiplies a numeric value by the provided converter parameter.
     /// Supports double/int inputs. Returns double.
-    /// </summary>
     public sealed class MultiplyConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

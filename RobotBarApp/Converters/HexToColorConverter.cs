@@ -5,10 +5,8 @@ using System.Windows.Media;
 
 namespace RobotBarApp.Converters
 {
-    /// <summary>
     /// Converts a hex color string ("#RRGGBB" or "#AARRGGBB") into a Color.
     /// Returns Transparent if input is null/invalid.
-    /// </summary>
     public sealed class HexToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

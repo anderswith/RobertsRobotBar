@@ -22,7 +22,7 @@ namespace UnitTests
             _logic = new IngredientUseCountLogic(_repoMock.Object);
         }
 
-        // ---------- AddIngredientUseCount ----------
+        //AddIngredientUseCount
 
         [Test]
         public void AddIngredientUseCount_Throws_WhenIngredientIdIsEmpty()
@@ -61,7 +61,7 @@ namespace UnitTests
             });
         }
 
-        // ---------- GetAllIngredientsUseCountForEvent ----------
+        //GetAllIngredientsUseCountForEvent
 
         [Test]
         public void GetAllIngredientsUseCountForEvent_Throws_WhenEventIdIsEmpty()
@@ -110,7 +110,7 @@ namespace UnitTests
             });
         }
 
-        // ---------- GetIngredientUseCountByTimeFrame ----------
+        //GetIngredientUseCountByTimeFrame
 
         [Test]
         public void GetIngredientUseCountByTimeFrame_Throws_WhenEventIdIsEmpty()

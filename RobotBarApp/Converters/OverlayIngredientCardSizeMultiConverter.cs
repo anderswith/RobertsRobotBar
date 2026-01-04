@@ -4,12 +4,10 @@ using System.Windows.Data;
 
 namespace RobotBarApp.Converters
 {
-    /// <summary>
     /// Computes an ingredient card size (width or height) from overlay available size.
     /// values[0] = overlay width (double)
     /// values[1] = overlay height (double)
     /// parameter = "W" or "H"
-    /// </summary>
     public sealed class OverlayIngredientCardSizeMultiConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

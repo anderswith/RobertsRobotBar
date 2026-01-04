@@ -4,10 +4,8 @@ using System.Windows.Data;
 
 namespace RobotBarApp.Converters
 {
-    /// <summary>
     /// Converts a segment index (0..14) to a Canvas.Top coordinate in the 520x520 glass coordinate space.
     /// Segment 0 is the bottom-most filled segment.
-    /// </summary>
     public sealed class SegmentIndexToCanvasTopConverter : IValueConverter
     {
         // These values match the bowl clip geometry in KundeMixSelvView.xaml.cs

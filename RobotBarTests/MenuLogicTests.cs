@@ -35,7 +35,7 @@ namespace UnitTests
                 _eventSessionMock.Object);
         }
 
-        // ---------- AddDrinksToMenu ----------
+        //AddDrinksToMenu
 
         [Test]
         public void AddDrinksToMenu_Throws_WhenDrinkIdsNullOrEmpty()
@@ -83,7 +83,7 @@ namespace UnitTests
                 Times.Once);
         }
 
-        // ---------- GetDrinksForMenu ----------
+        //GetDrinksForMenu
 
         [Test]
         public void GetDrinksForMenu_Throws_WhenMenuNotFound()
@@ -144,7 +144,7 @@ namespace UnitTests
             Assert.That(result[0].DrinkId, Is.EqualTo(drinkId));
         }
 
-        // ---------- RemoveDrinkFromMenu ----------
+        //RemoveDrinkFromMenu
 
         [Test]
         public void RemoveDrinkFromMenu_Throws_WhenMenuNotFound()
@@ -198,7 +198,7 @@ namespace UnitTests
             _menuRepoMock.Verify(r => r.UpdateMenu(menu), Times.Once);
         }
 
-        // ---------- GetMenuWithDrinksAndIngredients ----------
+        //GetMenuWithDrinksAndIngredients
 
         [Test]
         public void GetMenuWithDrinksAndIngredients_Throws_WhenNoActiveEvent()

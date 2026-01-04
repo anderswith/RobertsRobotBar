@@ -27,9 +27,8 @@ namespace UnitTests
                 _barSetupRepoMock.Object);
         }
 
-        // ------------------------------------------------------------
-        // Validation
-        // ------------------------------------------------------------
+
+        //GetAvailableDrinksForEvent
 
         [Test]
         public void GetAvailableDrinksForEvent_Throws_WhenEventIdIsEmpty()
@@ -39,10 +38,6 @@ namespace UnitTests
 
             Assert.That(ex!.Message, Is.EqualTo("Event ID cannot be empty."));
         }
-
-        // ------------------------------------------------------------
-        // Bar setup edge cases
-        // ------------------------------------------------------------
 
         [Test]
         public void GetAvailableDrinksForEvent_ReturnsEmpty_WhenNoBarSetup()
@@ -58,9 +53,6 @@ namespace UnitTests
             Assert.That(result, Is.Empty);
         }
 
-        // ------------------------------------------------------------
-        // Filtering logic
-        // ------------------------------------------------------------
 
         [Test]
         public void GetAvailableDrinksForEvent_FiltersOutDrink_WhenIngredientNotOnBar()
@@ -143,10 +135,6 @@ namespace UnitTests
             Assert.That(result, Is.Empty);
         }
 
-        // ------------------------------------------------------------
-        // Happy path
-        // ------------------------------------------------------------
-
         [Test]
         public void GetAvailableDrinksForEvent_ReturnsDrink_WhenAllIngredientsMatchPositions()
         {
@@ -188,10 +176,7 @@ namespace UnitTests
             Assert.That(result.Count, Is.EqualTo(1));
             Assert.That(result[0], Is.EqualTo(drink));
         }
-
-        // ------------------------------------------------------------
-        // Data integrity protection
-        // ------------------------------------------------------------
+        
 
         [Test]
         public void GetAvailableDrinksForEvent_Throws_WhenIngredientIsMissing()

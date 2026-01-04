@@ -5,10 +5,8 @@ using System.Windows.Data;
 
 namespace RobotBarApp.Converters
 {
-    /// <summary>
     /// Builds a symmetric horizontal Thickness based on a numeric value * factor.
     /// Usage: Width/Height -> returns new Thickness(spacing,0,spacing,0)
-    /// </summary>
     public sealed class MultiplyThicknessConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

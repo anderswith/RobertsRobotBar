@@ -21,7 +21,7 @@ namespace UnitTests
             _eventLogic = new EventLogic(_eventRepositoryMock.Object);
         }
 
-        // ---------- AddEvent ----------
+        //AddEvent
 
         [TestCase(null)]
         [TestCase("")]
@@ -69,7 +69,7 @@ namespace UnitTests
             });
         }
 
-        // ---------- GetAllEvents ----------
+        //GetAllEvents
 
         [Test]
         public void GetAllEvents_ShouldReturnRepositoryResult()
@@ -89,7 +89,7 @@ namespace UnitTests
             Assert.That(result, Is.EqualTo(events));
         }
 
-        // ---------- GetEventById ----------
+        //GetEventById 
 
         [Test]
         public void GetEventById_ShouldThrow_WhenIdIsEmpty()
@@ -115,7 +115,7 @@ namespace UnitTests
             Assert.That(result, Is.EqualTo(evt));
         }
 
-        // ---------- DeleteEvent ----------
+        // DeleteEvent
 
         [Test]
         public void DeleteEvent_ShouldThrow_WhenIdIsEmpty()
@@ -157,7 +157,7 @@ namespace UnitTests
                 Times.Once);
         }
 
-        // ---------- UpdateEvent ----------
+        //UpdateEvent 
 
         [Test]
         public void UpdateEvent_ShouldThrow_WhenIdIsEmpty()
@@ -242,7 +242,7 @@ namespace UnitTests
                 Times.Once);
         }
 
-        // ---------- GetEventIdForDrink ----------
+        //GetEventIdForDrink
 
         [Test]
         public void GetEventIdForDrink_DelegatesToRepository()

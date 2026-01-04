@@ -48,7 +48,7 @@ namespace UnitTests
                 _sessionMock.Object);
         }
 
-        // ---------- RunRobotScripts ----------
+        //RunRobotScripts
 
         [Test]
         public void RunRobotScripts_QueuesScripts()
@@ -62,7 +62,7 @@ namespace UnitTests
                 Times.Once);
         }
 
-        // ---------- RunMixSelvScripts ----------
+        //RunMixSelvScripts
 
         [Test]
         public void RunMixSelvScripts_Throws_WhenOrderNullOrEmpty()
@@ -150,7 +150,7 @@ namespace UnitTests
                 Times.Once);
         }
 
-        // ---------- RunDrinkScripts ----------
+        //RunDrinkScripts
 
         [Test]
         public void RunDrinkScripts_Throws_WhenDrinkIdEmpty()
@@ -219,7 +219,7 @@ namespace UnitTests
                 Times.Once);
         }
 
-        // ---------- ConnectionFailed ----------
+        //ConnectionFailed
 
         [Test]
         public void ConnectionFailed_IsPropagated_AndFlagSet()

@@ -132,7 +132,7 @@
                          Text="{Binding ScriptText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
 
-            <!-- ========== Row 2: Billed ========== -->
+            <!--Row 2: Billed -->
 
             <TextBlock Grid.Row="6" Grid.Column="0"
                        VerticalAlignment="Top"
@@ -161,7 +161,7 @@
             </StackPanel>
 
 
-            <!-- ========== Row 4: Alkohol (defines shared column sizes) ========== -->
+            <!-- Row 4: Alkohol (defines shared column sizes)-->
 
             <TextBlock Grid.Row="8" Grid.Column="0"
                        VerticalAlignment="Center"
@@ -232,7 +232,7 @@
             </Grid>
 
 
-            <!-- ========== Row 6: Syrup (shares column widths with Alcohol) ========== -->
+            <!--  Row 6: Syrup (shares column widths with Alcohol) -->
 
             <TextBlock Grid.Row="10" Grid.Column="0"
                        VerticalAlignment="Center"
@@ -281,7 +281,7 @@
             </Grid>
 
 
-            <!-- ========== Row 8: Sodavand (shares column widths) ========== -->
+            <!-- Row 8: Sodavand (shares column widths) -->
 
             <TextBlock Grid.Row="12" Grid.Column="0"
                        VerticalAlignment="Center"
@@ -321,7 +321,7 @@
             </Grid>
 
 
-            <!-- ========== Row 10: Buttons ========== -->
+            <!-- Row 10: Buttons  -->
 
             <Button Grid.Row="14" Grid.Column="0"
                     Content="Guide"

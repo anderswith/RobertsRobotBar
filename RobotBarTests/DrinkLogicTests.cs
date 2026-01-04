@@ -22,7 +22,7 @@ namespace UnitTests
             _logic = new DrinkLogic(_repo.Object);
         }
 
-        // ---------- GetAllDrinks ----------
+        //GetAllDrinks
 
         [Test]
         public void GetAllDrinks_ReturnsRepositoryResult()
@@ -41,7 +41,7 @@ namespace UnitTests
             _repo.Verify(r => r.GetAllDrinks(), Times.Once);
         }
 
-        // ---------- GetDrinkById ----------
+        //GetDrinkById
 
         [Test]
         public void GetDrinkById_EmptyGuid_Throws()
@@ -63,7 +63,7 @@ namespace UnitTests
             Assert.That(result, Is.EqualTo(drink));
         }
 
-        // ---------- AddDrink ----------
+        //AddDrink 
 
         [TestCase(null)]
         [TestCase("")]
@@ -190,7 +190,7 @@ namespace UnitTests
             });
         }
 
-        // ---------- DeleteDrink ----------
+        //DeleteDrink
 
         [Test]
         public void DeleteDrink_NotFound_Throws()
@@ -215,7 +215,7 @@ namespace UnitTests
             _repo.Verify(r => r.DeleteDrink(drink), Times.Once);
         }
 
-        // ---------- UpdateDrink ----------
+        //UpdateDrink
 
         [Test]
         public void UpdateDrink_NotFound_Throws()
@@ -285,8 +285,7 @@ namespace UnitTests
             });
         }
 
-        // ---------- Exists ----------
-
+        //Exists
         [Test]
         public void Exists_EmptyGuid_ReturnsFalse()
         {
@@ -306,8 +305,7 @@ namespace UnitTests
             _repo.Verify(r => r.Exists(id), Times.Once);
         }
 
-        // ---------- Helpers ----------
-
+        // Helpers
         private static List<DrinkContent> ValidContents() =>
             new()
             {

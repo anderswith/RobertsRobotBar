@@ -21,7 +21,7 @@ namespace UnitTests
             _barSetupLogic = new BarSetupLogic(_barSetupRepositoryMock.Object);
         }
 
-        // ---------- AddBarSetup ----------
+        //AddBarSetup
 
         [TestCase(0)]
         [TestCase(-1)]
@@ -132,7 +132,7 @@ namespace UnitTests
                 Times.Never);
         }
 
-        // ---------- DeleteBarSetup ----------
+        //DeleteBarSetup
 
         [Test]
         public void DeleteBarSetup_ShouldThrow_WhenSetupNotFound()
@@ -177,7 +177,7 @@ namespace UnitTests
             _barSetupRepositoryMock.Verify(r => r.deleteBarSetup(setup), Times.Once);
         }
 
-        // ---------- GetBarSetups----------
+        //GetBarSetups
 
         [Test]
         public void GetBarSetupsForEvent_ShouldThrow_WhenEventIdEmpty()

@@ -7,27 +7,16 @@
 
     <Application.Resources>
         <conv:PathToImageConverter x:Key="PathToImageConverter"/>
-        <!-- =====================
-             BASIC GLOBAL BRUSHES
-             (matches your app's colors)
-             ===================== -->
+
         <SolidColorBrush x:Key="TopBarBrush" Color="#4E7A95"/>
         <SolidColorBrush x:Key="AccentBrush" Color="#3A6A81"/>
         <SolidColorBrush x:Key="CardBrush" Color="#FFFFFFFF"/>
         <SolidColorBrush x:Key="LightGrayBrush" Color="#FFE5E5E5"/>
         <SolidColorBrush x:Key="BorderGrayBrush" Color="#DDDDDD"/>
-
-        <!-- =====================
-             CONVERTERS
-             ===================== -->
+        
         <conv:StepToVisibilityConverter x:Key="StepToVisibilityConverter"/>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
-        <!-- =====================
-             BASIC GLOBAL STYLES
-             ===================== -->
-
-        <!-- White rounded button -->
         <Style x:Key="RoundButton" TargetType="Button">
             <Setter Property="Background" Value="White"/>
             <Setter Property="Foreground" Value="Black"/>

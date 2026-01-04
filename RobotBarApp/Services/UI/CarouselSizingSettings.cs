@@ -5,10 +5,8 @@ using System.Windows;
 
 namespace RobotBarApp.Services.UI
 {
-    /// <summary>
     /// Holds tweakable sizing values for customer-facing carousels.
     /// Initialized once from the primary screen size (kiosk) and then reused.
-    /// </summary>
     public sealed class CarouselSizingSettings : INotifyPropertyChanged
     {
         private bool _isInitialized;
@@ -46,10 +44,8 @@ namespace RobotBarApp.Services.UI
         public double IngredientCardHeight { get; private set; }
         public double IngredientCardWidth { get; private set; }
         public Thickness IngredientCardMargin { get; private set; }
-
-        /// <summary>
+        
         /// Global instance for XAML bindings. Initialized from DI in KundeStartView.
-        /// </summary>
         public static CarouselSizingSettings Instance { get; } = new();
 
         public void InitializeFromScreenSize(double width, double height)

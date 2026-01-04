@@ -17,7 +17,7 @@ namespace RobotBarApp.Converters
 
             path = path.TrimStart('/');
 
-            // 🔑 Resolve PROJECT ROOT (not bin)
+            //  Resolve PROJECT ROOT (not bin)
             var projectRoot =
                 Directory.GetParent(AppContext.BaseDirectory)!  // net9.0-windows
                     .Parent!                                   // Debug

@@ -5,10 +5,8 @@ using System.Windows.Media;
 
 namespace RobotBarApp.Converters
 {
-    /// <summary>
     /// Converts a hex color string into a SolidColorBrush.
     /// Returns Transparent brush if input is null/invalid.
-    /// </summary>
     public sealed class HexToBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

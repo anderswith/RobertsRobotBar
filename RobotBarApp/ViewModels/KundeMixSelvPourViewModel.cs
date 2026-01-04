@@ -10,10 +10,8 @@ using RobotBarApp.Services.Interfaces;
 
 namespace RobotBarApp.ViewModels
 {
-    /// <summary>
     /// Pour screen for MixSelv. Reuses the selected ingredients + liquid segments from the MixSelv session,
     /// and adds a progress value (0..100) to drive a progress bar.
-    /// </summary>
     public sealed class KundeMixSelvPourViewModel : ViewModelBase
     {
         private readonly IRobotLogic _robotLogic;
