@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace RobotBarApp.Behaviors
+namespace RobotBarApp.Services.UI.Behaviors
 {
     public static class SelectedItemsBehavior
     {

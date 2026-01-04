@@ -5,6 +5,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="clr-namespace:RobotBarApp.Converters"
              xmlns:behaviors="clr-namespace:RobotBarApp.Behaviors"
+             xmlns:viewModels="clr-namespace:RobotBarApp.ViewModels"
+             xmlns:behaviors1="clr-namespace:RobotBarApp.Services.UI.Behaviors"
              mc:Ignorable="d"
              Background="#FFE5E5E5">
 
@@ -52,7 +54,7 @@
                     <ListBox ItemsSource="{Binding AvailableDrinks}"
                              SelectionMode="Extended"
                              DisplayMemberPath="Name"
-                             behaviors:SelectedItemsBehavior.BindableSelectedItems="{Binding SelectedAvailable}"
+                             behaviors1:SelectedItemsBehavior.BindableSelectedItems="{Binding SelectedAvailable}"
                              Height="250"/>
                 </StackPanel>
             </Border>
@@ -74,7 +76,7 @@
                     <ListBox ItemsSource="{Binding MenuDrinks}"
                              SelectionMode="Extended"
                              DisplayMemberPath="Name"
-                             behaviors:SelectedItemsBehavior.BindableSelectedItems="{Binding SelectedMenu}"
+                             behaviors1:SelectedItemsBehavior.BindableSelectedItems="{Binding SelectedMenu}"
                              Height="250"/>
                 </StackPanel>
             </Border>
