@@ -112,7 +112,7 @@ public class CalibrationWizardViewModel : ViewModelBase
         {
             Number = 6,
             Title = "Kloen",
-            Description = "Placér kalibrerings værktøjet på det markerede område så kanterne passer på kloen.",
+            Description = "Placér kalibrerings værktøjet så kanterne passer på kloen.",
             ImageSource = "/RobotBarApp;component/Resources/KalibreringGuide/KloMarkering.jpg"
         });
 
@@ -120,7 +120,7 @@ public class CalibrationWizardViewModel : ViewModelBase
         {
             Number = 7,
             Title = "Kloen",
-            Description = "Hold nu ‘luk’ knappen på RG6 nede indtil den stopper selv. Så er robotten klar til at køre kalibreringsscripts.",
+            Description = "Hold nu ‘luk’ knappen på RG6 nede indtil den kloen er helt lukket. Så er robotten klar til at køre kalibreringsscripts.",
             ImageSource = "/RobotBarApp;component/Resources/KalibreringGuide/LukketKlo.jpg"
         });
 
@@ -169,7 +169,7 @@ public class CalibrationWizardViewModel : ViewModelBase
             Number = 12,
             Title = "Færdig",
             Description = "Robotten er kalibreret og klar til brug.",
-            ImageSource = null
+            ImageSource = "/RobotBarApp;component/Resources/KalibreringGuide/TomStativ.jpg"
         });
     }
 

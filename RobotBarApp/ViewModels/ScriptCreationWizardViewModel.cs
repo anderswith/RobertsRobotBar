@@ -64,7 +64,7 @@ public class ScriptCreationWizardViewModel : ViewModelBase
         {
             Number = 1,
             Title = "Gentagelse af program",
-            Description = "Åbn et nyt program og kryds af gentagelse af, så scriptet kun kører en gang.",
+            Description = "Åbn et nyt program og kryds gentagelse af, så scriptet kun kører en gang.",
             ImageSource = "/RobotBarApp;component/Resources/ScriptGuide/AfkrydsGentag.jpg"
         });
 
@@ -119,7 +119,7 @@ public class ScriptCreationWizardViewModel : ViewModelBase
             Description =
                 "Tag højde for omgivelserne når du laver scripts. F.eks. når man henter en flaske, løft den lidt op så den er fri fra stativet og træk den ind mod " +
                 "robotten før du begynder at dreje så robotten ikke tager den korteste rute og banker ind i andre flasker eller lignende.",
-            ImageSource = null
+            ImageSource = "/RobotBarApp;component/Resources/ScriptGuide/Viapunkt.jpg"
         });
 
         Steps.Add(new ScriptGuideStep
@@ -127,7 +127,7 @@ public class ScriptCreationWizardViewModel : ViewModelBase
             Number = 8,
             Title = "Test",
             Description = "Eksperimentér og test undervejs. Afhængig af dispensere, hælde tutter og væske kan der være behov for forskellige ventetider og/eller teknikker og bevægelser.",
-            ImageSource = null
+            ImageSource = "/RobotBarApp;component/Resources/ScriptGuide/Test.jpg"
         });
 
         Steps.Add(new ScriptGuideStep
@@ -135,7 +135,7 @@ public class ScriptCreationWizardViewModel : ViewModelBase
             Number = 9,
             Title = "Test",
             Description = "Test scripts ved lavere hastighed og vær klar til at stoppe robotten hvis der er noget, der går galt.",
-            ImageSource = null
+            ImageSource = "/RobotBarApp;component/Resources/ScriptGuide/Test.jpg"
         });
 
         Steps.Add(new ScriptGuideStep
