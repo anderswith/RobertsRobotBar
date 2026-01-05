@@ -559,18 +559,7 @@ public sealed class KundeMixSelvViewModel : ViewModelBase
             return;
         }
 
-        try
-        {
-            // Call BLL with id + cl so script selection stays out of the UI.
-            var order = SelectedIngredients.Select(i => (i.IngredientId, i.Cl)).ToList();
-            var robotLogic = RobotBarApp.App.AppHost.Services.GetService(typeof(IRobotLogic)) as IRobotLogic;
-            robotLogic?.RunMixSelvScripts(order);
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message);
-            return;
-        }
+        
 
         var session = new MixSelvSession(SelectedIngredients, LiquidSegments, EffectiveEventId);
         _navigation.NavigateTo<KundeMixSelvPourViewModel>(session);

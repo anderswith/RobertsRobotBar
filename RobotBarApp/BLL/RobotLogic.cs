@@ -15,8 +15,7 @@ public class RobotLogic : IRobotLogic
     private readonly IRobotDashboardStreamReader _robotDashboardStreamReader;
     
     public event Action? DrinkFinished;
-    public event Action<int, int>? ScriptFinished;
-    public event Action<int>? ScriptsStarted;
+    public event Action? ScriptFinished;
     public event Action? ConnectionFailed;
     private bool _connectionFailed;
     public bool ConnectionFailedAlready => _connectionFailed;
@@ -36,11 +35,9 @@ public class RobotLogic : IRobotLogic
         _drinkUseCountLogic = drinkUseCountLogic;
         _eventSession = eventSessionService;
         
-        _scriptRunner.ScriptsStarted += total =>
-            ScriptsStarted?.Invoke(total);
         scriptRunner.DrinkFinished += () => DrinkFinished?.Invoke();
-        _scriptRunner.ScriptFinished += (f, t) =>
-            ScriptFinished?.Invoke(f, t);
+        _scriptRunner.ScriptFinished += () =>
+            ScriptFinished?.Invoke();
         dashboardReader.ConnectionFailed += () =>
         {
             _connectionFailed = true;
@@ -54,8 +51,9 @@ public class RobotLogic : IRobotLogic
         _scriptRunner.QueueScripts(scripts);
     }
 
-    public void RunMixSelvScripts(List<(Guid IngredientId, int Cl)> order)
+    public int RunMixSelvScripts(List<(Guid IngredientId, int Cl)> order)
     {
+        Console.WriteLine($"RunMixSelvScrtps kaldt i bll {order}");
         if (order == null || order.Count == 0)
         {
             throw new ArgumentException("Order cannot be null or empty.");
@@ -98,8 +96,13 @@ public class RobotLogic : IRobotLogic
                 );
             }
         }
-
+        foreach (var s in scripts)
+        {
+            Console.WriteLine($"kalder queuescripts {s}");
+        }
+        
         _scriptRunner.QueueScripts(scripts);
+        return scripts.Count;
     }
 
     public void RunDrinkScripts(Guid drinkId)
