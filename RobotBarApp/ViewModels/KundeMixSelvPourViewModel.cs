@@ -32,7 +32,8 @@ namespace RobotBarApp.ViewModels
             set { _pourProgress = value; OnPropertyChanged(); }
         }
         
-        public string StepCounterText => $"{CurrentStep}/{TotalSteps}";
+        public string StepCounterText
+            => TotalSteps == 0 ? "" : $"{CurrentStep}/{TotalSteps}";
 
         private int _currentStep;
         public int CurrentStep
@@ -40,7 +41,10 @@ namespace RobotBarApp.ViewModels
             get => _currentStep;
             set
             {
-                if (SetProperty(ref _currentStep, value))
+                // Clamp to valid range: 1..TotalSteps
+                var newValue = Math.Max(1, Math.Min(value, TotalSteps));
+
+                if (SetProperty(ref _currentStep, newValue))
                     OnPropertyChanged(nameof(StepCounterText));
             }
         }
@@ -52,7 +56,12 @@ namespace RobotBarApp.ViewModels
             set
             {
                 if (SetProperty(ref _totalSteps, value))
+                {
+                    // Reset step counter when total changes
+                    CurrentStep = _totalSteps > 0 ? 1 : 0;
+
                     OnPropertyChanged(nameof(StepCounterText));
+                }
             }
         }
 
@@ -68,10 +77,9 @@ namespace RobotBarApp.ViewModels
             _robotLogic = robotLogic;
             _robotLogic.ScriptFinished += OnScriptFinished;
             _robotLogic.DrinkFinished += OnDrinkFinished;
-            _robotLogic.ScriptsStarted += OnScriptsStarted;
-
             SelectedIngredients = session.SelectedIngredients;
             LiquidSegments = session.LiquidSegments;
+            TotalSteps = _robotLogic.RunMixSelvScripts(session.Order);
 
             SelectedIngredients.CollectionChanged += (_, _) =>
             {
@@ -84,14 +92,7 @@ namespace RobotBarApp.ViewModels
             // Temporary demo progress (replace with robot pour progress later).
             _ = RunFakeProgressAsync(_cts.Token);
         }
-        private void OnScriptsStarted(int total)
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                TotalSteps = total;
-                CurrentStep = 1; 
-            });
-        }
+       
         
 
         // Fallback for designer/legacy usage
@@ -114,6 +115,7 @@ namespace RobotBarApp.ViewModels
             _ = RunFakeProgressAsync(_cts.Token);
         }
         
+        
         private void OnDrinkFinished()
         {
             Application.Current.Dispatcher.Invoke(() =>
@@ -124,12 +126,12 @@ namespace RobotBarApp.ViewModels
             });
         }
 
-        private void OnScriptFinished(int finished, int total)
+        private void OnScriptFinished()
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                CurrentStep = finished;
-                TotalSteps = total;
+                if (CurrentStep < TotalSteps)
+                    CurrentStep++;
             });
         }
 

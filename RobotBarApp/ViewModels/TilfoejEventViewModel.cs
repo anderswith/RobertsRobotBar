@@ -130,6 +130,12 @@ namespace RobotBarApp.ViewModels
         public ObservableCollection<RackSlot> RackItems { get; }
 
         private RackSlot? _selectedSlot;
+        private Ingredient EmptyIngredient => new Ingredient
+        {
+            IngredientId = Guid.Empty,
+            Name = "Tom",
+            Image = null
+        };
 
         private void SelectSlot(object obj)
         {
@@ -137,6 +143,7 @@ namespace RobotBarApp.ViewModels
             _selectedSlot = slot;
 
             FilteredIngredients.Clear();
+            FilteredIngredients.Add(EmptyIngredient);
 
             foreach (var ing in Ingredients.Where(i =>
                 i.IngredientPositions.Any(ip => ip.Position == slot.Position)))
@@ -149,6 +156,11 @@ namespace RobotBarApp.ViewModels
         {
             if (_selectedSlot == null) return;
             if (param is not Ingredient ing) return;
+            if (ing.IngredientId == Guid.Empty)
+            {
+                _selectedSlot.Ingredient = null;
+                return;
+            }
 
             _selectedSlot.Ingredient = ing;
         }

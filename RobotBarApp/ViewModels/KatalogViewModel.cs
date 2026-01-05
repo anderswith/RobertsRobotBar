@@ -191,24 +191,46 @@ public class KatalogViewModel : ViewModelBase
 
         if (result != MessageBoxResult.Yes)
             return;
-        
-        switch (type)
+
+        try
         {
-            case KatalogItemType.Drink:
-                _drinkLogic.DeleteDrink(id);
-                break;
+            switch (type)
+            {
+                case KatalogItemType.Drink:
+                    _drinkLogic.DeleteDrink(id);
+                    break;
 
-            case KatalogItemType.Ingredient:
-                _ingredientLogic.DeleteIngredient(id);
-                break;
+                case KatalogItemType.Ingredient:
+                    _ingredientLogic.DeleteIngredient(id);
+                    break;
 
-            case KatalogItemType.Event:
-                _eventLogic.DeleteEvent(id);
-                break;
+                case KatalogItemType.Event:
+                    _eventLogic.DeleteEvent(id);
+                    break;
+            }
+
+            RemoveItem(id, type);
         }
-
-        RemoveItem(id, type);
+        catch (InvalidOperationException ex)
+        {
+            // Forretningsregel-fejl (fx "ingredient is used in bar setup")
+            MessageBox.Show(
+                ex.Message,
+                "Kan ikke slette",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
+        catch (Exception ex)
+        {
+            // Uventede fejl – stadig bedre end crash
+            MessageBox.Show(
+                "Der opstod en uventet fejl under sletning.\n\n" + ex.Message,
+                "Fejl",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
     }
+
 
     private void EditItem(Guid id, KatalogItemType type)
     {

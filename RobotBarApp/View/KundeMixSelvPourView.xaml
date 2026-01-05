@@ -270,12 +270,13 @@
                         </Viewbox>
 
                         <!-- Center: step counter (3/10) -->
-                        <TextBlock Text="{Binding StepCounterText}"
-                                   FontSize="54"
-                                   FontWeight="SemiBold"
-                                   Foreground="#2F4A3B"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
+                        <TextBlock
+                            Text="{Binding StepCounterText}"
+                            FontSize="54"
+                            FontWeight="SemiBold"
+                            Foreground="#2F4A3B"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
                     </Grid>
 
                     <!-- Text -->

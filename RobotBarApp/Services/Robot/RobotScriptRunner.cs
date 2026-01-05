@@ -7,22 +7,27 @@ public class RobotScriptRunner : IRobotScriptRunner
     private readonly IRobotComms _comms;
     private readonly ILogLogic _log;
     private readonly IRobotDashboardStreamReader _reader;
+
     private readonly ConcurrentQueue<string> _queue = new();
+
     private int _finishedScriptCount;
     private int _totalScriptCount;
-    public event Action? DrinkFinished;
-    public event Action<int, int>? ScriptFinished;
-    public event Action<int>? ScriptsStarted;
 
     private bool _isRunning = false;
     private readonly object _lock = new();
 
-    public RobotScriptRunner(IRobotComms comms, IRobotDashboardStreamReader reader, ILogLogic logLogic)
+    public event Action? ScriptFinished;
+    public event Action? DrinkFinished;
+
+    public RobotScriptRunner(
+        IRobotComms comms,
+        IRobotDashboardStreamReader reader,
+        ILogLogic logLogic)
     {
         _comms = comms;
         _reader = reader;
         _log = logLogic;
-        
+
         _reader.ProgramFinished += OnProgramFinished;
     }
 
@@ -31,23 +36,15 @@ public class RobotScriptRunner : IRobotScriptRunner
         var scriptList = scripts
             .Where(s => !string.IsNullOrWhiteSpace(s))
             .ToList();
+
+        _queue.Clear();
         _totalScriptCount = scriptList.Count;
         _finishedScriptCount = 0;
-        ScriptsStarted?.Invoke(_totalScriptCount);
 
-        TriggerScriptFinished(scriptList);
-        
-        foreach (var s in scripts)
-            if (!string.IsNullOrWhiteSpace(s))
-                _queue.Enqueue(s);
+        foreach (var s in scriptList)
+            _queue.Enqueue(s);
 
         TryStartNext();
-    }
-
-    public void TriggerScriptFinished(IEnumerable<string> scripts)
-    {
-        _totalScriptCount = scripts.Count();
-        _finishedScriptCount = 0;
     }
 
     private void TryStartNext()
@@ -91,17 +88,21 @@ public class RobotScriptRunner : IRobotScriptRunner
         {
             _isRunning = false;
         }
+
         _finishedScriptCount++;
-        
-        ScriptFinished?.Invoke(_finishedScriptCount, _totalScriptCount);
+
+        // 🔹 one script completed
+        ScriptFinished?.Invoke();
 
         Console.WriteLine(
             $"Script færdig ({_finishedScriptCount}/{_totalScriptCount})");
 
-        if (_finishedScriptCount == _totalScriptCount)
+        // 🔹 all scripts completed
+        if (_finishedScriptCount >= _totalScriptCount)
         {
-            Console.WriteLine("alle scripts er færdige");
+            Console.WriteLine("Alle scripts er færdige");
             DrinkFinished?.Invoke();
+            return;
         }
 
         TryStartNext();
