@@ -109,8 +109,7 @@ public partial class App : Application
 
                 services.AddSingleton<IRobotComms>(provider =>
                 {
-                    var reader = provider.GetRequiredService<IRobotDashboardStreamReader>();
-                    return new RobotComms("192.168.0.101", reader);
+                    return new RobotComms("192.168.0.101");
                 });
 
                 services.AddSingleton<IRobotScriptRunner>(provider =>

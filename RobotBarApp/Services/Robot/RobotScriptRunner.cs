@@ -90,14 +90,12 @@ public class RobotScriptRunner : IRobotScriptRunner
         }
 
         _finishedScriptCount++;
-
-        // 🔹 one script completed
+        
         ScriptFinished?.Invoke();
 
         Console.WriteLine(
             $"Script færdig ({_finishedScriptCount}/{_totalScriptCount})");
-
-        // 🔹 all scripts completed
+        
         if (_finishedScriptCount >= _totalScriptCount)
         {
             Console.WriteLine("Alle scripts er færdige");

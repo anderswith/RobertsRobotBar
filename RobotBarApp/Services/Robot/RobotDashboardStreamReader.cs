@@ -7,11 +7,8 @@ public class RobotDashboardStreamReader : IRobotDashboardStreamReader
 {
     private readonly ILogLogic _log;
     private readonly string _robotIp;
-
-    public event Action<string>? OnRobotError;
     public event Action? ProgramFinished;
     public event Action? ConnectionFailed;
-    public event Action<string>? OnRobotMessage;
 
     private TcpClient? _client;
     private CancellationTokenSource? _cts;
@@ -97,19 +94,6 @@ public class RobotDashboardStreamReader : IRobotDashboardStreamReader
 
     private void HandleMessage(string trimmed)
     {
-        if (trimmed.Contains("textmsg", StringComparison.OrdinalIgnoreCase))
-        {
-            OnRobotMessage?.Invoke(trimmed);
-        }
-
-        if (trimmed.Contains("protect", StringComparison.OrdinalIgnoreCase) ||
-            trimmed.Contains("fault", StringComparison.OrdinalIgnoreCase) ||
-            trimmed.Contains("emergency", StringComparison.OrdinalIgnoreCase))
-        {
-            _log.AddEventLog($"Error: {trimmed}", "RobotError");
-            OnRobotError?.Invoke(trimmed);
-        }
-
         if (trimmed.Contains("finished", StringComparison.OrdinalIgnoreCase) ||
             trimmed.Contains("stopped", StringComparison.OrdinalIgnoreCase))
         {

@@ -5,23 +5,13 @@ using RobotBarApp.Services.Robot.Interfaces;
 
 public class RobotComms : IRobotComms
 {
-    private readonly IRobotDashboardStreamReader _reader;
     private readonly string _ip;
 
-    public RobotComms(string ip, IRobotDashboardStreamReader reader)
+    public RobotComms(string ip)
     {
         _ip = ip;
-        _reader = reader;
     }
-
-    public async Task ConnectAsync()
-    {
-        // Start Primary Interface Reader (30001)
-        await _reader.StartAsync();
-
-        Console.WriteLine("RobotComms connected (reader running on 30001)");
-    }
-
+    
     public Task LoadProgramAsync(string programName)
         => SendDashboardCommand($"load {programName}");
 
