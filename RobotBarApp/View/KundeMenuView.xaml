@@ -45,8 +45,9 @@
                        RenderOptions.BitmapScalingMode="HighQuality"/>
             </Button>
 
-            <!-- Logo centered -->
-            <Image Grid.Column="1"
+            <!-- Logo centered (spans full header width) -->
+            <Image Grid.Column="0"
+                   Grid.ColumnSpan="3"
                    Source="/Resources/Icons/Roberts_robotbar_logo.png"
                    Height="70"
                    HorizontalAlignment="Center"
